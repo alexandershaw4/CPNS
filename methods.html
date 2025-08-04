@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPNS Lab — Methods</title>
+  <meta name="description" content="Computational modelling approaches used in the CPNS Lab at University of Exeter." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌁</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body { font: 17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+    .wrap { max-width: 780px; margin: 0 auto; padding: 28px; }
+    h1, h2, h3 { margin-top: 1.8em; }
+    h2 { font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    code, pre { background: #f4f4f4; padding: 8px; display: block; overflow-x: auto; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { color: var(--muted); font-size: 14px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Computational Methods</h1>
+      <p class="note">The CPNS Lab's approach to modelling the brain: generative models, variational inference, and neural dynamics.</p>
+    </header>
+
+    <section>
+      <h2>Overview</h2>
+      <p>Our modelling framework integrates neural mass models, Bayesian inversion, and active inference to investigate psychiatric conditions and build neuro-inspired AI systems. We develop and apply methods that combine conductance-based biophysics with advanced variational inference techniques, enabling interpretable and flexible characterisation of circuit mechanisms.</p>
+    </section>
+
+    <section>
+      <h2>Thalamo-Cortical Model (TCM)</h2>
+      <p>The TCM is a conductance-based neural mass model capturing voltage-dependent ion channel dynamics across thalamic and cortical populations. It includes AMPA, NMDA, GABA-A, GABA-B, M-type, and H-type currents, with compartmental separation and transmission delays.</p>
+      <p>Example dynamics:</p>
+      \[
+        C_m \frac{dV}{dt} = -g_{\mathrm{AMPA}}(V - E_{\mathrm{AMPA}})
+        - g_{\mathrm{NMDA}}(V - E_{\mathrm{NMDA}})
+        - g_{\mathrm{GABA_A}}(V - E_{\mathrm{GABA_A}}) + \cdots
+      \]
+      <p><strong>Fixed point estimation</strong>: To compute the Laplace-domain transfer function, we linearise the system around a fixed point \( x^* \) using Newton-Raphson iteration. This involves solving:</p>
+      \[
+        f(x^*) = 0 \quad \Rightarrow \quad x_{n+1} = x_n - J^{-1}(x_n) f(x_n)
+      \]
+      <p>where \( J = \frac{\partial f}{\partial x} \) is the Jacobian matrix of partial derivatives.</p>
+      <p class="note">A full circuit diagram and implementation are available on our <a href="https://github.com/alexandershaw4/" target="_blank">GitHub</a>.</p>
+    </section>
+
+    <section>
+      <h2>Laplace Transfer Function with Delays</h2>
+      <p>We linearise the system around the fixed point and compute the transfer function in the Laplace domain, capturing the system’s frequency response:</p>
+      \[
+        Y(s) = C (sI - A)^{-1} B U(s) + C (sI - A)^{-1} x_0
+      \]
+      <p><strong>Incorporating delays</strong>: To model finite transmission delays \( \tau_{ij} \) between populations, we substitute:</p>
+      \[
+        A \rightarrow A \odot e^{-s \tau},
+      \]
+      <p>where the Hadamard product is applied elementwise between \( A \) and the delay kernel \( e^{-s \tau} \). This modifies the transfer function to:</p>
+      \[
+        Y(s) = C (sI - A \odot e^{-s\tau})^{-1} B U(s)
+      \]
+      <p>This approach supports accurate spectral fits in DCM using biologically realistic axonal delays.</p>
+    </section>
+
+    <section>
+      <h2>Thermodynamic Variational Laplace (ThermoVL)</h2>
+      <p>We use an extended Laplace inference scheme with smarter variance updates, low-rank + diagonal covariance structure, and thermodynamic integration to estimate posterior uncertainty and model evidence.</p>
+      <p><strong>ELBO Objective:</strong></p>
+      \[
+        \mathcal{F} = \mathbb{E}_{q} [ \log p(y|\theta) ] - \text{KL}[ q(\theta) \| p(\theta) ]
+      \]
+      <p><strong>Key Steps:</strong></p>
+      <ol>
+        <li>Initialise prior \( p(\theta) \sim \mathcal{N}(m_0, S_0) \)</li>
+        <li>Linearise model \( y \approx f(\theta) + \epsilon \)</li>
+        <li>Estimate posterior \( q(\theta) = \mathcal{N}(m, S) \) using curvature \( H = \nabla^2 \log p(y|\theta) \)</li>
+        <li>Represent \( S \approx VV^\top + D \) for efficiency</li>
+        <li>Anneal posterior from prior to posterior with \( \beta \in [0, 1] \):</li>
+      </ol>
+      \[
+        \mathcal{F}(\beta) = \mathbb{E}_q [ \beta \log p(y|\theta) + \log p(\theta) - \log q(\theta) ]
+      \]
+      <p>Thermodynamic integration approximates \( \log Z \) via:</p>
+      \[
+        \log Z = \int_0^1 \mathbb{E}_{q_\beta} [ \log p(y|\theta) ] d\beta
+      \]
+    </section>
+
+    <section>
+      <h2>Resources & Code</h2>
+      <ul>
+        <li><a href="https://github.com/alexandershaw4/" target="_blank">ThermoVL GitHub</a></li>
+        <li><a href="mailto:A.D.Shaw@exeter.ac.uk">Request example data</a></li>
+        <li><a href="/index">Back to lab homepage</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p class="note">© <span id="year"></span> CPNS Lab · University of Exeter</p>
+    </footer>
+  </div>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
