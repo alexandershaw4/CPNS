@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPNS Lab — Active Inference Agent</title>
+  <meta name="description" content="Overview of our neuro-inspired active inference agent architecture." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌁</text></svg>" />
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body { font: 17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+    .wrap { max-width: 780px; margin: 0 auto; padding: 28px; }
+    h1, h2, h3 { margin-top: 1.8em; }
+    h2 { font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    code, pre { background: #f4f4f4; padding: 8px; display: block; overflow-x: auto; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { color: var(--muted); font-size: 14px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Neuro-Inspired Active Inference Agent</h1>
+      <p class="note">Modular, general-purpose generative architectures for intelligent behaviour.</p>
+    </header>
+
+    <section>
+      <h2>Overview</h2>
+      <p>This page outlines the architecture and inference procedures used in our neuro-inspired active inference agent, developed as part of our work on general-purpose intelligent systems. The agent is based on predictive coding, variational message passing, and the free energy principle.</p>
+    </section>
+
+    <section>
+      <h2>Generative Model Structure</h2>
+      <p>The agent is structured as a 7-module generative model, with components handling perception, dynamics, action selection, and learning. The latent state evolves according to:</p>
+      \[
+        x_{t+1} = f(x_t, a_t) + \omega_t, \quad y_t = g(x_t) + \epsilon_t
+      \]
+      <p>where \( x_t \) is the hidden state, \( a_t \) the action, \( y_t \) the sensory input, and \( \omega_t, \epsilon_t \) are noise terms.</p>
+    </section>
+
+    <section>
+      <h2>Free Energy Minimisation</h2>
+      <p>The agent selects actions and updates beliefs to minimise variational free energy:</p>
+      \[
+        \mathcal{F}(q) = \mathbb{E}_q [\log q(x) - \log p(x, y)]
+      \]
+      <p>Action is selected by planning over expected free energy (EFE):</p>
+      \[
+        G(a) = \mathbb{E}_q [ D_{KL}[q(s) \| p(s)] - \mathbb{E}_{q(s)}[\log p(o|s)] ]
+      \]
+    </section>
+
+    <section>
+      <h2>Inference Loop</h2>
+      <p>Each timestep consists of:</p>
+      <ol>
+        <li>Receive sensory input \( y_t \) (possibly partial/noisy)</li>
+        <li>Infer hidden state \( x_t \) via variational update (e.g., Laplace)</li>
+        <li>For each candidate action \( a \), roll out future trajectory and compute expected free energy \( G(a) \)</li>
+        <li>Select action that minimises \( G(a) \)</li>
+        <li>Apply action \( a_t \), observe outcome, repeat</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Pong Agent</h2>
+      <p>The Pong agent plays a 2D paddle game using an active inference loop. It observes a partial and noisy visual input of the ball and paddle positions, and uses belief updates and action selection to intercept the ball.</p>
+      <ul>
+        <li><strong>Observation:</strong> Noisy 1D ball and paddle coordinates</li>
+        <li><strong>Hidden state:</strong> Belief over ball trajectory and paddle location</li>
+        <li><strong>Action:</strong> Move paddle up/down</li>
+        <li><strong>Planning:</strong> Multi-step EFE rollouts to simulate future ball-paddle outcomes</li>
+        <li><strong>Control:</strong> Select actions that bring ball contact into high-probability state space</li>
+      </ul>
+      <p class="note">The agent uses a low-rank Laplace posterior over state variables and updates belief online during gameplay.</p>
+    </section>
+
+    <section>
+      <h2>Drone Agent</h2>
+      <p>This agent navigates a 2D/3D environment (gridworld or room maze) toward a target using visual or proprioceptive cues. The belief update and action selection loop is as follows:</p>
+      <ul>
+        <li><strong>Observation:</strong> egocentric image or sparse distance sensors (noisy)</li>
+        <li><strong>Hidden state:</strong> agent's location, orientation, and velocity</li>
+        <li><strong>Actions:</strong> move forward, turn left/right, hover</li>
+        <li><strong>Planning:</strong> expected free energy minimisation over predicted future states using dynamics model</li>
+        <li><strong>Goal:</strong> minimise uncertainty and reach preferred state (goal location)</li>
+      </ul>
+      <p>Inference and control are implemented with online updates to the posterior over latent states and forward rollout over dynamics.</p>
+    </section>
+
+    <section>
+      <h2>Resources</h2>
+      <ul>
+        <li><a href="https://github.com/alexandershaw4/" target="_blank">GitHub code</a></li>
+        <li><a href="mailto:A.D.Shaw@exeter.ac.uk">Contact us</a></li>
+        <li><a href="/cpns-lab">Back to lab homepage</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p class="note">© <span id="year"></span> CPNS Lab · University of Exeter</p>
+    </footer>
+  </div>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
