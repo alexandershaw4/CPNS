@@ -1,0 +1,333 @@
+<!--
+CPNS Lab — News Page
+------------------------------------------------------------
+Drop this file into your site as /news.html (or integrate the markup into your template).
+HOW TO ADD A NEWS ITEM:
+1) Duplicate an <article class="news-card"> block inside <section id="news-list">.
+2) Update:
+   - data-date="YYYY-MM-DD" (used for sorting & year filter)
+   - data-tags="Comma,Separated,Tags" (choose from Publication, Preprint, Grant, Award, Talk, Job, Media, Software, Event)
+   - Inside: .news-title, .news-meta (date shown), .news-excerpt, and link href.
+3) The Year and Tag filters populate automatically from your articles.
+4) For ~100+ items, consider splitting by year into separate pages or feeding from JSON.
+
+Optional: Create an RSS feed at /news.xml and update the <link rel="alternate"> below.
+------------------------------------------------------------
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPNS Lab — News</title>
+  <meta name="description" content="Latest updates from the Computational Psychiatry & Neuropharmacological Systems (CPNS) Lab: papers, preprints, grants, talks, software, jobs, and media." />
+  <link rel="alternate" type="application/rss+xml" title="CPNS Lab News RSS" href="/news.xml" />
+  <style>
+    :root{
+      --bg: #0b0f14; /* deep slate */
+      --panel: #121820;
+      --ink: #e9f0f7;
+      --muted: #a9b6c5;
+      --accent: #81d1ff; /* subtle cyan */
+      --accent-2: #b892ff; /* lilac */
+      --card: #0f141b;
+      --chip: #1a2330;
+      --ring: #25405a;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(11,15,20,0.95), rgba(11,15,20,0.6));backdrop-filter: blur(8px);border-bottom:1px solid rgba(129,209,255,0.12)}
+    .nav{display:flex;align-items:center;gap:16px;}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-2));box-shadow:0 0 16px var(--accent)}
+    .spacer{flex:1}
+    .btn{display:inline-flex;align-items:center;gap:8px;background:var(--chip);border:1px solid var(--ring);padding:10px 14px;border-radius:12px;color:var(--ink);text-decoration:none}
+    .btn:hover{border-color:var(--accent);}
+    .hero{padding:36px 0 18px}
+    .title{font-size:clamp(28px, 4vw, 40px);font-weight:800;margin:2px 0}
+    .subtitle{color:var(--muted);max-width:800px}
+
+    .toolbar{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin:22px 0}
+    .search{display:flex;gap:10px;background:var(--panel);border:1px solid var(--ring);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+    .search input{flex:1;background:transparent;border:0;outline:none;color:var(--ink);font-size:16px}
+    .filters{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{cursor:pointer;user-select:none;background:var(--chip);border:1px solid var(--ring);padding:8px 12px;border-radius:999px;color:var(--ink);font-size:14px}
+    .chip.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(129,209,255,0.15) inset}
+
+    .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+    select{background:var(--panel);border:1px solid var(--ring);color:var(--ink);padding:10px 12px;border-radius:10px}
+    .count{color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .news-card{grid-column:span 12;background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    @media (min-width:720px){ .news-card{grid-column:span 6} }
+    @media (min-width:1024px){ .news-card{grid-column:span 4} }
+
+    .news-title{font-size:18px;font-weight:700;margin:0 0 8px}
+    .news-meta{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-bottom:8px}
+    .tag{display:inline-flex;align-items:center;background:var(--chip);border:1px solid var(--ring);padding:4px 8px;border-radius:999px;font-size:12px;margin-right:6px}
+    .news-excerpt{color:#cbd6e2;margin:8px 0 12px}
+    .card-actions{display:flex;gap:10px;align-items:center}
+
+    .load-more{margin:26px auto 60px;display:block}
+    footer{margin:32px 0 14px;color:var(--muted);font-size:14px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#content">Skip to content</a>
+  <header>
+    <div class="wrap nav">
+      <div class="brand"><span class="dot"></span><span>CPNS Lab</span></div>
+      <div class="spacer"></div>
+      <a class="btn" href="/">← Back to Home</a>
+    </div>
+  </header>
+
+  <main id="content" class="wrap">
+    <section class="hero" aria-labelledby="news-heading">
+      <h1 id="news-heading" class="title">Lab News</h1>
+      <p class="subtitle">Papers, preprints, grants, talks, software releases, jobs, awards, and media from the Computational Psychiatry & Neuropharmacological Systems lab.</p>
+    </section>
+
+    <section class="toolbar" aria-label="News controls">
+      <div class="search" role="search">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M10 2a8 8 0 1 1 0 16a8 8 0 0 1 0-16m13 20l-6.1-6.1" opacity="0.5"/></svg>
+        <input id="q" type="search" placeholder="Search title, tags, or summary…" aria-label="Search news" />
+      </div>
+      <div class="row" style="justify-content:flex-end">
+        <label class="sr-only" for="year">Filter by year</label>
+        <select id="year">
+          <option value="">All years</option>
+        </select>
+        <span class="count" id="count">0 items</span>
+      </div>
+      <div class="filters" id="tag-chips" aria-label="Tag filters"></div>
+    </section>
+
+    <section class="grid" id="news-list" aria-live="polite">
+      <!-- OUR NEWS CARDS -->
+      <article class="news-card" data-date="2025-08-01" data-tags="Preprint,Publication,Computational" data-year="2025">
+        <h3 class="news-title">Preprint: Females with epilepsy show abnormal changes to perimenstrual sensory induced long-term potentiation </h3>
+        <div class="news-meta">
+          <time datetime="2025-08-12">12 Aug 2025</time>
+          <span class="tag">Preprint</span>
+          <span class="tag">Computational</span>
+        </div>
+        <p class="news-excerpt">New preprint in colaboration with Rachael Sumners gang in Auckland. EEG and modelling across the menstrual cycle in catamedial epilepsy</p>
+        <div class="card-actions">
+          <a class="btn" href="https://doi.org/10.1101/2025.08.10.669555" target="_blank" rel="noopener">Read Preprint</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-08-01" data-tags="Preprint,Publication,Computational" data-year="2025">
+        <h3 class="news-title">Preprint: Sleep as a window into thalamocortical pathology: generative modeling implicates NMDA receptor hypofunction in 22q11.2 deletion syndrome </h3>
+        <div class="news-meta">
+          <time datetime="2025-08-04">4 Aug 2025</time>
+          <span class="tag">Preprint</span>
+          <span class="tag">Computational</span>
+        </div>
+        <p class="news-excerpt">The first preprint from the Sleep Detectives!</p>
+        <div class="card-actions">
+          <a class="btn" href="https://doi.org/10.1101/2025.08.01.25332824" target="_blank" rel="noopener">Read preprint</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-08-01" data-tags="Preprint,Publication,Computational" data-year="2025">
+        <h3 class="news-title">Paper: Restoring Synaptic Balance in Schizophrenia: Insights from a thalamo-cortical conductance-based model </h3>
+        <div class="news-meta">
+          <time datetime="2025-08-01">1 Aug 2025</time>
+          <span class="tag">Preprint</span>
+          <span class="tag">Computational</span>
+        </div>
+        <p class="news-excerpt">We just had a paper in accepted in Schizophrenia Bulletin.</p>
+        <div class="card-actions">
+          <a class="btn" href="https://doi.org/10.1093/schbul/sbaf149" target="_blank" rel="noopener">Read paper</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-08-01" data-tags="Preprint,Publication,Computational" data-year="2025">
+        <h3 class="news-title">Preprint: Toward a reusable architecture for intelligent agents</h3>
+        <div class="news-meta">
+          <time datetime="2025-08-01">1 Aug 2025</time>
+          <span class="tag">Preprint</span>
+          <span class="tag">Computational</span>
+        </div>
+        <p class="news-excerpt">We outline a reusable, modular generative model for active inference agents and show Pong/drone demos with thermodynamic Variational Laplace.</p>
+        <div class="card-actions">
+          <a class="btn" href="https://osf.io/preprints/psyarxiv/6nxf3_v1" target="_blank" rel="noopener">Read preprint</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-07-10" data-tags="Software,Release" data-year="2025">
+        <h3 class="news-title">Julia implementation of Therodynamic Variational Laplace</h3>
+        <div class="news-meta">
+          <time datetime="2025-07-10">10 Jul 2025</time>
+          <span class="tag">Software</span>
+          <span class="tag">Release</span>
+        </div>
+        <p class="news-excerpt">Adds low‑rank covariance, heteroscedastic noise, and thermodynamic integration.</p>
+        <div class="card-actions">
+          <a class="btn" href="https://github.com/alexandershaw4/VariationalLaplace">View on GitHub</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-06-03" data-tags="Grant,Award,Job,Studentship" data-year="2025">
+        <h3 class="news-title">New industry PhD studentship and collaboration</h3>
+        <div class="news-meta">
+          <time datetime="2025-08-03">3 Aug 2025</time>
+          <span class="tag">Grant</span>
+          <span class="tag">Award</span>
+        </div>
+        <p class="news-excerpt">Following some successful collaborations with GABA Labs, we are offering a fully-funded PhD to continue working on EEG and modelling of functional drinks.</p>
+        <div class="card-actions">
+          <a class="btn" href="https://www.findaphd.com/phds/project/from-relaxation-to-cognition-mapping-the-neurophysiology-of-gabaergic-modulation/?p185486">Advert / Apply</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-06-03" data-tags="Grant,Award,Job,Studentship" data-year="2025">
+        <h3 class="news-title">Preprint: A Neuro‑Inspired Computational Framework for AGI: Predictive Coding, Active Inference, and Free Energy Minimisation</h3>
+        <div class="news-meta">
+          <time datetime="2025-08-03">3 Aug 2025</time>
+          <span class="tag">Grant</span>
+          <span class="tag">Award</span>
+        </div>
+        <p class="news-excerpt">We outline a roadmap to AGI drawing on theoretical neuroscience and particularly the Free Energy Principal and Active Inference</p>
+        <div class="card-actions">
+          <a class="btn" href="https://doi.org/10.31234/osf.io/9cu2z_v2">Read preprint</a>
+        </div>
+      </article>
+
+      <article class="news-card" data-date="2025-06-03" data-tags="Grant,Award,Job,Studentship" data-year="2025">
+        <h3 class="news-title">Preprint: Predictive Coding and Neurocomputational Psychiatry: A Mechanistic Framework for Understanding Mental Disorders</h3>
+        <div class="news-meta">
+          <time datetime="2025-08-03">3 Aug 2025</time>
+          <span class="tag">Grant</span>
+          <span class="tag">Award</span>
+        </div>
+        <p class="news-excerpt">In this prospective piece we propose a predictive coding perspective on mental disorders and illustrate how such a framework can lead to testable hypotheses of pathophysiology</p>
+        <div class="card-actions">
+          <a class="btn" href="https://doi.org/10.31234/osf.io/wd23k_v2">Read preprint</a>
+        </div>
+      </article>
+
+      <!-- END SAMPLE CARDS -->
+    </section>
+
+    <button id="loadMore" class="btn load-more">Load more</button>
+
+    <footer>
+      <div>© <span id="yearNow"></span> CPNS Lab · <a href="mailto:cpnslab@exeter.ac.uk">Contact</a> · <a href="/news.xml">RSS</a></div>
+    </footer>
+  </main>
+
+  <script>
+    // Utility: format date nice (e.g., 1 Aug 2025)
+    const formatDate = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+
+    const list = document.getElementById('news-list');
+    const q = document.getElementById('q');
+    const yearSel = document.getElementById('year');
+    const chips = document.getElementById('tag-chips');
+    const count = document.getElementById('count');
+    const loadMoreBtn = document.getElementById('loadMore');
+    const pageSize = 12; // cards per reveal
+    let visible = pageSize;
+
+    // Gather article data
+    const articles = [...list.querySelectorAll('.news-card')].map(card => ({
+      el: card,
+      date: card.getAttribute('data-date'),
+      year: card.getAttribute('data-year') || (card.getAttribute('data-date')||'').slice(0,4),
+      tags: (card.getAttribute('data-tags')||'').split(',').map(s=>s.trim().toLowerCase()),
+      text: (card.textContent||'').toLowerCase()
+    })).sort((a,b)=> b.date.localeCompare(a.date));
+
+    // Re-render order by date (newest first) and normalise shown date text
+    articles.forEach(a=>{
+      const t = a.el.querySelector('time');
+      if(t){ t.textContent = formatDate(a.date); t.setAttribute('datetime', a.date); }
+      list.appendChild(a.el);
+    });
+
+    // Build year options
+    const years = [...new Set(articles.map(a=>a.year))].sort((a,b)=>b.localeCompare(a));
+    years.forEach(y=>{ const opt=document.createElement('option'); opt.value=y; opt.textContent=y; yearSel.appendChild(opt); });
+
+    // Build tag chips from all tags
+    const allTags = new Set();
+    articles.forEach(a=>a.tags.forEach(t=>t&&allTags.add(t)));
+    const activeTags = new Set();
+    [...allTags].sort().forEach(t=>{
+      const s = document.createElement('button');
+      s.className='chip'; s.textContent=t.replace(/\b\w/g,c=>c.toUpperCase()); s.dataset.tag=t;
+      s.addEventListener('click',()=>{ s.classList.toggle('active'); if(s.classList.contains('active')) activeTags.add(t); else activeTags.delete(t); applyFilters(true); });
+      chips.appendChild(s);
+    });
+
+    // Filtering logic
+    function applyFilters(resetVisible){
+      const query = (q.value||'').toLowerCase().trim();
+      const y = yearSel.value;
+      let shown = 0;
+      articles.forEach(({el,text,tags,year}, idx)=>{
+        const matchQ = !query || text.includes(query);
+        const matchY = !y || y === year;
+        const matchT = activeTags.size===0 || [...activeTags].every(t=>tags.includes(t));
+        const show = matchQ && matchY && matchT && (idx < visible);
+        el.style.display = show ? '' : 'none';
+        if(show) shown++;
+      });
+      count.textContent = `${shown} item${shown!==1?'s':''}`;
+      loadMoreBtn.style.display = (visible < articles.length && shown>0) ? '' : 'none';
+    }
+
+    q.addEventListener('input', ()=>{ visible = pageSize; applyFilters(true); });
+    yearSel.addEventListener('change', ()=>{ visible = pageSize; applyFilters(true); });
+    loadMoreBtn.addEventListener('click', ()=>{ visible += pageSize; applyFilters(); });
+    document.getElementById('yearNow').textContent = new Date().getFullYear();
+
+    // Share buttons
+    list.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-share]');
+      if(!btn) return;
+      e.preventDefault();
+      const card = e.target.closest('.news-card');
+      const title = encodeURIComponent(card.querySelector('.news-title')?.textContent?.trim()||'CPNS Lab News');
+      const url = encodeURIComponent(location.href.split('#')[0]);
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}`;
+      window.open(shareUrl, '_blank');
+    });
+
+    // Initial render
+    applyFilters(true);
+  </script>
+
+  <!-- Structured data for better SEO on sample items. Replace as you add real posts. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "CPNS Lab News",
+    "url": "https://cpnslab.com/news",
+    "blogPost": [
+      {
+        "@type": "NewsArticle",
+        "headline": "A Neuro‑Inspired Computational Framework for AGI",
+        "datePublished": "2025-08-01",
+        "author": {"@type": "Organization", "name": "CPNS Lab"}
+      },
+      {
+        "@type": "NewsArticle",
+        "headline": "VariationalLaplace (thermoVL) v0.6 released",
+        "datePublished": "2025-07-10",
+        "author": {"@type": "Organization", "name": "CPNS Lab"}
+      }
+    ]
+  }
+  </script>
+</body>
+</html>
