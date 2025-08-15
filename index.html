@@ -44,6 +44,35 @@
     footer{padding:28px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
     .grid-2{display:grid;grid-template-columns:1fr;gap:8px}
     @media (min-width:760px){ .grid-2{grid-template-columns:1fr 1fr} }
+
+    /* People cards */
+    .person {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .person img {
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      filter: grayscale(100%) brightness(65%);
+      transition: filter .25s ease, transform .25s ease;
+      flex-shrink: 0;
+    }
+    .person:hover img {
+      filter: none;
+      transform: translateY(-2px);
+    }
+    .person .details { flex: 1; }
+    .person .details .role { font-weight: 600; }
+
+    @media (max-width: 520px) {
+      .person { gap: 12px; }
+      .person img { width: 96px; height: 96px; }
+    }
+
   </style>
 <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
@@ -102,26 +131,89 @@
   </p>
 </div>
 </section>
+
 <section id="people">
-<h2>People</h2>
-<img src="alex_shaw.jpg" alt="Alexander D. Shaw" style="max-width:220px;border-radius:50%;margin-top:20px;">  
-<ul class="list">
-<li><strong>Alexander D. Shaw</strong> — PI <span class="note">Computational neuroscience &amp; psychiatry; neuro‑inspired AI.</span></li>
-<img src="lio.png" alt="Lioba Berndt" style="max-width:220px;border-radius:50%;margin-top:20px;"> 
-<li><strong>Lio Berndt</strong> — Research Associate <span class="note">
-My research focuses on computational psychiatry, developing mathematical models and computational frameworks to understand brain dynamics and neural circuit function in psychiatric disorders, with applications toward precision medicine approaches. In my current work I investigate sleep EEG patterns in children at high risk of psychosis, using these mathematical models to understand the synaptic mechanisms underlying sleep disturbances and identify early biomarkers and candidate intervention targets in high-risk neurodevelopment.</span></li>
-<li><strong>Alessia Caccamo</strong> — PhD Student <span class="note">Applied mathematics approaches to brain dynamics.</span></li>
-<img src="crow.png" alt="Rosina Crow Diebel" style="max-width:220px;border-radius:50%;margin-top:20px;"> 
-<li><strong>Rosina (Crow) Diebel</strong> — PhD Student <span class="note">My research uses computational models on patient cohorts with the goal of better understanding the pathophysiology underpinning psychiatric disorders and mapping out the biological and neural circuitry of the brain in pursuit of a more concrete and detailed picture of various psychiatric disorders.</span></li>
-<li><strong>Joy Krecke</strong> — PhD Student <span class="note">Ketamine and mu‑opioid receptor modelling.</span></li>
-<li><strong>Victoria Smart</strong> — PhD Student <span class="note">Computational modelling of psychedelics.</span></li>
-<li><strong>Zhihao Deng</strong> — PhD Student <span class="note">Predictive coding and psychiatric disorders.</span></li>
-<li><strong>Olivia Hill‑Cousins</strong> — PhD Student <span class="note">Moral mind/brain and AI systems.</span></li>
+  <h2>People</h2>
 
+  <div class="person">
+    <img src="alex_shaw.jpg" alt="Dr Alexander D. Shaw">
+    <div class="details">
+      <div><strong>Alexander D. Shaw</strong> - <span class="role">PI</span></div>
+      <div class="note">Computational neuroscience &amp; psychiatry; neuro-inspired AI.</div>
+    </div>
+  </div>
 
-<li><strong>Vacancy</strong> — Funded PhD <span class="note">GABA Labs: neurophysiology of GABAergic functional drinks.</span></li>
-</ul>
+  <div class="person">
+    <img src="lio.png" alt="Lio Berndt">
+    <div class="details">
+      <div><strong>Lio Berndt</strong> - <span class="role">Research Associate</span></div>
+      <div class="note">
+        My research focuses on computational psychiatry, developing mathematical models and computational frameworks to understand brain dynamics and neural circuit function in psychiatric disorders, with applications toward precision medicine approaches. In my current work I investigate sleep EEG patterns in children at high risk of psychosis, using these mathematical models to understand the synaptic mechanisms underlying sleep disturbances and identify early biomarkers and candidate intervention targets in high-risk neurodevelopment.
+      </div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="alessia.jpg" alt="Alessia Caccamo">
+    <div class="details">
+      <div><strong>Alessia Caccamo</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">Applied mathematics approaches to brain dynamics.</div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="crow.png" alt="Rosina (Crow) Diebel">
+    <div class="details">
+      <div><strong>Rosina (Crow) Diebel</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">
+        My research uses computational models on patient cohorts with the goal of better understanding the pathophysiology underpinning psychiatric disorders and mapping out the biological and neural circuitry of the brain in pursuit of a more concrete and detailed picture of various psychiatric disorders.
+      </div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="joy.jpg" alt="Joy Krecke">
+    <div class="details">
+      <div><strong>Joy Krecke</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">Ketamine and mu-opioid receptor modelling.</div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="victoria.jpg" alt="Victoria Smart">
+    <div class="details">
+      <div><strong>Victoria Smart</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">Computational Modelling of the Pharmacodynamics of Psychedelics.</div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="zhihao.jpg" alt="Zhihao Deng">
+    <div class="details">
+      <div><strong>Zhihao Deng</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">Predictive coding and psychiatric disorders.</div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="placeholder.png" alt="Olivia Hill-Cousins">
+    <div class="details">
+      <div><strong>Olivia Hill-Cousins</strong> - <span class="role">PhD Student</span></div>
+      <div class="note">Moral mind/brain and AI systems.</div>
+    </div>
+  </div>
+
+  <div class="person">
+    <img src="you.png" alt="Vacancy - Funded PhD">
+    <div class="details">
+      <div><strong>Vacancy</strong> - <span class="role">Funded PhD</span></div>
+      <div class="note">GABA Labs: neurophysiology of GABAergic functional drinks.</div>
+    </div>
+  </div>
 </section>
+
+
+
 <section id="collaborators" style="padding:34px 0;border-top:1px solid var(--rule);">
   <h2 style="font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)">Collaborators</h2>
   <ul class="list" style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 20px;">
@@ -129,10 +221,9 @@ My research focuses on computational psychiatry, developing mathematical models 
     <li><strong>Prof Matt Jones</strong> <span class="note">Bristol</span></li>
     <li><strong>Prof Krish Singh</strong> <span class="note">Cardiff</span></li>
     <li><strong>Prof Celia Morgan</strong> <span class="note">Exeter</span></li>
-    <li><strong>Prof Karl Friston</strong> <span class="note">UCL / Verses.ai</span></li>
+    <li><strong>Prof Karl Friston</strong> <span class="note">Verses.ai</span></li>
     <li><strong>Prof Jeremy Hall</strong> <span class="note">Cardiff</span></li>
-    <li><strong>Prof David Nutt</strong> <span class="note">Imperial / GABA Labs</span></li>
-    <li><strong>Prof Suresh Muthukumaraswamy</strong> <span class="note">Auckland</span></li>
+    <li><strong>Prof David Nutt</strong> <span class="note">GABA Labs</span></li>
     <li><strong>Prof James Rowe</strong> <span class="note">Cambridge</span></li>
     <li><strong>Dr Rachael Sumner</strong> <span class="note">Auckland</span></li>
     <li><strong>Dr Dom Dunstan</strong> <span class="note">Exeter</span></li>
