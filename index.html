@@ -1,138 +1,141 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>CPNS Lab — University of Exeter</title>
-<meta content="Computational Psychiatry &amp; Neuropharmacological Systems (CPNS) Lab." name="description"/>
+<meta content="Computational Psychiatry & Neuropharmacological Systems (CPNS) Lab." name="description"/>
 <link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⌁&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
 <style>
-    :root{
-      --bg: #fff;
-      --text: #0a0a0a;
-      --muted: #6b7280;
-      --rule: #e5e7eb;
-      --accent: #0a0a0a;
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0b0b0c; --text:#f3f4f6; --muted:#9ca3af; --rule:#26272b; --accent:#f3f4f6;
-      }
-    }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);}
-    body{font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;}
-    .wrap{max-width:780px;margin:0 auto;padding:28px}
-    header{padding:36px 0 16px;border-bottom:1px solid var(--rule);}
-    .brand{font-weight:700;letter-spacing:.3px;font-size:22px;margin-bottom:4px}
-    .sub{color:var(--muted);font-size:14px}
-    nav{margin-top:18px}
-    nav a{margin-right:14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none}
-    nav a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
-    .hero{padding:44px 0}
-    .hero h1{font-size:clamp(30px,4.2vw,48px);line-height:1.12;margin:0 0 10px;letter-spacing:-.01em}
-    .hero p{margin:0;color:var(--muted);max-width:60ch}
-    section{padding:34px 0;border-top:1px solid var(--rule)}
-    h2{font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)}
-    ul.list{list-style:none;margin:0;padding:0}
-    ul.list li{padding:8px 0}
-    a{color:var(--accent);text-underline-offset:3px}
-    a:hover{text-decoration:underline}
-    .cta{display:inline-block;margin-top:10px;border:1px solid var(--rule);padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--text)}
-    .cta:hover{border-color:var(--text)}
-    .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);font-size:14px}
-    footer{padding:28px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
-    .grid-2{display:grid;grid-template-columns:1fr;gap:8px}
-    @media (min-width:760px){ .grid-2{grid-template-columns:1fr 1fr} }
+  :root{
+    --bg: #fff; --text: #0a0a0a; --muted: #6b7280; --rule: #e5e7eb; --accent: #0a0a0a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b0b0c; --text:#f3f4f6; --muted:#9ca3af; --rule:#26272b; --accent:#f3f4f6; }
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+  body{font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
+  .wrap{max-width:780px;margin:0 auto;padding:28px}
+  header{padding:36px 0 16px;border-bottom:1px solid var(--rule)}
+  .brand{font-weight:700;letter-spacing:.3px;font-size:22px;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:14px}
+  nav{margin-top:18px}
+  nav a{margin-right:14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  nav a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+  .hero{padding:44px 0}
+  .hero h1{font-size:clamp(30px,4.2vw,48px);line-height:1.12;margin:0 0 10px;letter-spacing:-.01em}
+  .hero p{margin:0;color:var(--muted);max-width:60ch}
+  section{padding:34px 0;border-top:1px solid var(--rule)}
+  h2{font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)}
+  ul.list{list-style:none;margin:0;padding:0}
+  ul.list li{padding:8px 0}
+  a{color:var(--accent);text-underline-offset:3px}
+  a:hover{text-decoration:underline}
+  .cta{display:inline-block;margin-top:10px;border:1px solid var(--rule);padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--text)}
+  .cta:hover{border-color:var(--text)}
+  .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);font-size:14px}
+  footer{padding:28px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
+  .grid-2{display:grid;grid-template-columns:1fr;gap:8px}
+  @media (min-width:760px){ .grid-2{grid-template-columns:1fr 1fr} }
 
-    /* People cards */
-    .person {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-    .person img {
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      filter: grayscale(100%) brightness(65%);
-      transition: filter .25s ease, transform .25s ease;
-      flex-shrink: 0;
-    }
-    .person:hover img {
-      filter: none;
-      transform: translateY(-2px);
-    }
-    .person .details { flex: 1; }
-    .person .details .role { font-weight: 600; }
+  /* Research tiles become links */
+  .research-item a{display:block;padding:6px 8px;border-radius:10px;text-decoration:none;color:inherit}
+  .research-item a:hover{background:color-mix(in srgb, var(--rule) 50%, transparent)}
 
-    @media (max-width: 520px) {
-      .person { gap: 12px; }
-      .person img { width: 96px; height: 96px; }
-    }
+  /* Modal styles (native <dialog>) */
+  dialog.sheet{border:none;border-radius:16px;max-width:min(780px, 92vw);padding:0;box-shadow:0 20px 60px rgba(0,0,0,.25);background:var(--bg);color:var(--text)}
+  dialog::backdrop{background:rgba(0,0,0,.4)}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0}
+  .sheet-body{padding:0 18px 18px}
+  .sheet-title{margin:0;font-size:22px;letter-spacing:-.01em}
+  .chip{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:2px 8px;font-size:12px;color:var(--muted)}
+  .close-btn{appearance:none;border:1px solid var(--rule);border-radius:10px;background:transparent;padding:8px 10px;cursor:pointer}
+  .close-btn:hover{border-color:var(--text)}
 
-  </style>
-<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  /* People cards (unchanged) */
+  .person { display:flex; align-items:flex-start; gap:16px; margin-bottom:22px; }
+  .person img { border-radius:50%; width:120px; height:120px; object-fit:cover; filter:grayscale(100%) brightness(65%); transition:filter .25s ease, transform .25s ease; flex-shrink:0; }
+  .person:hover img { filter:none; transform:translateY(-2px); }
+  .person .details { flex:1; }
+  .person .details .role { font-weight:600; }
+  @media (max-width: 520px) { .person { gap:12px; } .person img { width:96px; height:96px; } }
+</style>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <div class="wrap">
-<header>
-<div class="brand">CPNS Lab</div>
-<div class="sub">Computational Psychiatry &amp; Neuropharmacological Systems (CPNS) · University of Exeter</div>
-<nav aria-label="Primary">
-<a href="#research">Research</a>
-<a href="#people">People</a>
-<a href="#collaborators">Collaborators</a>
-<a href="#publications">Publications</a>
-<a href="#openings">Openings</a>
-<a href="#contact">Contact</a>
-<a href="news.html">News</a>
-</nav>
-</header>
-<section class="hero" id="top">
-<h1>Mechanistic modelling for mind, brain, and intelligent systems.</h1>
-<p>We study predictive coding, neural dynamics, and active inference in computational psychiatry and neuroscience, combining experimental and clinical studies with computational modelling to understand psychiatric disorders and build intelligent agents. </p>
-<a class="cta" href="#openings">Join the lab</a>
-</section>
-<section id="research">
-<h2>Research</h2>
-<div class="grid-2">
-<div>
-<strong>Computational Psychiatry</strong><br/>
-<span class="note">EEG/MEG + generative models (DCM, Variational Laplace) in psychiatric disease.</span>
-</div>
-<div>
-<strong>Neuro‑Inspired AI</strong><br/>
-<span class="note">Active inference agents; reusable generative architectures.</span>
-</div>
-<div>
-<strong>Methods</strong><br/>
-<span class="note">Thermodynamic VL; Bayesian optimisation with low‑rank covariances; heteroscedastic noise.</span>
-</div>
-<div>
-<strong>The Sleep Detectives</strong><br/>
-<span class="note">Linking sleep disruption in psychiatric risk CNVs to cognition and psychosis risk using EEG, MEG, and computational psychiatry.</span>
-</div>
-<div>
-<strong>Ketamine, Depression &amp; Network Modelling</strong><br/>
-<span class="note">Modelling fronto-parietal networks as targets of ketamine therapy in depression.</span>
-</div>
-<div>
-<strong>In-silico GABA receptor assays with EEG</strong><br/>
-<span class="note">Using EEG and modelling to characterise GABAergic receptor dynamics.</span>
-</div>
-<div>
-<div>
-  <p class="note" style="margin-top:20px;margin-bottom:0;">
-    <a href="methods.html" class="note" style="text-decoration:none">Comp-Neuro Methods Overview</a><br>
-    <a href="methods2.html" class="note" style="text-decoration:none">Neuro-AI Methods Overview</a>
-  </p>
-</div>
-</section>
+  <header>
+    <div class="brand">CPNS Lab</div>
+    <div class="sub">Computational Psychiatry & Neuropharmacological Systems (CPNS) · University of Exeter</div>
+    <nav aria-label="Primary">
+      <a href="#research">Research</a>
+      <a href="#people">People</a>
+      <a href="#collaborators">Collaborators</a>
+      <a href="#publications">Publications</a>
+      <a href="#openings">Openings</a>
+      <a href="#contact">Contact</a>
+      <a href="news.html">News</a>
+    </nav>
+  </header>
 
-<section id="people">
+  <section class="hero" id="top">
+    <h1>Mechanistic modelling for mind, brain, and intelligent systems.</h1>
+    <p>We study predictive coding, neural dynamics, and active inference in computational psychiatry and neuroscience, combining experimental and clinical studies with computational modelling to understand psychiatric disorders and build intelligent agents. </p>
+    <a class="cta" href="#openings">Join the lab</a>
+  </section>
+
+  <!-- RESEARCH with popover links + fallback pages -->
+  <section id="research">
+    <h2>Research</h2>
+    <div class="grid-2">
+      <div class="research-item">
+        <a href="research/computational-psychiatry.html" data-sheet="computational-psychiatry" aria-haspopup="dialog" aria-controls="sheet-computational-psychiatry">
+          <strong>Computational Psychiatry</strong><br/>
+          <span class="note">EEG/MEG + generative models (DCM, Variational Laplace) in psychiatric disease.</span>
+        </a>
+      </div>
+      <div class="research-item">
+        <a href="research/neuro-inspired-ai.html" data-sheet="neuro-inspired-ai" aria-haspopup="dialog" aria-controls="sheet-neuro-inspired-ai">
+          <strong>Neuro‑Inspired AI</strong><br/>
+          <span class="note">Active inference agents; reusable generative architectures.</span>
+        </a>
+      </div>
+      <div class="research-item">
+        <a href="research/sleep-detectives.html" data-sheet="sleep-detectives" aria-haspopup="dialog" aria-controls="sheet-sleep-detectives">
+          <strong>The Sleep Detectives</strong><br/>
+          <span class="note">Linking sleep disruption in psychiatric risk CNVs to cognition and psychosis risk using EEG, MEG, and computational psychiatry.</span>
+        </a>
+      </div>
+      <div class="research-item">
+        <a href="research/ketamine-depression.html" data-sheet="ketamine-depression" aria-haspopup="dialog" aria-controls="sheet-ketamine-depression">
+          <strong>Ketamine, Depression & Network Modelling</strong><br/>
+          <span class="note">Modelling fronto-parietal networks as targets of ketamine therapy in depression.</span>
+        </a>
+      </div>
+      <div class="research-item">
+        <a href="research/gaba-eeg-assays.html" data-sheet="gaba-eeg-assays" aria-haspopup="dialog" aria-controls="sheet-gaba-eeg-assays">
+          <strong>In‑silico GABA receptor assays with EEG</strong><br/>
+          <span class="note">Using EEG and modelling to characterise GABAergic receptor dynamics.</span>
+        </a>
+      </div>
+      <div>
+            <div class="research-item">
+        <a href="research/methods.html" data-sheet="methods" aria-haspopup="dialog" aria-controls="sheet-methods">
+          <strong>Methods</strong><br/>
+          <span class="note">Thermodynamic VL; Bayesian optimisation with low‑rank covariances; heteroscedastic noise.</span>
+        </a>
+      </div>
+        <p class="note" style="margin-top:20px;margin-bottom:0;">
+          <a href="methods.html" class="note" style="text-decoration:none">Comp‑Neuro Methods Overview</a><br>
+          <a href="methods2.html" class="note" style="text-decoration:none">Neuro‑AI Methods Overview</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  
+  <section id="people">
   <h2>People</h2>
 
   <div class="person">
@@ -374,6 +377,259 @@
 <div>© <span id="y"></span> CPNS Lab. No cookies. Math: \(\mathcal{F}=\mathrm{ELBO}\).</div>
 </footer>
 </div>
-<script>document.getElementById('y').textContent=new Date().getFullYear()</script>
-</body>
-</html>
+
+<!-- === POPUP SHEETS (one per research area) === -->
+<dialog class="sheet" id="sheet-computational-psychiatry" aria-label="Computational Psychiatry">
+<div class="sheet-head">
+<h3 class="sheet-title">Computational Psychiatry <span class="chip">EEG/MEG · DCM · VL</span></h3>
+<button class="close-btn" data-close>Close</button>
+</div>
+<div class="sheet-body">
+<p>We use task and resting-state M/EEG with biophysical generative models (DCM; Variational Laplace with thermodynamic integration) to infer synaptic and circuit mechanisms across disorders including schizophrenia, depression, catamenial epilepsy, and neurodevelopmental CNVs (e.g., 22q11.2DS).</p>
+<ul>
+<li>Thalamo‑cortical conductance modelling for psychosis‑risk CNVs (22q11.2DS)</li>
+<li>Receptor‑informed network models for antidepressant response in depression</li>
+<li>Visual LTP paradigms and circuit modelling in catamenial epilepsy</li>
+<li>Hierarchical/group VL and empirical Bayes for cohort‑level inference</li>
+</ul>
+<p class="note">Selected manuscripts:
+<br>
+• <a target="_blank" rel="noopener" href="https://www.biorxiv.org/content/10.1101/2025.08.10.669555v1">Catamenial epilepsy: perimenstrual visual LTP (bioRxiv, 2025)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://www.medrxiv.org/content/10.1101/2025.08.01.25332824v2">22q11.2DS sleep & thalamo‑cortical pathology (medRxiv, 2025)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://apps.crossref.org/pendingpub/pendingpub.html?doi=10.1093%2Fschbul%2Fsbaf149">Restoring synaptic balance in schizophrenia (Schizophrenia Bulletin, in press)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41398-024-02738-w">Ketamine response: FPN connectivity & GABA<sub>A</sub> (Translational Psychiatry, 2024)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://bmcneurosci.biomedcentral.com/articles/10.1186/s12868-024-00844-5">Microdose LSD & visual LTP captured by TCM (BMC Neurosci, 2024)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://alz-journals.onlinelibrary.wiley.com/doi/10.1002/alz.14531">GABAergic modulation of beta & motor adaptation (Alzheimer’s & Dementia, 2025)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://academic.oup.com/schizophreniabulletin/article/46/2/345/5521107?login=false">Impaired GABAergic inhibition in schizophrenia (Schizophrenia Bulletin, 2020)</a>
+</p>
+</div>
+</dialog>
+
+<dialog class="sheet" id="sheet-neuro-inspired-ai" aria-label="Neuro‑Inspired AI">
+<div class="sheet-head">
+<h3 class="sheet-title">Neuro‑Inspired AI <span class="chip">Active Inference · Agents</span></h3>
+<button class="close-btn" data-close>Close</button>
+</div>
+<div class="sheet-body">
+<p>The Free Energy Principle and Active Inference originated in neuroscience as a unifying account of perception, learning, and action. We view them as the foundation for next‑generation AI: truly agentic systems that maintain beliefs about the world and themselves, minimise expected free energy, and act adaptively.</p>
+<p>Our work spans proof‑of‑concept agents, from predictive Pong and gridworlds to autonomous drones, culminating in an 11‑node “general generative model” that demonstrates reusable active‑inference components. These agents illustrate planning, action selection, and learning with the same principles we deploy in computational psychiatry.</p>
+<ul>
+<li>Thermodynamic Variational Laplace for online inference in agents</li>
+<li>Seven‑component reusable architecture with precision modulation and message passing</li>
+<li>Pong, gridworld, and drone demos with multi‑step policy rollout and belief visualisation</li>
+</ul>
+<p class="note">Preprints:
+<br>
+• <a target="_blank" rel="noopener" href="https://cpnslab.com/TowardAReusableArchitectureForIntelligenAgents_Shaw2025.pdf">Toward a Reusable Architecture for Intelligent Agents (2025)</a>
+<br>
+• <a target="_blank" rel="noopener" href="https://cpnslab.com/ANeuroInspiredComputationalFrameworkforAGI_ActiveInference%20.pdf">A Neuro‑Inspired Computational Framework for AGI: Predictive Coding, Active Inference, and Free Energy (2025)</a>
+</p>
+<p class="note">Code: <a target="_blank" rel="noopener" href="https://github.com/alexandershaw4/VariationalLaplace">VariationalLaplace (Julia)</a> · <a target="_blank" rel="noopener" href="https://github.com/alexandershaw4/aLogLikeFit">aLogLikeFit (MATLAB)</a> · <a target="_blank" rel="noopener" href="https://github.com/alexandershaw4">GitHub</a></p>
+</div>
+</dialog>
+
+<dialog class="sheet" id="sheet-methods" aria-label="Methods">
+  <div class="sheet-head">
+    <h3 class="sheet-title">Methods <span class="chip">Thermo-VL · Low-rank · Heteroscedastic</span></h3>
+    <button class="close-btn" data-close>Close</button>
+  </div>
+  <div class="sheet-body">
+    <p>We develop inference methods that make biophysical modelling fast, robust, and scalable. Our <em>thermodynamic Variational Laplace</em> (Thermo-VL) augments classical VL with annealed likelihoods, low-rank curvature, and smarter noise updates for reliable fits to nonlinear dynamical systems (e.g., neural mass models, agents).</p>
+
+    <ul>
+      <li><strong>Adaptive low-rank covariances</strong> factorise the Hessian into a rank-<em>k</em> subspace (<code>V D V^T</code>) updated each iteration, capturing dominant curvature while keeping inference tractable.</li>
+      <li><strong>Heteroscedastic noise</strong> update observation variance per feature/epoch to prevent over-confidence and absorb structured residuals (e.g., frequency-dependent M/EEG noise).</li>
+      <li><strong>Thermodynamic integration (TI)</strong> anneal the likelihood with <code>β∈[0,1]</code> to stabilise optimisation and enable path-sampling estimates of the log evidence.</li>
+      <li><strong>Solenoidal mixing</strong> optional skew-symmetric term in the natural-gradient preconditioner to align updates with posterior geometry.</li>
+      <li><strong>Laplace-domain transfer functions</strong> linearise dynamics with delays to compute cross-spectra efficiently for DCM-style fits.</li>
+      <li><strong>Mixture-of-Gaussians features</strong> represent data/model features with Gaussian bases for flexible spectral fits and denoising.</li>
+    </ul>
+
+    <h4 style="margin:14px 0 8px">How <code>fitVariationalLaplaceThermo</code> works (brief)</h4>
+    <p class="note" style="margin:0 0 8px">Core loop: refine mean <code>m</code>, structured covariance <code>V,D</code>, and noise, while annealing <code>β</code> and tracking ELBO.</p>
+    <pre><code>// Pseudocode (see MATLAB implementation)
+init m=m0, S0 → low-rank V,D; set β schedule; set σ²
+repeat until convergence:
+  // Tempered objective
+  Lβ(m) = β·log p(y|m,σ²) + log p(m)
+  // Curvature & low-rank update
+  H ≈ ∇²Lβ(m); [U,S]=svd(H); V=U(:,1:k)·sqrt(S₁:k)
+  D = diag(diag(H) - rownorm(V)^2)
+  // Mean update (preconditioned / natural gradient)
+  m ← m + step · (V,V,D)⁻¹ ∇Lβ(m)
+  // Noise & heteroscedastic variance
+  σ² ← update_per_feature(residuals)
+  // Anneal β and compute ELBO / g_ELBO for line-search
+until |ΔELBO| < tol</code></pre>
+
+    <p class="note">
+      MATLAB source: <a target="_blank" rel="noopener" href="https://github.com/alexandershaw4/aLogLikeFit/blob/main/fitVariationalLaplaceThermo.m">fitVariationalLaplaceThermo.m</a> ·
+      Overviews: <a href="methods.html">Comp-Neuro</a> · <a href="methods2.html">Neuro-AI</a>
+    </p>
+  </div>
+</dialog>
+
+
+<dialog class="sheet" id="sheet-sleep-detectives" aria-label="The Sleep Detectives">
+  <div class="sheet-head">
+    <h3 class="sheet-title">The Sleep Detectives <span class="chip">CNVs · EEG · Biomarkers</span></h3>
+    <button class="close-btn" data-close>Close</button>
+  </div>
+  <div class="sheet-body">
+    <p>We investigate how sleep disruption in neurodevelopmental CNVs (e.g., 22q11.2DS) impacts cognition and psychosis risk. We combine overnight EEG with mechanistic thalamo-cortical modelling to derive circuit-level biomarkers and candidate intervention targets.</p>
+    <ul>
+      <li>Spindle and slow-wave phenotyping linked to thalamo-cortical mechanisms</li>
+      <li>Cross-species assays and translational pipelines</li>
+      <li>Partnerships with clinics, patient groups, and methodologists</li>
+    </ul>
+
+    <p class="note" style="margin-top:8px">
+      Lead researcher: <strong>Lio Berndt</strong>. Collaborators include
+      <strong>Prof Matt Jones</strong>, <strong>Prof Jeremy Hall</strong>,
+      <strong>Prof Marianne Van den Bree</strong>, <strong>Prof Chris Jarrold</strong>, and others.
+    </p>
+
+    <p class="note">
+      Preprint: <a target="_blank" rel="noopener"
+      href="https://www.medrxiv.org/content/10.1101/2025.08.01.25332824v2">
+      Sleep as a window into thalamo-cortical pathology in 22q11.2DS (medRxiv, 2025)</a>
+    </p>
+
+    <p class="note">
+      Funding: Wellcome — <a target="_blank" rel="noopener"
+      href="https://wellcome.org/research-funding/funding-portfolio/funded-grants/sleep-detectives-sleep-stratification-young-people">
+      Sleep Detectives: sleep stratification in young people</a>
+    </p>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="sheet-ketamine-depression" aria-label="Ketamine, Depression & Network Modelling">
+  <div class="sheet-head">
+    <h3 class="sheet-title">Ketamine, Depression & Network Modelling <span class="chip">FPN · NMDA · M/EEG</span></h3>
+    <button class="close-btn" data-close>Close</button>
+  </div>
+  <div class="sheet-body">
+    <p>Ketamine is a rapid-acting antidepressant, with downstream effects from NMDA receptor modulation that reshape cortical network dynamics within hours. We model fronto-parietal circuits (FPN) as treatment targets, integrating receptor-informed priors with M/EEG connectivity and biophysical models to explain symptom improvement and individual heterogeneity in response.</p>
+
+    <ul>
+      <li>Receptor-informed DCM/TCM of ketamine effects on oscillations and connectivity</li>
+      <li>Fronto-parietal network mechanisms underlying antidepressant response</li>
+      <li>Biomarker discovery for patient stratification and treatment optimisation</li>
+    </ul>
+
+    <p class="note" style="margin-top:8px">
+      We collaborate widely, including with <strong>Dr Rachael Sumner</strong> (University of Auckland),
+      <strong>Prof Celia Morgan</strong> (Exeter), and <strong>Joy Krecke</strong> (Exeter), among others.
+    </p>
+
+    <p class="note">
+      Key papers:
+      <br>
+      • <a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41398-024-02738-w">Ketamine for depression: M/EEG connectivity and GABA<sub>A</sub> changes (Translational Psychiatry, 2024)</a>
+      <br>
+      • <a target="_blank" rel="noopener" href="https://www.sciencedirect.com/science/article/pii/S1053811920306753?via%3Dihub">Generative modelling of thalamo-cortical mechanisms underlying ketamine effects on oscillations (NeuroImage, 2020)</a>
+    </p>
+
+    <p class="note">
+      Clinical study: <a target="_blank" rel="noopener" href="https://psychology.exeter.ac.uk/participate/bamstudy/">BAM study (Awakn Life Sciences)</a>
+    </p>
+  </div>
+</dialog>
+
+
+<dialog class="sheet" id="sheet-gaba-eeg-assays" aria-label="In-silico GABA receptor assays with EEG">
+  <div class="sheet-head">
+    <h3 class="sheet-title">In-silico GABA receptor assays with EEG <span class="chip">GABA<sub>A</sub> · Oscillations</span></h3>
+    <button class="close-btn" data-close>Close</button>
+  </div>
+  <div class="sheet-body">
+    <p>We develop EEG/MEG-based <em>in-silico</em> assays of GABAergic function to characterise cortical dynamics in health and disease, and to compare the neuronal and behavioural effects of GABA-modulating compounds and functional drinks.</p>
+
+    <ul>
+      <li><strong>Drug studies</strong>: tiagabine (GABA uptake inhibitor), alcohol, propofol, various benzodiazepines and more — analysed with receptor-informed spectral/connectivity models.</li>
+      <li><strong>Biophysical modelling</strong>: DCM/TCM fits of oscillations and connectivity; parameter-to-phenotype mapping for circuit-level interpretation.</li>
+      <li><strong>Assay design</strong>: task and resting paradigms optimised for GABA<sub>A</sub> sensitivity (beta/gamma power, connectivity, and visual LTP interactions).</li>
+    </ul>
+
+    <p class="note">Selected papers:
+      <a target="_blank" rel="noopener" href="https://doi.org/10.1016/j.euroneuro.2021.04.005">Tiagabine matches PET-derived GABA<sub>A</sub> receptor maps (ENP, 2021)</a> ·
+      <a target="_blank" rel="noopener" href="https://doi.org/10.1016/j.neuroimage.2021.118659">Propofol vs dexmedetomidine oscillations (NeuroImage, 2021)</a> ·
+      <a target="_blank" rel="noopener" href="https://doi.org/10.1523/JNEUROSCI.1689-19.2019">GABA-ergic dynamics in frontotemporal networks (J. Neurosci., 2020)</a>
+    </p>
+
+    <p class="note">We have teamed up with <strong>Prof David Nutt</strong> and <strong>GABA Labs</strong> to investigate <em>Sentia</em> and related GABA-ergic functional drinks, benchmarking their neural and behavioural signatures against pharmacological GABA agents.</p>
+
+    <p class="note">
+      Links:
+      <a target="_blank" rel="noopener" href="https://gabalabs.com/team/">GABA Labs team</a> ·
+      <a target="_blank" rel="noopener" href="https://www.findaphd.com/phds/project/from-relaxation-to-cognition-mapping-the-neurophysiology-of-gabaergic-modulation/?p185486">PhD project: Neurophysiology of GABAergic modulation</a>
+    </p>
+  </div>
+</dialog>
+
+
+<script>
+  // Year
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Popover logic with deep-linking (#research/<slug>) and graceful fallback
+  const links = document.querySelectorAll('[data-sheet]');
+  const sheets = new Map();
+  document.querySelectorAll('dialog.sheet').forEach(d => sheets.set(d.id.replace('sheet-',''), d));
+
+  function openSheet(slug){
+    const dlg = sheets.get(slug);
+    if(!dlg) return;
+    if(typeof dlg.showModal === 'function'){
+      dlg.showModal();
+      history.pushState({sheet: slug}, '', `#research/${slug}`);
+    } else {
+      // No <dialog> support: follow the real link
+      const a = document.querySelector(`[data-sheet="${slug}"]`);
+      if(a) window.location.href = a.getAttribute('href');
+    }
+  }
+  function closeSheet(dlg){
+    if(dlg.open) dlg.close();
+    if(location.hash.startsWith('#research/')){
+      // Go back to just #research (or remove hash entirely)
+      history.pushState({}, '', '#research');
+    }
+  }
+
+  // Click handlers
+  links.forEach(a => {
+    a.addEventListener('click', (e) => {
+      const slug = a.getAttribute('data-sheet');
+      // Use popover if available; otherwise let the link work as a normal page
+      if(window.HTMLDialogElement){ e.preventDefault(); openSheet(slug); }
+    });
+  });
+
+  // Close buttons and click-outside
+  document.querySelectorAll('dialog.sheet').forEach(dlg => {
+    dlg.addEventListener('click', (e) => {
+      const rect = dlg.getBoundingClientRect();
+      const inDialog = (rect.top <= e.clientY && e.clientY <= rect.bottom) && (rect.left <= e.clientX && e.clientX <= rect.right);
+      if(!inDialog) closeSheet(dlg);
+    });
+    dlg.querySelector('[data-close]')?.addEventListener('click', () => closeSheet(dlg));
+    dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeSheet(dlg); }); // ESC
+  });
+
+  // Hash routing on load/back/forward
+  function handleHash(){
+    const m = location.hash.match(/^#research\/(.+)$/);
+    if(m){ openSheet(m[1]); }
+  }
+  window.addEventListener('popstate', handleHash);
+  window.addEventListener('hashchange', handleHash);
+  handleHash();
+</script>
+
