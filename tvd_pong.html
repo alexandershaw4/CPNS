@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thermodynamic Variational Laplace — Pong Agent (Demo)</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --panel:#101113; --text:#f5f7fb; --muted:#9aa3ad; --rule:#1f232a; --accent:#86efac;
+    --red:#fca5a5; --amber:#fcd34d; --blue:#93c5fd; --green:#86efac; --purple:#c4b5fd;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"}
+  .wrap{display:grid; grid-template-columns: 1fr 320px; gap:16px; padding:16px; max-width:1200px; margin:0 auto}
+  .card{background:var(--panel); border:1px solid var(--rule); border-radius:16px; box-shadow:0 4px 30px rgba(0,0,0,.2)}
+  header{display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--rule)}
+  header h1{margin:0; font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  main{display:grid; grid-template-columns:1fr; gap:16px}
+  #stage{display:grid; grid-template-columns:1fr; gap:12px; padding:12px}
+  canvas{display:block; width:100%; height:auto; border-radius:12px; background:#0a0b0e}
+  .panel{padding:12px}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .row + .row{margin-top:10px}
+  .btn{appearance:none; border:1px solid var(--rule); background:#16181d; color:var(--text); padding:8px 12px; border-radius:12px; cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{border-color:#214c2f; background:#11241a}
+  label{font-size:12px; color:var(--muted)}
+  input[type="range"]{width:160px}
+  select, input[type="number"]{background:#0e1116; color:var(--text); border:1px solid var(--rule); border-radius:10px; padding:6px 8px}
+  .kpi{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px}
+  .kpi .tile{background:#0e1116; border:1px solid var(--rule); border-radius:12px; padding:8px}
+  .tile small{display:block; color:var(--muted)}
+  .legend{display:flex; gap:12px; font-size:12px; color:var(--muted); margin:8px 0}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:6px}
+  details{border-top:1px solid var(--rule); margin-top:8px; padding-top:8px}
+  code{background:#0e1116; padding:2px 6px; border-radius:6px; border:1px solid var(--rule)}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+  footer{color:var(--muted); font-size:12px; padding:8px 16px; border-top:1px solid var(--rule)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <header>
+        <h1>Thermodynamic Variational Laplace — Pong Agent</h1>
+        <div class="row">
+          <button class="btn" id="btnReset">Reset</button>
+          <button class="btn primary" id="btnPlay">Play</button>
+          <button class="btn" id="btnPause">Pause</button>
+        </div>
+      </header>
+      <div id="stage">
+        <canvas id="game" width="640" height="360" aria-label="Pong simulation"></canvas>
+        <div class="panel">
+          <div class="row">
+            <label>Speed × <span id="speedVal" class="mono">1.0</span></label>
+            <input id="speed" type="range" min="0.25" max="3" value="1" step="0.05" />
+            <label>Obs. noise σ <span id="noiseVal" class="mono">1.5</span></label>
+            <input id="noise" type="range" min="0.3" max="4" value="1.5" step="0.1" />
+            <label>β schedule</label>
+            <select id="beta">
+              <option value="cosine">Cosine anneal</option>
+              <option value="linear">Linear ↑</option>
+              <option value="hold">Hold</option>
+              <option value="cyclic">Cyclic</option>
+            </select>
+            <label>H (temp steps)</label>
+            <input id="H" type="number" value="32" min="8" max="256" step="1" />
+          </div>
+          <div class="kpi">
+            <div class="tile"><small>Free energy F</small><div id="kpiF" class="mono">–</div></div>
+            <div class="tile"><small>β (temperature)</small><div id="kpiBeta" class="mono">–</div></div>
+            <div class="tile"><small>Score</small><div id="kpiScore" class="mono">0</div></div>
+          </div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--green)"></i>Agent posterior μ</span>
+            <span><i class="dot" style="background:var(--amber)"></i>Observation</span>
+            <span><i class="dot" style="background:var(--blue)"></i>Predicted intercept</span>
+          </div>
+          <canvas id="plot" width="640" height="120" aria-label="Free energy plot"></canvas>
+          <details>
+            <summary>What is this doing?</summary>
+            <p>
+              The agent maintains Gaussian beliefs over the ball state <span class="mono">s = [x,y,vx,vy]</span> and the paddle action <span class="mono">a</span>.
+              It performs a lightweight Thermodynamic Variational Laplace (TVL) update by sweeping an inverse temperature
+              <span class="mono">β</span> from 0→1 over <span class="mono">H</span> steps, iteratively updating the posterior mean <span class="mono">μ</span>
+              with a Laplace (Newton) step on a surrogate free energy objective:
+            </p>
+            <p class="mono">F(μ) ≈ β · ||o − g(μ)||²/σ² + KL[q(μ) || p(μ)] + λ·||a||²</p>
+            <p>
+              Here, <span class="mono">g</span> is a simple forward model of Pong physics. Action selection uses a one-step
+              expected free energy proxy that favours paddle positions that reduce predicted sensory surprise at the moment of contact.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <header><h1>Controls & Embedding</h1></header>
+      <div class="panel">
+        <div class="row">
+          <button class="btn" id="btnStep">Step</button>
+          <button class="btn" id="btnServe">Serve</button>
+        </div>
+        <div class="row">
+          <label>Agent gain η <span id="gainVal" class="mono">0.6</span></label>
+          <input id="gain" type="range" min="0.1" max="1.5" step="0.05" value="0.6" />
+        </div>
+        <div class="row">
+          <label>Action cost λ <span id="lambdaVal" class="mono">0.02</span></label>
+          <input id="lambda" type="range" min="0" max="0.2" step="0.005" value="0.02" />
+        </div>
+        <details open>
+          <summary>Model notes</summary>
+          <ul>
+            <li>Gaussian posterior with diagonal covariance (for clarity).</li>
+            <li>Laplace step via gradient of <span class="mono">F</span> wrt μ at each β.</li>
+            <li>β schedules: hold, linear, cosine anneal, cyclic.</li>
+            <li>Expected free energy ≈ predicted impact error + action cost.</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Limitations</summary>
+          <ul>
+            <li>1‑step look‑ahead only; no policy tree.</li>
+            <li>Diagonal covariance; no full Hessian.</li>
+            <li>Simple physics; no spin or random bounces.</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+  </div>
+
+<script>
+(function(){
+  const rand = (a,b)=>a+Math.random()*(b-a);
+  const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+
+  // --- Environment (Pong) ---
+  class PongEnv{
+    constructor(w=640,h=360){
+      this.w=w; this.h=h;
+      this.reset();
+    }
+    reset(){
+      this.ball = {x:this.w*0.5, y:this.h*0.5, vx:rand(-120,120), vy:rand(-80,80), r:6};
+      if(Math.abs(this.ball.vx) < 60) this.ball.vx = (Math.random()<0.5?-1:1)*100;
+      // LEFT paddle
+      this.pad = {x:24, y:this.h*0.5, vy:0, w:14, h:96};
+      this.score = 0; this.t=0; this.justServedUntil = 0;
+    }
+    serve(dir=-1){
+      // Serve from center toward LEFT (agent)
+      this.ball.x=this.w*0.5; this.ball.y=this.h*0.5; this.ball.vx=dir*rand(100,140); this.ball.vy=rand(-90,90);
+      this.justServedUntil = this.t + 0.6; // show a hint briefly
+    }
+    step(dt, actionY){
+      // Guard against invalid actions
+      if(!Number.isFinite(actionY)) actionY = this.pad.y;
+      // Move paddle toward actionY (left side)
+      const speed=900; const dy = clamp(actionY - this.pad.y, -speed*dt, speed*dt);
+      this.pad.y = clamp(this.pad.y + dy, this.pad.h/2, this.h - this.pad.h/2);
+
+      // Ball physics
+      let b=this.ball;
+      b.x += b.vx*dt; b.y += b.vy*dt;
+      if(b.y < b.r){ b.y=b.r; b.vy = Math.abs(b.vy); }
+      if(b.y > this.h-b.r){ b.y=this.h-b.r; b.vy = -Math.abs(b.vy); }
+
+      // RIGHT wall = BOUNCE (opposite paddle)
+      if(b.x > this.w - b.r){ b.x = this.w - b.r; b.vx = -Math.abs(b.vx); }
+
+      // LEFT side = MISS (if the ball fully exits), then serve again toward the agent
+      if(b.x < -20){ this.score = Math.max(0,this.score-1); this.serve(-1); }
+
+      // LEFT Paddle collision (bounce to the right)
+      const pxFace=this.pad.x + this.pad.w/2; // front face x
+      if(b.x - b.r < pxFace && b.x + b.r > this.pad.x - this.pad.w/2 && b.y > this.pad.y - this.pad.h/2 && b.y < this.pad.y + this.pad.h/2){
+        b.x = pxFace + b.r; b.vx = Math.abs(b.vx) + rand(10,20); // send rightward
+        const off=(b.y - this.pad.y)/(this.pad.h/2);
+        b.vy += off*80;
+        this.score += 1;
+      }
+
+      this.t += dt; return {o:[b.x,b.y], score:this.score};
+    }
+    predictIntercept(state){
+      // Predict y at LEFT paddle using linear flight with wall bounces
+      const px=this.pad.x + this.pad.w/2 + state.r; // just to the right of paddle face
+      let x=state.x, y=state.y, vx=state.vx, vy=state.vy, h=this.h, r=state.r;
+      const dt = (px - x)/vx; if(!Number.isFinite(dt) || dt <= 0) return this.pad.y; // need future time
+      // reflect off top/bottom walls with triangular wave wrap
+      let y2 = y + vy*dt;
+      const period = 2*(h - r*2);
+      let m = (y2 - r) % period; if(m < 0) m += period;
+      const yWrapped = m <= (h - 2*r) ? r + m : (h - r) - (m - (h - 2*r));
+      return yWrapped;
+    }
+  }
+
+  // --- Thermodynamic VL Agent (lightweight surrogate) ---
+  class TVLAgent{
+    constructor(env){
+      this.env=env;
+      // Beliefs over state s=[x,y,vx,vy]; diagonal covariance
+      this.mu = new Float64Array([env.w*0.5, env.h*0.5, -90, 30]); // expect incoming to the LEFT initially
+      this.S  = new Float64Array([80,80,120,120]); // std devs
+      // Action belief: paddle target y
+      this.aMu = env.h*0.5; this.aStd = 60;
+      // Hyperparams
+      this.obsSigma = 1.5; // noise
+      this.lambda = 0.02;  // action cost
+      this.eta = 0.6;      // Laplace step size
+      this.betaMode = 'cosine';
+      this.H = 32; // temperature steps
+      this.beta = 0; // current beta
+      this.lastF = 0;
+    }
+    setNoise(s){ this.obsSigma = s; }
+    setLambda(l){ this.lambda = l; }
+    setGain(e){ this.eta = e; }
+    setBetaMode(m){ this.betaMode = m; }
+    setH(h){ this.H = Math.max(8,Math.min(256, h|0)); }
+
+    betaAt(k, K){
+      const t = k/(K-1);
+      switch(this.betaMode){
+        case 'linear': return t;
+        case 'hold': return 1.0;
+        case 'cyclic': return 0.5 - 0.5*Math.cos(2*Math.PI*t);
+        case 'cosine':
+        default: return 1 - Math.cos(Math.PI*t)*0.5; // 0→1 smooth
+      }
+    }
+
+    forward(mu, dt){
+      // Minimal evolution model: constant velocity
+      const [x,y,vx,vy] = mu;
+      return new Float64Array([x + vx*dt, y + vy*dt, vx, vy]);
+    }
+
+    observe(){
+      const b=this.env.ball;
+      // Observations are ball position (x,y)
+      return new Float64Array([b.x, b.y]);
+    }
+
+    gradF(mu, o){
+      // ∂F/∂μ for F ≈ β * ||o - g(μ)||^2/σ^2 + KL (μ||μ0)
+      const sigma2 = this.obsSigma*this.obsSigma;
+      const g = new Float64Array([mu[0], mu[1]]); // readout position
+      const resid = new Float64Array([g[0]-o[0], g[1]-o[1]]);
+      // Jacobian of g wrt μ: Jg = [[1,0,0,0],[0,1,0,0]]
+      const grad_like = new Float64Array([2*resid[0]/sigma2, 2*resid[1]/sigma2, 0, 0]);
+      // Simple prior pull toward previous state
+      const mu0 = this.mu_prior || this.mu; // last prior
+      const grad_prior = new Float64Array([
+        (mu[0]-mu0[0])/(this.S[0]*this.S[0]),
+        (mu[1]-mu0[1])/(this.S[1]*this.S[1]),
+        (mu[2]-mu0[2])/(this.S[2]*this.S[2]),
+        (mu[3]-mu0[3])/(this.S[3]*this.S[3])
+      ]);
+      // Total gradient at current β
+      const grad = new Float64Array(4);
+      for(let i=0;i<4;i++) grad[i] = this.beta*grad_like[i] + grad_prior[i];
+      // Free energy scalar for display
+      const F = this.beta*((resid[0]**2+resid[1]**2)/sigma2) +
+                0.5*((mu[0]-mu0[0])**2/(this.S[0]**2) + (mu[1]-mu0[1])**2/(this.S[1]**2) + (mu[2]-mu0[2])**2/(this.S[2]**2) + (mu[3]-mu0[3])**2/(this.S[3]**2));
+      return {grad, F};
+    }
+
+    act(dt){
+      // Thermodynamic sweep over β in H steps to refine μ
+      const o = this.observe();
+      this.mu_prior = this.forward(this.mu, dt);
+      let mu = this.mu.slice();
+      let F=0;
+      for(let k=0;k<this.H;k++){
+        this.beta = this.betaAt(k, this.H);
+        const {grad, F:Fs} = this.gradF(mu, o);
+        // Laplace / Newton step: μ ← μ − η * D^−1 * grad (diag preconditioner)
+        //const D=[1/(this.S[0]**2+1e-6),1/(this.S[1]**2+1e-6),1/(this.S[2]**2+1e-6),1/(this.S[3]**2+1e-6)];
+        //for(let i=0;i<4;i++) mu[i] -= this.eta * grad[i] / (D[i]+1e-6);
+        //F = Fs;
+        for (let i = 0; i < 4; i++) {
+        const var_i = this.S[i] * this.S[i];               // use variance, not inverse variance
+        let step = this.eta * grad[i] * var_i;             // preconditioned gradient step
+        const cap = (i < 2) ? 20 : 30;                     // cap pos (px) vs vel (px/s) per inner update
+        if (!Number.isFinite(step)) step = 0;
+        if (Math.abs(step) > cap) step = Math.sign(step) * cap;
+        mu[i] -= step;
+        }
+        // keep beliefs sane to avoid NaNs propagating into rendering
+        mu[0] = clamp(mu[0], 0, this.env.w);
+        mu[1] = clamp(mu[1], 0, this.env.h);
+        mu[2] = clamp(mu[2], -240, 240);
+        mu[3] = clamp(mu[3], -240, 240);
+        F = Number.isFinite(Fs) ? Fs : 0;
+              }
+              this.mu = mu; this.lastF = F;
+
+      // Expected free energy proxy for action (choose paddle y target on LEFT)
+      let y_hat = this.env.predictIntercept({x:mu[0],y:mu[1],vx:mu[2],vy:mu[3],r:this.env.ball.r});
+      if(!Number.isFinite(y_hat)) y_hat = this.env.h*0.5; // guard
+      let target = y_hat;
+      if (!Number.isFinite(target)) target = this.env.h*0.5;
+      const diff = Math.abs(target - this.env.pad.y);
+      if (diff < 1) target = this.env.ball.y;
+      this.lastTarget = target;
+
+      const padY = this.env.pad.y;
+      const a_opt = clamp(target, this.env.pad.h/2, this.env.h - this.env.pad.h/2);
+      const actionCost = this.lambda * (a_opt - padY)**2 / (this.env.h*this.env.h);
+      const efe = (a_opt - padY)**2/(this.env.h*this.env.h) + actionCost;
+      this.aMu = a_opt; // deterministic control
+      return {y:a_opt, efe, y_hat, mu:this.mu.slice(), F:this.lastF, beta:this.beta};
+    }
+  }
+
+  // --- Rendering ---
+  const game = document.getElementById('game');
+  const plot = document.getElementById('plot');
+  const ctx = game.getContext('2d');
+  const ptx = plot.getContext('2d');
+  const env = new PongEnv(game.width, game.height);
+  const agent = new TVLAgent(env);
+
+  const kpiF = document.getElementById('kpiF');
+  const kpiBeta = document.getElementById('kpiBeta');
+  const kpiScore = document.getElementById('kpiScore');
+
+  function draw(){
+    ctx.clearRect(0,0,game.width,game.height);
+    // Background grid
+    ctx.strokeStyle = '#12151b'; ctx.lineWidth=1; ctx.beginPath();
+    for(let x=0;x<game.width;x+=32){ ctx.moveTo(x,0); ctx.lineTo(x,game.height);} 
+    for(let y=0;y<game.height;y+=32){ ctx.moveTo(0,y); ctx.lineTo(game.width,y);} 
+    ctx.stroke();
+
+    // Ball
+    const b = env.ball;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+
+    // Paddle (LEFT)
+    const p = env.pad;
+    const py = Number.isFinite(p.y) ? p.y : env.h*0.5;
+    ctx.fillStyle = '#86efac';
+    ctx.fillRect(p.x - p.w/2, py - p.h/2, p.w, p.h);
+    ctx.strokeStyle = '#c9f7d1';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(p.x - p.w/2 + 0.5, py - p.h/2 + 0.5, p.w - 1, p.h - 1);
+
+    // Agent posterior μ position (green dot)
+    ctx.fillStyle = '#86efac';
+    ctx.beginPath(); ctx.arc(agent.mu[0], agent.mu[1], 3, 0, Math.PI*2); ctx.fill();
+
+    // Observation marker (amber)
+    ctx.fillStyle = '#fcd34d';
+    ctx.beginPath(); ctx.arc(b.x, b.y, 2, 0, Math.PI*2); ctx.fill();
+
+    // Predicted intercept line (blue) at LEFT paddle x-face
+    const yhat = env.predictIntercept({x:agent.mu[0],y:agent.mu[1],vx:agent.mu[2],vy:agent.mu[3],r:b.r});
+    const yline = Number.isFinite(yhat) ? yhat : env.h*0.5;
+    ctx.strokeStyle = '#93c5fd'; ctx.setLineDash([4,4]); ctx.beginPath();
+    ctx.moveTo(env.pad.x - 30, yline);
+    ctx.lineTo(env.pad.x + env.pad.w/2 + 6, yline);
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // Target marker (magenta) shows what the controller is chasing
+    if (typeof agent.lastTarget === 'number' && Number.isFinite(agent.lastTarget)){
+      ctx.strokeStyle = '#ff7ae6';
+      ctx.beginPath();
+      ctx.moveTo(env.pad.x - 20, agent.lastTarget);
+      ctx.lineTo(env.pad.x + env.pad.w/2 + 10, agent.lastTarget);
+      ctx.stroke();
+    }
+
+    // Center line
+    ctx.globalAlpha = .2; ctx.fillStyle = '#ffffff';
+    for(let y=0;y<game.height;y+=16) ctx.fillRect(game.width/2-1, y, 2, 8);
+    ctx.globalAlpha = 1;
+
+    // Serve hint
+    if(env.justServedUntil && env.t < env.justServedUntil){
+      ctx.save();
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = '#0b0c10';
+      ctx.fillRect(game.width/2 - 40, 8, 80, 20);
+      ctx.strokeStyle = '#93c5fd';
+      ctx.strokeRect(game.width/2 - 40.5, 7.5, 81, 21);
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '12px ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Serve', game.width/2, 22);
+      ctx.restore();
+    }
+  }
+
+  // Plot of F over time
+  const Fhist = []; const Bhist=[]; const maxHist=640;
+  function drawPlot(){
+    ptx.clearRect(0,0,plot.width,plot.height);
+    ptx.fillStyle = '#0b0c10'; ptx.fillRect(0,0,plot.width,plot.height);
+    // axes
+    ptx.strokeStyle = '#1f232a'; ptx.beginPath();
+    for(let x=0;x<plot.width;x+=64){ ptx.moveTo(x,0); ptx.lineTo(x,plot.height); }
+    for(let y=0;y<plot.height;y+=24){ ptx.moveTo(0,y); ptx.lineTo(plot.width,y); }
+    ptx.stroke();
+    // F line
+    const minF = Math.min(...Fhist, 0), maxF = Math.max(...Fhist, 1e-3);
+    const sx = plot.width/Math.max(1,Fhist.length-1);
+    ptx.beginPath();
+    for(let i=0;i<Fhist.length;i++){
+      const x=i*sx;
+      const y=plot.height - (Fhist[i]-minF)/(maxF-minF+1e-9)*plot.height;
+      if(i===0) ptx.moveTo(x,y); else ptx.lineTo(x,y);
+    }
+    ptx.strokeStyle = '#86efac'; ptx.lineWidth=2; ptx.stroke();
+    // beta line
+    ptx.beginPath();
+    for(let i=0;i<Bhist.length;i++){
+      const x=i*sx;
+      const y=plot.height - Bhist[i]*plot.height;
+      if(i===0) ptx.moveTo(x,y); else ptx.lineTo(x,y);
+    }
+    ptx.strokeStyle = '#93c5fd'; ptx.lineWidth=1.5; ptx.stroke();
+  }
+
+  // --- Loop ---
+  let playing=false; let last=performance.now(); let speedMul=1;
+  function tick(now){
+    if(!playing){ last=now; return; }
+    const dt = Math.min(1/30, (now-last)/1000) * speedMul; last=now;
+    // Agent update & environment step
+    const {y, mu, F, beta} = agent.act(dt);
+    const actY = Number.isFinite(y) ? y : env.pad.y; // guard action
+    env.step(dt, actY);
+    // KPIs
+    kpiF.textContent = F.toFixed(3);
+    kpiBeta.textContent = beta.toFixed(3);
+    kpiScore.textContent = env.score;
+    Fhist.push(F); if(Fhist.length>maxHist) Fhist.shift();
+    Bhist.push(beta); if(Bhist.length>maxHist) Bhist.shift();
+    // Draw
+    draw(); drawPlot();
+    requestAnimationFrame(tick);
+  }
+
+  // --- UI wiring ---
+  const $ = (id)=>document.getElementById(id);
+  $('btnPlay').onclick = ()=>{ if(!playing){ playing=true; requestAnimationFrame(tick);} };
+  $('btnPause').onclick = ()=> playing=false;
+  $('btnReset').onclick = ()=>{ playing=false; env.reset(); agent.mu = new Float64Array([env.w*0.5, env.h*0.5, -90, 30]); Fhist.length=0; Bhist.length=0; draw(); drawPlot(); };
+  $('btnServe').onclick = ()=> env.serve(-1);
+  $('btnStep').onclick = ()=>{ const {y}=agent.act(1/60); const actY = Number.isFinite(y) ? y : env.pad.y; env.step(1/60, actY); draw(); };
+
+  const speed = $('speed'), speedVal=$('speedVal');
+  speed.oninput = ()=>{ speedMul = parseFloat(speed.value); speedVal.textContent = speedMul.toFixed(2); };
+  const noise = $('noise'), noiseVal=$('noiseVal');
+  noise.oninput = ()=>{ const v=parseFloat(noise.value); agent.setNoise(v); noiseVal.textContent=v.toFixed(2); };
+  const betaSel = $('beta'); betaSel.oninput = ()=> agent.setBetaMode(betaSel.value);
+  const H = $('H'); H.onchange = ()=> agent.setH(parseInt(H.value,10));
+  const gain = $('gain'), gainVal=$('gainVal'); gain.oninput = ()=>{ const v=parseFloat(gain.value); agent.setGain(v); gainVal.textContent=v.toFixed(2); };
+  const lam = $('lambda'), lamVal=$('lambdaVal'); lam.oninput = ()=>{ const v=parseFloat(lam.value); agent.setLambda(v); lamVal.textContent=v.toFixed(2); };
+
+  // Initial draw
+  draw(); drawPlot();
+})();
+</script>
+</body>
+</html>
