@@ -59,8 +59,18 @@
   .person .details { flex:1; }
   .person .details .role { font-weight:600; }
   @media (max-width: 520px) { .person { gap:12px; } .person img { width:96px; height:96px; } }
+
+  /* collaborator avatars */
+  #collaborators .list li{display:flex;align-items:center;gap:10px}
+  #collaborators .avatar{
+    width:36px;height:36px;border-radius:50%;
+    object-fit:cover;filter:grayscale(100%);
+    flex:0 0 36px
+  }
 </style>
+
 <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
 </head>
 <body>
 <div class="wrap">
@@ -235,20 +245,55 @@
 
 <section id="collaborators" style="padding:34px 0;border-top:1px solid var(--rule);">
   <h2 style="font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)">Collaborators</h2>
+
   <ul class="list" style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 20px;">
-    <li><strong><a href="https://experts.exeter.ac.uk/23176-marc-goodfellow" target="_blank">Prof Marc Goodfellow</a></strong> <span class="note">Exeter</span></li>
-    <li><strong><a href="https://www.bristol.ac.uk/people/person/Matt-Jones-946b921d-1431-4981-89bf-3c2b4eb86428" target="_blank">Prof Matt Jones</a></strong> <span class="note">Bristol</span></li>
-    <li><strong><a href="https://profiles.cardiff.ac.uk/staff/singhkd" target="_blank">Prof Krish Singh</a></strong> <span class="note">Cardiff</span></li>
-    <li><strong><a href="https://experts.exeter.ac.uk/23023-celia-morgan" target="_blank">Prof Celia Morgan</a></strong> <span class="note">Exeter</span></li>
-    <li><strong><a href="https://www.verses.ai/videos/karls-corner-august-2025" target="_blank">Prof Karl Friston</a></strong> <span class="note">Verses.ai</span></li>
-    <li><strong><a href="https://profiles.cardiff.ac.uk/staff/hallj10" target="_blank">Prof Jeremy Hall</a></strong> <span class="note">Cardiff</span></li>
-    <li><strong><a href="https://en.wikipedia.org/wiki/David_Nutt" target="_blank">Prof David Nutt</a></strong> <span class="note">GABA Labs</span></li>
-    <li><strong><a href="https://experts.exeter.ac.uk/23146-joseph-sweetman" target="_blank">Dr Joe Sweetman</a></strong> <span class="note">Exeter</span></li>
-    <li><strong><a href="https://ftd.neurology.cam.ac.uk/directory/jamesrowe" target="_blank">Prof James Rowe</a></strong> <span class="note">Cambridge</span></li>
-    <li><strong><a href="https://profiles.auckland.ac.nz/r-sumner" target="_blank">Dr Rachael Sumner</a></strong> <span class="note">Auckland</span></li>
-    <li><strong><a href="https://experts.exeter.ac.uk/35597-dominic-dunstan" target="_blank">Dr Dom Dunstan</a></strong> <span class="note">Exeter</span></li>
+    <li>
+      <img class="avatar" src="pics/marcgoodfellow.jpeg" alt="Marc Goodfellow" loading="lazy">
+      <strong><a href="https://experts.exeter.ac.uk/23176-marc-goodfellow" target="_blank">Prof Marc Goodfellow</a></strong> <span class="note">Exeter</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/mattjones.jpg" alt="Matt Jones" loading="lazy">
+      <strong><a href="https://www.bristol.ac.uk/people/person/Matt-Jones-946b921d-1431-4981-89bf-3c2b4eb86428" target="_blank">Prof Matt Jones</a></strong> <span class="note">Bristol</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/krishsingh.jpeg" alt="Krish Singh" loading="lazy">
+      <strong><a href="https://profiles.cardiff.ac.uk/staff/singhkd" target="_blank">Prof Krish Singh</a></strong> <span class="note">Cardiff</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/celiamorgan.jpeg" alt="Celia Morgan" loading="lazy">
+      <strong><a href="https://experts.exeter.ac.uk/23023-celia-morgan" target="_blank">Prof Celia Morgan</a></strong> <span class="note">Exeter</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/karlfriston.jpeg" alt="Karl Friston" loading="lazy">
+      <strong><a href="https://www.verses.ai/videos/karls-corner-august-2025" target="_blank">Prof Karl Friston</a></strong> <span class="note">Verses.ai</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/jeremyhall.jpg" alt="Jeremy Hall" loading="lazy">
+      <strong><a href="https://profiles.cardiff.ac.uk/staff/hallj10" target="_blank">Prof Jeremy Hall</a></strong> <span class="note">Cardiff</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/davidnutt.png" alt="David Nutt" loading="lazy">
+      <strong><a href="https://en.wikipedia.org/wiki/David_Nutt" target="_blank">Prof David Nutt</a></strong> <span class="note">GABA Labs</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/joesweetman.jpeg" alt="Joe Sweetman" loading="lazy">
+      <strong><a href="https://experts.exeter.ac.uk/23146-joseph-sweetman" target="_blank">Dr Joe Sweetman</a></strong> <span class="note">Exeter</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/jamesrowe.jpeg" alt="James Rowe" loading="lazy">
+      <strong><a href="https://ftd.neurology.cam.ac.uk/directory/jamesrowe" target="_blank">Prof James Rowe</a></strong> <span class="note">Cambridge</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/rachaelsumner.jpeg" alt="Rachael Sumner" loading="lazy">
+      <strong><a href="https://profiles.auckland.ac.nz/r-sumner" target="_blank">Dr Rachael Sumner</a></strong> <span class="note">Auckland</span>
+    </li>
+    <li>
+      <img class="avatar" src="pics/domdunstan.jpg" alt="Dom Dunstan" loading="lazy">
+      <strong><a href="https://experts.exeter.ac.uk/35597-dominic-dunstan" target="_blank">Dr Dom Dunstan</a></strong> <span class="note">Exeter</span>
+    </li>
   </ul>
 </section>
+
 
 <section id="publications">
 <h2>Publications</h2>
