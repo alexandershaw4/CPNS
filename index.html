@@ -60,13 +60,35 @@
   .person .details .role { font-weight:600; }
   @media (max-width: 520px) { .person { gap:12px; } .person img { width:96px; height:96px; } }
 
-  /* collaborator avatars */
-  #collaborators .list li{display:flex;align-items:center;gap:10px}
-  #collaborators .avatar{
-    width:36px;height:36px;border-radius:50%;
-    object-fit:cover;filter:grayscale(100%);
-    flex:0 0 36px
+  /* Collaborators grid */
+  #collaborators .list{
+    display:grid !important;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr)) !important; /* was 240px */
+    gap:14px 24px !important;
+    align-items:start;
+    list-style:none;margin:0;padding:0;
   }
+
+  /* Each person */
+  #collaborators .collab{
+    display:flex;align-items:flex-start;gap:12px;padding:6px 0;
+  }
+
+  /* Avatar */
+  #collaborators .avatar{
+    width:44px;height:44px;flex:0 0 44px;border-radius:50%;
+    object-fit:cover;object-position:center 20%;
+    filter:grayscale(100%);
+  }
+
+  /* Text block */
+  #collaborators .info{display:flex;flex-direction:column;line-height:1.2}
+  #collaborators .name{
+    font-weight:600;text-decoration:none;border-bottom:1px solid var(--rule);
+  }
+  #collaborators .name:hover{border-color:var(--text)}
+  #collaborators .note{color:var(--muted);font-size:.9rem;margin-top:3px}
+
 </style>
 
 <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -246,53 +268,97 @@
 <section id="collaborators" style="padding:34px 0;border-top:1px solid var(--rule);">
   <h2 style="font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)">Collaborators</h2>
 
-  <ul class="list" style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 20px;">
-    <li>
-      <img class="avatar" src="pics/marcgoodfellow.jpeg" alt="Marc Goodfellow" loading="lazy">
-      <strong><a href="https://experts.exeter.ac.uk/23176-marc-goodfellow" target="_blank">Prof Marc Goodfellow</a></strong> <span class="note">Exeter</span>
+  <ul class="list">
+    <li class="collab">
+      <img class="avatar" src="pics/marcgoodfellow.jpeg" alt="Marc Goodfellow" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://experts.exeter.ac.uk/23176-marc-goodfellow" target="_blank" rel="noopener">Prof Marc Goodfellow</a>
+        <span class="note">Exeter</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/mattjones.jpg" alt="Matt Jones" loading="lazy">
-      <strong><a href="https://www.bristol.ac.uk/people/person/Matt-Jones-946b921d-1431-4981-89bf-3c2b4eb86428" target="_blank">Prof Matt Jones</a></strong> <span class="note">Bristol</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/mattjones.jpg" alt="Matt Jones" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://www.bristol.ac.uk/people/person/Matt-Jones-946b921d-1431-4981-89bf-3c2b4eb86428" target="_blank" rel="noopener">Prof Matt Jones</a>
+        <span class="note">Bristol</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/krishsingh.jpeg" alt="Krish Singh" loading="lazy">
-      <strong><a href="https://profiles.cardiff.ac.uk/staff/singhkd" target="_blank">Prof Krish Singh</a></strong> <span class="note">Cardiff</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/krishsingh.jpeg" alt="Krish Singh" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://profiles.cardiff.ac.uk/staff/singhkd" target="_blank" rel="noopener">Prof Krish Singh</a>
+        <span class="note">Cardiff</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/celiamorgan.jpeg" alt="Celia Morgan" loading="lazy">
-      <strong><a href="https://experts.exeter.ac.uk/23023-celia-morgan" target="_blank">Prof Celia Morgan</a></strong> <span class="note">Exeter</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/celiamorgan.jpeg" alt="Celia Morgan" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://experts.exeter.ac.uk/23023-celia-morgan" target="_blank" rel="noopener">Prof Celia Morgan</a>
+        <span class="note">Exeter</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/karlfriston.jpeg" alt="Karl Friston" loading="lazy">
-      <strong><a href="https://www.verses.ai/videos/karls-corner-august-2025" target="_blank">Prof Karl Friston</a></strong> <span class="note">Verses.ai</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/karlfriston.jpeg" alt="Karl Friston" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://www.verses.ai/videos/karls-corner-august-2025" target="_blank" rel="noopener">Prof Karl Friston</a>
+        <span class="note">Verses.ai</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/jeremyhall.jpg" alt="Jeremy Hall" loading="lazy">
-      <strong><a href="https://profiles.cardiff.ac.uk/staff/hallj10" target="_blank">Prof Jeremy Hall</a></strong> <span class="note">Cardiff</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/jeremyhall.jpg" alt="Jeremy Hall" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://profiles.cardiff.ac.uk/staff/hallj10" target="_blank" rel="noopener">Prof Jeremy Hall</a>
+        <span class="note">Cardiff</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/davidnutt.png" alt="David Nutt" loading="lazy">
-      <strong><a href="https://en.wikipedia.org/wiki/David_Nutt" target="_blank">Prof David Nutt</a></strong> <span class="note">GABA Labs</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/davidnutt.png" alt="David Nutt" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://en.wikipedia.org/wiki/David_Nutt" target="_blank" rel="noopener">Prof David Nutt</a>
+        <span class="note">GABA Labs</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/joesweetman.jpeg" alt="Joe Sweetman" loading="lazy">
-      <strong><a href="https://experts.exeter.ac.uk/23146-joseph-sweetman" target="_blank">Dr Joe Sweetman</a></strong> <span class="note">Exeter</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/joesweetman.jpeg" alt="Joe Sweetman" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://experts.exeter.ac.uk/23146-joseph-sweetman" target="_blank" rel="noopener">Dr Joe Sweetman</a>
+        <span class="note">Exeter</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/jamesrowe.jpeg" alt="James Rowe" loading="lazy">
-      <strong><a href="https://ftd.neurology.cam.ac.uk/directory/jamesrowe" target="_blank">Prof James Rowe</a></strong> <span class="note">Cambridge</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/jamesrowe.jpeg" alt="James Rowe" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://ftd.neurology.cam.ac.uk/directory/jamesrowe" target="_blank" rel="noopener">Prof James Rowe</a>
+        <span class="note">Cambridge</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/rachaelsumner.jpeg" alt="Rachael Sumner" loading="lazy">
-      <strong><a href="https://profiles.auckland.ac.nz/r-sumner" target="_blank">Dr Rachael Sumner</a></strong> <span class="note">Auckland</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/rachaelsumner.jpeg" alt="Rachael Sumner" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://profiles.auckland.ac.nz/r-sumner" target="_blank" rel="noopener">Dr Rachael Sumner</a>
+        <span class="note">Auckland</span>
+      </div>
     </li>
-    <li>
-      <img class="avatar" src="pics/domdunstan.jpg" alt="Dom Dunstan" loading="lazy">
-      <strong><a href="https://experts.exeter.ac.uk/35597-dominic-dunstan" target="_blank">Dr Dom Dunstan</a></strong> <span class="note">Exeter</span>
+
+    <li class="collab">
+      <img class="avatar" src="pics/domdunstan.jpg" alt="Dom Dunstan" loading="lazy" decoding="async">
+      <div class="info">
+        <a class="name" href="https://experts.exeter.ac.uk/35597-dominic-dunstan" target="_blank" rel="noopener">Dr Dom Dunstan</a>
+        <span class="note">Exeter</span>
+      </div>
     </li>
   </ul>
 </section>
+
 
 
 <section id="publications">
