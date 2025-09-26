@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CPNS Lab Calendar</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <h1>CPNS Lab Calendar</h1>
+      <nav>
+        <ul class="nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="research.html">Research</a></li>
+          <li><a href="collaborators.html">Collaborators</a></li>
+          <li><a href="methods.html">Methods</a></li>
+          <li><a href="calendar.html" class="active">Calendar</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Calendar embed -->
+    <main>
+      <p>The CPNS Lab calendar (Google Calendar embed):</p>
+
+      <!-- Replace src below with your actual Google Calendar embed URL -->
+      <iframe 
+        src="https://calendar.google.com/calendar/embed?src=554af4a1a0a13223153e8ffdf29220c9448c85418dd55d1bc1a48c15be41c845%40group.calendar.google.com&ctz=Europe%2FLondon""
+        style="border:0"
+        width="100%" 
+        height="800" 
+        frameborder="0" 
+        scrolling="no">
+      </iframe>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 CPNS Lab</p>
+    </footer>
+
+  </div>
+</body>
+</html>
