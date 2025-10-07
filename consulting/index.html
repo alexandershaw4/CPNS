@@ -42,6 +42,22 @@
     .card{background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:clamp(16px,2vw,24px)}
     hr{border:none; border-top:1px solid var(--line); margin:14px 0}
 
+    .nowrap{ white-space: nowrap; }
+
+    .hero .headline h1{
+    font-size: clamp(18px, 2.6vw, 34px);
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: keep-all;
+  }
+
+    @media (max-width: 520px){
+      .hero .headline h1{ font-size: 22px; }
+    }
+
+
     /* ===== Header / Nav ===== */
     header{position:sticky; top:0; z-index:50; background:#ffffffea; backdrop-filter:blur(6px); border-bottom:1px solid var(--line)}
     .nav{display:flex; align-items:center; justify-content:space-between; padding:10px 0}
@@ -140,13 +156,9 @@
   <section class="hero">
     <div class="container">
       <div class="headline">
-        <h1>Dr Alexander D. Shaw — Neurocomputational Consulting</h1>
+        <h1 class="nowrap">Dr&nbsp;Alexander&nbsp;Shaw&nbsp;–&nbsp;Neurocomputational&nbsp;Consulting</h1>
         <div class="subtitle">Bridging Neuroscience, Psychiatry &amp; AI through Mechanistic Modelling</div>
         <p class="muted">I help organisations interpret neural data, design neuro-inspired intelligent systems, and translate complex science into actionable decisions.</p>
-        <div class="kpis">
-          <span class="kpi">Computational Psychiatry • Dynamic Causal Modelling • Variational Bayes/Laplace</span>
-          <span class="kpi">Dynamical Systems • Optimisation • Active Inference</span>
-        </div>
         <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap">
           <a class="btn btn--accent" href="#services">View Services</a>
           <a class="btn" href="mailto:a.d.shaw@exeter.ac.uk?subject=Book%20a%20consultation&body=Hi%20Alex%2C%20could%20we%20book%20an%20intro%20call%20to%20discuss%20...">Book a Consultation</a>
