@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Computational Modelling & Theoretical Neuroscience — CPNS</title>
+<meta content="Joint CPNS × Mathematics group for mechanistic modelling, calibration, and applications to sleep and psychiatry." name="description"/>
+<link href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌁</text></svg>" rel="icon"/>
+
+<!-- Match CPNS base styling -->
+<style>
+  :root{
+    --bg: #fff; --text: #0a0a0a; --muted: #6b7280; --rule: #e5e7eb; --accent: #0a0a0a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b0b0c; --text:#f3f4f6; --muted:#9ca3af; --rule:#26272b; --accent:#f3f4f6; }
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+  body{font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
+  .wrap{max-width:780px;margin:0 auto;padding:28px}
+  header{padding:36px 0 16px;border-bottom:1px solid var(--rule)}
+  .brand{font-weight:700;letter-spacing:.3px;font-size:22px;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:14px}
+  nav{margin-top:18px}
+  nav a{margin-right:14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  nav a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+  .hero{padding:44px 0}
+  .hero h1{font-size:clamp(30px,4.2vw,48px);line-height:1.12;margin:0 0 10px;letter-spacing:-.01em}
+  .hero p{margin:0;color:var(--muted);max-width:60ch}
+  section{padding:34px 0;border-top:1px solid var(--rule)}
+  h2{font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)}
+  ul.list{list-style:none;margin:0;padding:0}
+  ul.list li{padding:8px 0}
+  a{color:var(--accent);text-underline-offset:3px}
+  a:hover{text-decoration:underline}
+  .cta{display:inline-block;margin-top:10px;border:1px solid var(--rule);padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--text)}
+  .cta:hover{border-color:var(--text)}
+  .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);font-size:14px}
+
+  /* Grid helpers (like your research/collaborators) */
+  .grid{display:grid;gap:14px}
+  .grid-2{grid-template-columns:1fr}
+  @media (min-width:760px){ .grid-2{grid-template-columns:1fr 1fr} }
+
+  /* People cards in a unified grid (borrows collaborators style) */
+  .people-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px 24px}
+  .person{display:flex;align-items:flex-start;gap:12px}
+  .person img{
+    width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:center 20%;
+    filter:grayscale(100%) brightness(75%);transition:filter .25s ease, transform .25s ease;flex:0 0 56px;
+  }
+  .person:hover img{filter:none;transform:translateY(-2px)}
+  .person .info{display:flex;flex-direction:column;line-height:1.2}
+  .person .name{font-weight:600;text-decoration:none;border-bottom:1px solid var(--rule)}
+  .person .name:hover{border-color:var(--text)}
+  .person .role{color:var(--muted);font-size:.95rem;margin-top:3px}
+
+  /* Cards (for themes/projects) */
+  .card{border:1px solid var(--rule);border-radius:12px;padding:12px}
+  .card h3{margin:0 0 6px;font-size:18px;letter-spacing:-.01em}
+
+  /* Link row in cards */
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .chip{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:2px 8px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">CPNS Lab</div>
+    <div class="sub">Computational Modelling & Mathematical Neuroscience — University of Exeter</div>
+    <nav aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/#research">Research</a>
+      <a href="/#people">People</a>
+      <a href="/#collaborators">Collaborators</a>
+      <a href="/news.html">News</a>
+      <a href="/consulting/">Consulting</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Computational Modelling & Mathematical Neuroscience</h1>
+    <p>Joint CPNS × Goodfellow Mathematics group for biophysical neural mass models, calibration & inference, sleep dynamics, and translational applications in psychiatry.</p>
+    <p class="note" style="margin-top:8px">Methods: Multiobjective optimisation, Genetic Algorithms, Variational Laplace (thermodynamic), low-rank curvature, heteroscedastic noise, hybrid global-local optimisation, EEG.</p>
+  </section>
+
+  <section id="themes">
+    <h2>Research Themes</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Neural Mass Models</h3>
+        <div class="note">Thalamo-cortical conductance models (AMPA/NMDA/GABA-A/B, M, H), delays, stability, and transient dynamics.</div>
+      </div>
+      <div class="card">
+        <h3>Calibration & Inference</h3>
+        <div class="note">Hybrid global + local / Bayesian pipelines; identifiability; evidence via path-sampling.</div>
+      </div>
+      <div class="card">
+        <h3>Sleep & Rhythmicity</h3>
+        <div class="note">Spindles and slow oscillations; stage-wise modelling; neuromodulatory control.</div>
+      </div>
+      <div class="card">
+        <h3>Epilepsy & Seizure Dynamics</h3>
+        <div class="note">Neural mass/field modelling of ictogenesis and spread, with bifurcation-led analysis and EEG/iEEG calibration for presurgical mapping and virtual resection.</div>
+      </div>
+      <div class="card">
+        <h3>Psychiatry & Pharmacology</h3>
+        <div class="note">Parameter-to-phenotype mapping in CNVs and drug studies (GABAergic, NMDA, 5-HT2A).</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="people">
+    <h2>People</h2>
+    <div class="people-grid">
+      <!-- Replace image paths / links as needed -->
+      <div class="person">
+        <img src="alex_shaw.jpg" alt="Dr Alexander D. Shaw">
+        <div class="info">
+          <a class="name" href="https://cpnslab.com/" target="_blank" rel="noopener">Dr Alexander D. Shaw</a>
+          <div class="role">Lead — CPNS Lab (Psychology)</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="marcgoodfellow.jpeg" alt="Prof Marc Goodfellow">
+        <div class="info">
+          <a class="name" href="https://experts.exeter.ac.uk/23176-marc-goodfellow" target="_blank" rel="noopener">Prof Marc Goodfellow</a>
+          <div class="role">Lead — Goodfellow Group (Mathematics & LSI)</div>
+        </div>
+      </div>
+      <div class="person">
+        <img src="ravi.jpg" alt="Dr Ravi Poorun">
+        <div class="info">
+          <a class="name" href="https://experts.exeter.ac.uk/33368-ravi-poorun" target="_blank" rel="noopener">Dr Ravi Poorun</a>
+          <div class="role">Lead — NIHR Clinical Lecturer in Paediatrics</div>
+        </div>
+      </div>
+
+      <!-- Example team entries; duplicate/edit -->
+      <div class="person">
+        <img src="domdunstan.jpg" alt="Dominic Dunstan">
+        <div class="info">
+          <span class="name">Dominic Dunstan</span>
+          <div class="role">Postdoc — NMM calibration methods; Epilepsy</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="Alessia2.jpg" alt="Alessia Caccamo">
+        <div class="info">
+          <span class="name">Alessia Caccamo</span>
+          <div class="role">PhD — NMM calibration & uncertainty</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="lio.png" alt="Lio Berndt">
+        <div class="info">
+          <span class="name">Lio Berndt</span>
+          <div class="role">Research Associate — Modelling, M/EEG, Sleep & CNVs</div>
+        </div>
+      </div>
+      
+      <div class="person">
+        <img src="crow.png" alt="Crow Diebel">
+        <div class="info">
+          <span class="name">Crow Diebel</span>
+          <div class="role">PhD — DCM, Sleep & CNVs</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="/pics/mason.png" alt="Mason Taylor">
+        <div class="info">
+          <span class="name">Mason Taylor</span>
+          <div class="role">PhD — Sleep EEG</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="joy.jpg" alt="Joy Krecke">
+        <div class="info">
+          <span class="name">Joy Krecke</span>
+          <div class="role">PhD — Ketamine & μ-opioid modelling</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="victoria.jpg" alt="Victoria Smart">
+        <div class="info">
+          <span class="name">Victoria Smart</span>
+          <div class="role">PhD — Psychedelics & circuit models</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="ewan.jpg" alt="Ewan Reeves">
+        <div class="info">
+          <span class="name">Ewan Reeves</span>
+          <div class="role">Natural Sciences Student</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="imogen.jpg" alt="Imogen Cleary">
+        <div class="info">
+          <span class="name">Imogen Cleary</span>
+          <div class="role">Natural Sciences Student</div>
+        </div>
+      </div>
+
+      <div class="person">
+        <img src="ella.jpg" alt="Ella Jackson-Drexler">
+        <div class="info">
+          <span class="name">Ella Jackson-Drexler</span>
+          <div class="role">Psychology Student</div>
+        </div>
+      </div>
+
+
+      <!-- Add more unified entries from both groups -->
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Sleep Detectives <span class="chip">EEG · CNVs</span></h3>
+        <div class="note">Mechanistic modelling of spindles and sleep stage dynamics; thalamo-cortical biomarkers.</div>
+        <div class="links">
+          <a href="https://cpnslab.com/" target="_blank" rel="noopener">Overview</a>
+          <a href="https://github.com/alexandershaw4/CPNS" target="_blank" rel="noopener">CPNS GitHub</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Calibration Pipelines <span class="chip">Global ↔ VL</span></h3>
+        <div class="note">Hybrid global + Thermo-VL optimisation, low-rank curvature, heteroscedastic noise, TI evidence.</div>
+        <div class="links">
+          <a href="https://doi.org/10.1101/2025.09.26.678721" target="_blank" rel="noopener">Dynamics-Informed Priors (DIP) for Neural Mass Modelling</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="outputs">
+    <h2>Recent Outputs</h2>
+    <ul class="list">
+      <li><a href="https://doi.org/10.1101/2025.09.26.678721" target="_blank" rel="noopener">Dynamics-Informed Priors (DIP) for Neural Mass Modelling</a> — bioRxiv, 2025.</li>
+      <li><a href="https://github.com/alexandershaw4/aLogLikeFit" target="_blank" rel="noopener">fitVariationalLaplaceThermo</a> — Thermodynamic Variational Laplace (MATLAB).</li>
+      <li><a href="https://github.com/alexandershaw4/atcm.jl" target="_blank" rel="noopener">atcm.jl</a> — Conductance-based thalamo-cortical modelling (Julia).</li>
+    </ul>
+  </section>
+
+  <section id="contact">
+    <h2>Collaborate or Join</h2>
+    <p>We welcome collaborations and student projects at the interface of mathematics, neuroscience, and psychiatry.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <a class="cta" href="mailto:A.D.Shaw@exeter.ac.uk">Email Dr Alex Shaw</a>
+      <a class="cta" href="mailto:M.Goodfellow@exeter.ac.uk">Email Prof Marc Goodfellow</a>
+      <a class="cta" href="https://github.com/alexandershaw4/CPNS" target="_blank" rel="noopener">See our code</a>
+    </div>
+  </section>
+
+  <footer style="padding:28px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:14px">
+    <div>© <span id="y"></span> CPNS Lab — Modelling Group</div>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
