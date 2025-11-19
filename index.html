@@ -89,6 +89,46 @@
   #collaborators .name:hover{border-color:var(--text)}
   #collaborators .note{color:var(--muted);font-size:.9rem;margin-top:3px}
 
+
+    /* Vertical lightweight student list */
+.student-list {
+  margin-top: 18px;
+  border-top: 1px solid var(--rule);
+  padding-top: 16px;
+}
+
+.student-list h3 {
+  margin: 10px 0 6px;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.student-vert {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.student-item {
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-item strong {
+  font-weight: 600;
+}
+
+.student-item .meta {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+
+
 </style>
 
 <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -273,6 +313,31 @@
       <div><strong>Regan Mills</strong> - <span class="role">PhD Student</span></div>
       <div class="note">My research focuses on exploring striatal connectomics, leveraging large-scale, open-access datasets, and multi-modal data from the UKRI Brain and Genomics Hub. I aim to elucidate the biological mechanisms that underpin striatal networks as an assay of psychosis-linked dysfunction, informing strategies to refine diagnosis, model clinical trajectories, and improve treatment response.</div>
     </div>
+  </div>
+
+  <div class="student-groups">
+    <h3>Masters (Postgraduate Taught)</h3>
+    <p class="note" style="margin:0 0 6px;">
+      Current postgraduate taught students (2025/26)
+    </p>
+    <ul class="student-chips">
+      <li class="student-chip"><strong>Al Fayed Barakat</strong> <span>· MSc Clinical Psychology</span></li>
+      <li class="student-chip"><strong>Kashish Malik</strong> <span>· MSc Clinical Psychology</span></li>
+      <li class="student-chip"><strong>Lana Moidu</strong> <span>· MSc Clinical Psychology</span></li>
+      <li class="student-chip"><strong>Shreya Dwivedi</strong> <span>· MSc Clinical Psychology</span></li>
+      <!-- add/remove as needed -->
+    </ul>
+
+    <h3 style="margin-top:14px;">Undergraduate</h3>
+    <p class="note" style="margin:0 0 6px;">
+      Current BSc students (2025/26)
+    </p>
+    <ul class="student-chips">
+      <li class="student-chip"><strong>Ella Jackson-Drexler</strong> <span>· BSc Psychology project</span></li>
+      <li class="student-chip"><strong>Holly Earnshaw</strong> <span>· BSc Psychology project</span></li>
+      <li class="student-chip"><strong>Katherine Mak</strong> <span>· BSc Psychology project</span></li>
+      <!-- more names as chips if you like -->
+    </ul>
   </div>
 </section>
 
