@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Polyphonic Gridworld Demo — CPNS Lab</title>
+<meta content="Polyphonic active inference gridworld demo (multi-objective negotiation via concurrent generative models)." name="description"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⌁&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+
+<style>
+  /* === CPNS base style (mirrors index.html) === */
+  :root{
+    --bg: #fff; --text: #0a0a0a; --muted: #6b7280; --rule: #e5e7eb; --accent: #0a0a0a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b0b0c; --text:#f3f4f6; --muted:#9ca3af; --rule:#26272b; --accent:#f3f4f6; }
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+  body{font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
+  .wrap{max-width:780px;margin:0 auto;padding:28px}
+  header{padding:36px 0 16px;border-bottom:1px solid var(--rule)}
+  .brand{font-weight:700;letter-spacing:.3px;font-size:22px;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:14px}
+  nav{margin-top:18px}
+  nav a{margin-right:14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  nav a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+  section{padding:34px 0;border-top:1px solid var(--rule)}
+  h2{font-size:16px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 14px;color:var(--muted)}
+  a{color:var(--accent);text-underline-offset:3px}
+  a:hover{text-decoration:underline}
+  .cta{display:inline-block;margin-top:10px;border:1px solid var(--rule);padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--text)}
+  .cta:hover{border-color:var(--text)}
+  .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);font-size:14px}
+  footer{padding:28px 0;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
+
+  /* === Polyphonic demo: uses site variables, minimal extra styling === */
+  .demo-head{
+    display:block;
+    margin-bottom:16px;
+  }
+  .kicker{
+    margin:0 0 8px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .title{
+    font-size:clamp(28px,4.2vw,44px);
+    line-height:1.12;
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  .lede{
+    margin:0;
+    color:var(--muted);
+    max-width:68ch;
+  }
+
+  figure.demo-media{margin:18px 0 18px}
+  video.demo-video{
+    width:100%;
+    display:block;
+    background:#000;
+    border-radius:14px;
+    border:1px solid var(--rule);
+  }
+  .caption{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-top:18px;
+  }
+  @media (min-width:760px){
+    .grid{grid-template-columns:1fr 1fr;}
+  }
+
+  .card{
+    border:1px solid var(--rule);
+    border-radius:14px;
+    padding:16px;
+    background:color-mix(in srgb, var(--bg) 92%, transparent);
+  }
+  .card h3{
+    margin:0 0 10px;
+    font-size:15px;
+    letter-spacing:-.005em;
+  }
+  .card p,.card li{
+    margin:0;
+    color:var(--text);
+    font-size:14px;
+    line-height:1.65;
+  }
+  .card p{color:color-mix(in srgb, var(--text) 86%, transparent);}
+  .card ul,.card ol{margin:0;padding-left:18px}
+  .card li + li{margin-top:6px}
+  .card p + p{margin-top:10px}
+
+  code, pre{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:14px;
+  }
+  code.inline{
+    padding:1px 6px;
+    border-radius:10px;
+    border:1px solid var(--rule);
+    background:color-mix(in srgb, var(--rule) 35%, transparent);
+  }
+
+  .eqbox{
+    border:1px dashed var(--rule);
+    border-radius:14px;
+    padding:14px 14px 8px;
+    margin-top:10px;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+  }
+  .eqbox .note{margin:6px 0 0}
+
+  .links{
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .pill{
+    display:inline-block;
+    border:1px solid var(--rule);
+    padding:8px 10px;
+    border-radius:999px;
+    text-decoration:none;
+    color:var(--text);
+    font-size:13px;
+  }
+  .pill:hover{border-color:var(--text)}
+</style>
+
+<!-- MathJax (as in index.html) -->
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">CPNS Lab</div>
+    <div class="sub">Computational Psychiatry &amp; Neuropharmacological Systems (CPNS) · University of Exeter</div>
+    <nav aria-label="Primary">
+      <a href="index.html#research">Research</a>
+      <a href="index.html#people">People</a>
+      <a href="index.html#collaborators">Collaborators</a>
+      <a href="index.html#publications">Publications</a>
+      <a href="index.html#openings">Openings</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="news.html">News</a>
+      <a href="tvd_pong.html">Live Demo</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="/consulting/">Consulting</a>
+    </nav>
+  </header>
+
+  <!-- ===== Polyphonic Gridworld page ===== -->
+  <section id="polyphonic-gridworld" style="border-top:none;padding-top:28px;">
+    <div class="demo-head">
+      <p class="kicker">Demo</p>
+      <h1 class="title">Polyphonic Active Inference Gridworld</h1>
+      <p class="lede">
+        This is a toy environment where behaviour emerges from the <strong>negotiation of multiple concurrent objectives</strong>
+        (“voices”) rather than a single dominating controller. Each voice runs a short-horizon rollout, proposes an action
+        distribution, and a polyphonic coordination layer integrates them into the final move.
+      </p>
+      <p class="note" style="margin:12px 0 0;">Tip: if the video doesn’t autoplay on mobile, tap once — it’s <code class="inline">playsinline</code>.</p>
+    </div>
+
+    <figure class="demo-media">
+      <!-- Update these paths to match your site -->
+      <video class="demo-video" controls playsinline preload="metadata"
+             poster="assets/videos/polyphonic_gridworld_poster.png">
+        <!-- Prefer mp4 for widest compatibility. webm is optional. -->
+        <source src="assets/videos/polyphonic_gridworld.mp4" type="video/mp4">
+        <source src="assets/videos/polyphonic_gridworld.webm" type="video/webm">
+        Sorry — your browser doesn’t support embedded video.
+      </video>
+      <figcaption class="caption">
+        The heatmap shows the agent’s <em>belief</em> about hazard probability in each cell (not ground truth).
+        Bars show each voice’s action posterior \(q_k(a)\), and the mixture weights \(\pi\) show which voice is currently
+        most influential in the negotiated action.
+      </figcaption>
+    </figure>
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>World legend (how to read the map)</h3>
+        <ul>
+          <li><strong>Coloured cells (heatmap):</strong> the agent’s <em>belief</em> about hazard probability in each location (blue ≈ low risk, yellow ≈ high risk).</li>
+          <li><strong>Black squares:</strong> walls — impassable structure that both the real agent and its internal rollouts must respect.</li>
+          <li><strong>Gold square:</strong> the current goal location. When reached, a new goal is spawned elsewhere.</li>
+          <li><strong>Purple pentagons:</strong> charging stations that replenish the agent’s battery.</li>
+          <li><strong>White circle:</strong> the agent’s current position.</li>
+          <li><strong>White arrow:</strong> the action selected after polyphonic integration (the negotiated move).</li>
+          <li><strong>Crosses (optional):</strong> true hazards, only shown when ground truth is revealed for debugging.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>What you’re seeing (at a glance)</h3>
+        <ul>
+          <li><strong>Belief map:</strong> \(p(\text{hazard}\mid \text{data})\) per cell, updated from local, noisy cues.</li>
+          <li><strong>Walls:</strong> hard constraints; rollouts respect them (the agent can’t “imagine” walking through walls).</li>
+          <li><strong>Goal:</strong> respawns after capture so the episode keeps generating interesting trade-offs.</li>
+          <li><strong>Chargers:</strong> replenish battery; low battery increases pressure from the energy voice.</li>
+          <li><strong>Action bars:</strong> one \(q_k(a)\) per voice plus the final mixture \(q(a)\).</li>
+          <li><strong>\(\pi\) weights:</strong> “who’s winning the argument” at this moment — but with anti-dominance safeguards.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>The four voices (conceptually)</h3>
+        <p>
+          Each voice is a small generative model + preference set. It scores short rollouts using an EFE-like objective
+          (risk/utility, exploration, resource constraints), then converts rollout scores into an action distribution.
+        </p>
+        <ol style="margin-top:10px;">
+          <li><strong>Safety:</strong> risk-sensitive control: avoids states believed to be hazardous.</li>
+          <li><strong>Goal:</strong> pragmatic control: reduces distance-to-goal while respecting risk.</li>
+          <li><strong>Epistemic:</strong> exploration pressure: seeks uncertainty reduction and novelty.</li>
+          <li><strong>Energy:</strong> homeostatic control: maintains battery; prioritises chargers when reserves drop.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>Active inference ingredients (non-domain-specific)</h3>
+        <p>
+          The agent does three things repeatedly: <strong>(i) infer hidden state</strong> (here: where hazards likely are),
+          <strong>(ii) look ahead</strong> a few steps (rollout) using its transition model, and <strong>(iii) choose actions</strong>
+          that minimise an expected “surprise/cost” functional.
+        </p>
+        <p>
+          In many active-inference demos, these ingredients are wrapped into a single objective. Here, we keep multiple
+          objectives explicit by making them separate voices that run in parallel.
+        </p>
+        <p class="note" style="margin-top:10px;">
+          In code terms: per voice → rollout → EFE-like score → softmax → \(q_k(a)\).
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Polyphonic coordination (the key idea)</h3>
+        <p>
+          Each voice proposes a distribution over actions \(q_k(a)\). The polyphonic layer keeps a running (leaky) evidence
+          score for each voice and converts that into mixture weights \(\pi_k\). The negotiated action posterior is:
+        </p>
+
+        <div class="eqbox">
+          <p style="margin:0;">
+            \[
+              q(a) \;=\; \sum_{k=1}^{K}\pi_k\,q_k(a)
+            \]
+          </p>
+          <p class="note">
+            Intuition: “do a weighted average of proposed actions” — but the weights evolve online.
+          </p>
+        </div>
+
+        <p style="margin-top:12px;">
+          A minimal version of the weight dynamics is:
+        </p>
+
+        <div class="eqbox">
+          <p style="margin:0;">
+            \[
+              \ell_k(t) \leftarrow \rho\,\ell_k(t-1) + \underbrace{(-G_k^\*)}_{\text{evidence}} \;-\;
+              \lambda\,\underbrace{\Omega_k}_{\text{anti-dominance / compatibility}}
+            \]
+            \[
+              \pi_k \;=\; \mathrm{softmax}\!\big(\gamma\,\ell_k\big), \quad
+              \pi \leftarrow (1-\varepsilon)\pi + \varepsilon\,\pi_{\mathrm{floor}}
+            \]
+          </p>
+          <p class="note">
+            Here \(G_k^\*\) is the best (lowest) rollout score found by voice \(k\). \(\Omega_k\) is a light penalty when a voice
+            becomes inconsistent with the others (so it can’t permanently dominate).
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>What “EFE-like” means here (simple version)</h3>
+        <p>
+          Expected free energy (EFE) is a planning functional that can trade off <strong>utility/risk</strong> against
+          <strong>information gain</strong>. In many formulations you’ll see a decomposition into terms that look like:
+          “seek preferred outcomes” + “reduce uncertainty”.
+        </p>
+        <div class="eqbox">
+          <p style="margin:0;">
+            \[
+              G(\pi) \approx \underbrace{\mathbb{E}[\text{risk / cost}]}_{\text{pragmatic}}
+              \;-\;
+              \underbrace{\mathbb{E}[\text{information gain}]}_{\text{epistemic}}
+            \]
+          </p>
+          <p class="note">
+            In this gridworld, different voices emphasise different pieces of this trade-off.
+          </p>
+        </div>
+        <p style="margin-top:12px;">
+          The precise form varies by implementation; what matters for this demo is: each voice scores imagined futures in
+          a way that encodes its “personality” (safety, goal-seeking, exploration, energy maintenance).
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Why polyphonic intelligence matters</h3>
+        <p>
+          Real agents rarely have one objective. They juggle constraints, drives, and competing time-scales. Polyphonic
+          intelligence treats this not as an afterthought (“add a penalty term”), but as a <strong>first-class architectural
+          principle</strong>: maintain multiple concurrent generative models and integrate them without forcing collapse to a
+          single winner.
+        </p>
+        <p>
+          The result is behaviour that can look more <strong>robust</strong> (doesn’t fail catastrophically when one objective
+          becomes brittle), more <strong>adaptable</strong> (weights shift with context), and more <strong>interpretable</strong>
+          (you can inspect which voice is driving which actions).
+        </p>
+
+        <div class="links">
+          <a class="pill" href="/research/polyphonic-intelligence">Read more</a>
+          <a class="pill" href="https://arxiv.org/abs/2601.13182" target="_blank" rel="noopener">arXiv: Polyphonic Intelligence</a>
+          <a class="pill" href="index.html#research">Back to CPNS</a>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    <div>© <span id="y"></span> CPNS Lab. No cookies. Math: \(\mathcal{F}=\mathrm{ELBO}\).</div>
+  </footer>
+</div>
+
+<script>
+  // Year (matches index.html)
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
