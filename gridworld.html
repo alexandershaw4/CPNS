@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polyphonic Active Inference Gridworld | CPNS Lab</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-soft: #121932;
+      --panel: rgba(255,255,255,0.06);
+      --panel-border: rgba(255,255,255,0.1);
+      --text: #eef2ff;
+      --muted: #b8c1e0;
+      --accent: #63b3ff;
+      --accent-2: #8ef0c6;
+      --shadow: 0 18px 50px rgba(0,0,0,0.28);
+      --radius: 18px;
+      --maxw: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(99,179,255,0.14), transparent 35%),
+        radial-gradient(circle at top right, rgba(142,240,198,0.10), transparent 28%),
+        linear-gradient(180deg, #09101f 0%, #0d1327 42%, #0a1020 100%);
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .wrap {
+      width: min(var(--maxw), calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 5.5rem 0 3rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.8rem;
+      border: 1px solid var(--panel-border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(99,179,255,0.6);
+    }
+
+    h1, h2, h3 {
+      line-height: 1.1;
+      margin: 0 0 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin-top: 1rem;
+      font-size: clamp(2.5rem, 5vw, 4.6rem);
+    }
+
+    .lead {
+      max-width: 850px;
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin: 0 0 1.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-top: 1.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      padding: 0.95rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 600;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .btn:hover {
+      text-decoration: none;
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(99,179,255,0.22), rgba(142,240,198,0.18));
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .grid.two {
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .video-shell {
+      padding: 0.9rem;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      border-radius: 14px;
+      background: #050814;
+    }
+
+    .section {
+      padding: 1.2rem 0 0.2rem;
+    }
+
+    .section h2 {
+      font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+      margin-bottom: 0.8rem;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.55rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--panel-border);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .feature {
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .feature h3 {
+      font-size: 1.02rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .equation {
+      overflow-x: auto;
+      margin: 1rem 0;
+      padding: 1rem 1.1rem;
+      border-radius: 14px;
+      background: rgba(5, 10, 24, 0.75);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      color: #d8e5ff;
+      font-size: 0.98rem;
+    }
+
+    .steps {
+      display: grid;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 0.9rem;
+      align-items: start;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(99,179,255,0.22), rgba(142,240,198,0.18));
+      border: 1px solid rgba(255,255,255,0.12);
+      font-weight: 700;
+    }
+
+    .download-card h3,
+    .aside-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .download-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .download-links a {
+      display: block;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .download-links a span {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .footer-note {
+      padding: 3rem 0 4rem;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    @media (max-width: 980px) {
+      .grid.two {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        padding-top: 4.2rem;
+      }
+
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow"><span class="dot"></span> CPNS Lab demo and method overview</div>
+      <h1>Hierarchical Polyphonic Active Inference in a Partially Observed Gridworld</h1>
+      <p class="lead">
+        This demo shows a polyphonic active inference agent navigating a gridworld with goals, walls,
+        hazards, charging stations, partial observability, and battery-constrained action. Rather than
+        following a single reward signal, behaviour emerges from the interaction of multiple voices that
+        evaluate candidate policies under different priorities such as safety, goal pursuit, uncertainty
+        reduction, energy preservation, and habit.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#video">Watch the demo</a>
+        <a class="btn" href="PolyphonicGridworld_V2.pdf" target="_blank" rel="noopener">Open the PDF write-up</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="video" class="section">
+      <div class="wrap grid two">
+        <div class="card video-shell">
+          <video controls playsinline preload="metadata" poster="">
+            <source src="polyphonic_gridworld_new1.mp4" type="video/mp4" />
+            Your browser does not support embedded video. You can instead download the MP4 file directly.
+          </video>
+        </div>
+
+        <aside class="grid">
+          <div class="card aside-card">
+            <h3>What is shown in the demo?</h3>
+            <p class="muted">
+              The agent moves through a maze-like environment while inferring which behavioural mode is most relevant,
+              selecting subgoals, and mixing policy recommendations from several internal voices. This creates behaviour
+              that is adaptive, interpretable, and often more realistic than a controller driven by a single scalar objective.
+            </p>
+            <div class="pill-row">
+              <span class="pill">Partial observability</span>
+              <span class="pill">Hazard beliefs</span>
+              <span class="pill">Subgoal selection</span>
+              <span class="pill">Expected free energy</span>
+              <span class="pill">Voice arbitration</span>
+            </div>
+          </div>
+
+          <div class="card download-card">
+            <h3>Downloads</h3>
+            <p class="muted">The full technical write-up describes the model assumptions, architecture, and algorithm in more detail.</p>
+            <div class="download-links">
+              <a href="PolyphonicGridworld_V2.pdf" target="_blank" rel="noopener">
+                View PDF write-up
+                <span>Full overview, equations, and algorithm</span>
+              </a>
+              <a href="polyphonic_gridworld_new.mp4" target="_blank" rel="noopener">
+                Open video directly
+                <span>MP4 demo of the agent in action</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card">
+          <h2>Overview</h2>
+          <p>
+            The model places an active inference agent in a discrete two-dimensional world containing a current goal,
+            impassable walls, charging stations, and hidden hazards. The environment is only partially observed, so the
+            agent must maintain and update probabilistic beliefs about local threat structure as it moves. This is not
+            simply path planning. It is a belief-guided control problem in which action depends on inferred context,
+            uncertainty, and internal constraints as much as on the goal itself.
+          </p>
+          <p>
+            A central idea of the polyphonic framework is that action should not be treated as the output of a single
+            monolithic utility function. Instead, distinct control units or voices express partially competing priorities.
+            A higher-level latent mode then shapes how much influence each voice has at a given moment, allowing the
+            overall policy to change as the situation changes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card">
+          <h2>World and internal architecture</h2>
+          <div class="feature-list">
+            <div class="feature">
+              <h3>Environment</h3>
+              <p class="muted">
+                The grid contains walls, one current goal, charging stations, and true hazards that are not directly
+                visible unless sampled through noisy local observation.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>State</h3>
+              <p class="muted">
+                The agent maintains a position in the grid together with a battery state that influences both preferences
+                and transition success.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Observations</h3>
+              <p class="muted">
+                At each step the agent sees only a local patch around itself and receives noisy hazard cues, forcing it
+                to infer danger rather than read it off directly.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Beliefs</h3>
+              <p class="muted">
+                A hazard belief map stores the posterior probability that each location is dangerous, and a separate reset
+                memory map marks recently catastrophic outcomes as temporarily more aversive.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Modes</h3>
+              <p class="muted">
+                The agent infers a posterior over behavioural modes such as Explore, Pursue Goal, Recharge, Avoid Threat,
+                and Verify, based on context including battery urgency, uncertainty, and local threat.
+              </p>
+            </div>
+            <div class="feature">
+              <h3>Voices</h3>
+              <p class="muted">
+                Safety, Goal, Epistemic, Energy, and Habit voices each evaluate the same candidate futures using a different
+                weighting over cost and information terms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap grid two">
+        <div class="card">
+          <h2>Expected free energy and policy evaluation</h2>
+          <p>
+            For each voice, the agent evaluates a finite set of short-horizon policies. These candidate futures are rolled
+            forward under approximate transition dynamics and scored using an expected free energy style decomposition.
+            In this implementation, the planner combines three broad terms: risk, ambiguity, and epistemic value.
+          </p>
+          <div class="equation">G_k(π) = w_risk R_k(π) + w_amb A_k(π) - w_epi E_k(π)</div>
+          <p class="muted">
+            Risk captures mismatch with preferences, including hazard exposure, distance from the current subgoal, low
+            battery, charger viability failure, reset-memory penalties, and control costs. Ambiguity reflects uncertainty
+            in outcomes, approximated here from the entropy of hazard beliefs at predicted locations. Epistemic value acts
+            as an information-seeking term, favouring locations that remain uncertain and relatively unvisited.
+          </p>
+          <div class="equation">q_k(π) ∝ exp(-β_π G_k(π))</div>
+          <p>
+            Each voice therefore forms its own posterior over policies. These voice-wise posteriors are then mixed using
+            a set of adaptive voice weights derived from the current mode posterior, giving a polyphonic posterior over
+            action rather than a single-system decision rule.
+          </p>
+          <div class="equation">q(π) = Σ_k π_t(k) q_k(π)</div>
+        </div>
+
+        <div class="card">
+          <h2>Why this matters</h2>
+          <p class="muted">
+            The model sits between a simple reward-maximising controller and a full exact active inference scheme. It is
+            more structured than conventional utility maximisation because it separates competing imperatives, explicitly
+            represents uncertainty, uses hierarchical context inference, and supports subgoal-based route restructuring.
+          </p>
+          <p class="muted">
+            At the same time, it remains computationally tractable and visually interpretable, which makes it useful both
+            as a working agent and as a conceptual platform for studying how inference, arbitration, and planning interact.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card">
+          <h2>Algorithm at a glance</h2>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div><strong>Observe locally.</strong> The agent samples a small neighbourhood and receives noisy binary hazard cues.</div></div>
+            <div class="step"><div class="step-num">2</div><div><strong>Update hazard beliefs.</strong> Cellwise beliefs are revised approximately using Bayesian updates and mild regularisation toward a prior.</div></div>
+            <div class="step"><div class="step-num">3</div><div><strong>Infer behavioural mode.</strong> Contextual variables such as battery urgency, threat, uncertainty, and distance to goal determine a posterior over modes.</div></div>
+            <div class="step"><div class="step-num">4</div><div><strong>Select or retain a subgoal.</strong> Depending on mode, the internal target may be the true goal, a safe refuge, a charger route, or an uncertainty-relevant location.</div></div>
+            <div class="step"><div class="step-num">5</div><div><strong>Update voice weights.</strong> The mode posterior is converted into a smoothed mixture over Safety, Goal, Epistemic, Energy, and Habit voices.</div></div>
+            <div class="step"><div class="step-num">6</div><div><strong>Evaluate policies.</strong> Each voice rolls out candidate short-horizon action sequences and computes an approximate expected free energy.</div></div>
+            <div class="step"><div class="step-num">7</div><div><strong>Integrate polyphonically.</strong> Voice-specific policy posteriors are combined into a global posterior over policies and then over first actions.</div></div>
+            <div class="step"><div class="step-num">8</div><div><strong>Act under battery-gated dynamics.</strong> The selected action may still fail when battery is low, creating a distinction between intended and realised transitions.</div></div>
+            <div class="step"><div class="step-num">9</div><div><strong>Learn from consequences.</strong> If the agent hits a true hazard it is reset, the local threat representation is strengthened, and reset-memory is boosted.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap grid two">
+        <div class="card">
+          <h2>Interpretation</h2>
+          <p>
+            One useful aspect of this framework is that failures are often informative rather than merely undesirable.
+            Oscillations between goal pursuit and threat avoidance, deadlocks near bottlenecks, repeated visits to risky
+            regions, or unstable subgoal switching can reveal which representational or planning ingredients are still
+            missing from the model.
+          </p>
+          <p class="muted">
+            In that sense, the gridworld functions as more than a toy benchmark. It becomes a transparent setting in which
+            theoretical assumptions about inference, arbitration, and internal control structure can be inspected directly.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Possible next steps</h2>
+          <p class="muted">
+            Natural extensions include smoother probabilistic threat fields, more expressive route-level subgoal inference,
+            explicit belief updates over path structure, policy pruning or tree search for longer horizons, and a fuller
+            discrete-state active inference formalism with explicit likelihood and transition matrices.
+          </p>
+          <p class="muted">
+            The broader motivation is to move toward richer active inference agents in which planning, uncertainty, internal
+            drives, and hierarchical arbitration interact in a reusable and interpretable way.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-note">
+    <div class="wrap">
+      Built for the CPNS Lab website. Replace the local file paths with your site paths as needed, for example keeping the MP4 and PDF in the same directory as this page.
+    </div>
+  </footer>
+</body>
+</html>
