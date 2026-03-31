@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Active Inference Agents — CPNS Lab</title>
+
+<style>
+  :root{
+    --bg:#fff; --text:#0a0a0a; --muted:#6b7280; --rule:#e5e7eb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b0b0c; --text:#f3f4f6; --muted:#9ca3af; --rule:#26272b; }
+  }
+
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+  body{font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif}
+
+  .wrap{max-width:780px;margin:0 auto;padding:28px}
+
+  header{padding:36px 0 16px;border-bottom:1px solid var(--rule)}
+  .brand{font-weight:700;font-size:22px}
+  .sub{color:var(--muted);font-size:14px}
+
+  section{padding:34px 0;border-top:1px solid var(--rule)}
+
+  h1{font-size:34px;margin:0 0 10px}
+  h2{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+
+  p{margin:0 0 14px}
+  .note{color:var(--muted);font-size:14px}
+
+  img{width:100%;border-radius:12px;border:1px solid var(--rule)}
+
+  video{width:100%;border-radius:12px;border:1px solid var(--rule)}
+
+  .equation{
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    background:rgba(0,0,0,0.04);
+    padding:10px;
+    border-radius:8px;
+    font-size:14px;
+  }
+</style>
+
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">CPNS Lab</div>
+  <div class="sub">Active Inference Agents & Embodied Intelligence</div>
+</header>
+
+
+<section>
+  <h1>Active Inference in the real world</h1>
+
+  <p>
+    Most AI systems are trained to map inputs to outputs, optimise rewards, or imitate behaviour.
+  </p>
+
+  <p>
+    Active inference takes a different approach.
+  </p>
+
+  <p>
+    Instead of learning a policy directly, the agent maintains a model of the world, continuously predicts what it expects to observe, and acts to reduce the mismatch between prediction and reality.
+  </p>
+
+  <p>
+    In simple terms:
+  </p>
+
+  <p class="note">
+    the agent predicts → compares → updates → acts → and repeats
+  </p>
+
+  <p>
+    Behaviour emerges from this loop.
+  </p>
+</section>
+
+<section>
+  <h2>From idea to mechanism</h2>
+
+  <img src="active_inference_robot.png" alt="Active inference robot diagram"/>
+
+  <p class="note">
+   (I work with industry partners applying active inference and generative modelling to real-world systems.  
+   <a href="/consulting/">Consulting)</a>
+  </p>
+  
+  <p>
+    The agent receives sensory input from the world (here, ray-cast distances acting as a crude form of vision), and uses a generative model to predict what those inputs should be under different actions.
+  </p>
+
+  <p>
+    When predictions are wrong, the model updates. When actions can reduce prediction error, the agent moves.
+  </p>
+
+  <p>
+    There is no explicit reward function, and no pretraining. Behaviour arises from maintaining consistency between beliefs and observations.
+  </p>
+</section>
+
+<section>
+  <h2>Embodiment and physics</h2>
+
+  <p>
+    Moving from 2D environments to a 3D physical world changes everything.
+  </p>
+
+  <p>
+    The agent must deal with inertia, drag, collisions, and partial observability. It cannot simply “jump” between states — it has to act through a body, in space, over time.
+  </p>
+
+  <p>
+    In this setting, behaviour becomes visibly different:
+  </p>
+
+  <ul>
+    <li>small corrections and reorientation</li>
+    <li>hesitation near obstacles</li>
+    <li>gradual convergence to goals</li>
+    <li>recovery when predictions fail</li>
+  </ul>
+
+  <p>
+    The world is not given. The transition dynamics are learned online from interaction with the environment.
+  </p>
+</section>
+
+<section>
+  <h2>Example: collect and return</h2>
+
+  <p>
+    In this task, the robot must locate an object, grasp it, and return to a home zone.
+  </p>
+
+  <p>
+    All behaviour (exploration, obstacle avoidance, grasping, and return) emerges from the same underlying inference process.
+  </p>
+
+  <video controls>
+    <source src="pybullet_collect_return_arm_roomlike.mp4" type="video/mp4">
+  </video>
+</section>
+
+<section>
+  <h2>Mathematical formulation</h2>
+
+  <p>
+    Active inference is grounded in variational inference.
+  </p>
+
+  <p>
+    The agent maintains beliefs over hidden states \(x\) and minimises a quantity known as variational free energy:
+  </p>
+
+  <div class="equation">
+    \( F = \mathbb{E}_{q(x)}[\log q(x) - \log p(y, x)] \)
+  </div>
+
+  <p>
+    This can be interpreted as:
+  </p>
+
+  <div class="equation">
+    \( F = \text{prediction error} + \text{complexity} \)
+  </div>
+
+  <p>
+    Minimising \(F\) corresponds to finding the best explanation of sensory data.
+  </p>
+
+  <p>
+    Action is selected by minimising expected free energy:
+  </p>
+
+  <div class="equation">
+    \( G(\pi) = \mathbb{E}[\text{risk}] + \mathbb{E}[\text{ambiguity}] \)
+  </div>
+
+  <p>
+    This drives behaviour that both achieves goals (low risk) and reduces uncertainty (low ambiguity).
+  </p>
+</section>
+
+<section>
+  <h2>Why this matters</h2>
+
+  <p>
+    Active inference provides a unified framework for perception, learning, and action.
+  </p>
+
+  <p>
+    The same principles used to model brain function can be used to build agents that operate in complex, uncertain environments.
+  </p>
+
+  <p>
+    Rather than separating learning, planning, and control, these processes emerge from a single objective: maintaining coherent beliefs about the world.
+  </p>
+</section>
+
+<footer class="note">
+  CPNS Lab · University of Exeter
+</footer>
+
+</div>
+</body>
+</html>
