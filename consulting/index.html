@@ -411,6 +411,52 @@
     </div>
   </section>
 
+  <!-- Contact Form-->
+  <section id="contact">
+  <div class="container" style="max-width:760px;">
+    <div class="card">
+      <h2>Contact</h2>
+      <p class="muted">
+        If you'd like to discuss collaboration, consulting, speaking, research partnerships, or applied AI / modelling work,
+        send a message below.
+      </p>
+
+      <form action="https://formspree.io/f/mdapydre" method="POST" style="display:grid; gap:14px; margin-top:18px;">
+        <div>
+          <label for="name"><strong>Name</strong></label><br>
+          <input id="name" name="name" type="text" required
+                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
+        </div>
+
+        <div>
+          <label for="email"><strong>Email</strong></label><br>
+          <input id="email" name="email" type="email" required
+                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
+        </div>
+
+        <div>
+          <label for="subject"><strong>Subject</strong></label><br>
+          <input id="subject" name="subject" type="text"
+                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
+        </div>
+
+        <div>
+          <label for="message"><strong>Message</strong></label><br>
+          <textarea id="message" name="message" rows="6" required
+                    style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit; resize:vertical;"></textarea>
+        </div>
+
+        <input type="hidden" name="_subject" value="New message from cpns.co.uk">
+        <input type="text" name="_gotcha" style="display:none">
+
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <button type="submit" class="btn">Send message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
   <!-- ===== Contact ===== -->
   <section id="contact">
     <div class="container grid" style="grid-template-columns:1.2fr 1fr; align-items:start">
