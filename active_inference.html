@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is Active Inference? | CPNS Lab</title>
+  <meta name="description" content="A simple but rigorous introduction to active inference, how it works, and how it differs from other AI approaches." />
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --text: #172033;
+      --muted: #5c667a;
+      --line: #dbe3ee;
+      --brand: #123b63;
+      --brand-2: #295a8a;
+      --accent: #dce9f6;
+      --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(calc(100% - 2rem), var(--max));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: rgba(248, 251, 255, 0.88);
+      border-bottom: 1px solid rgba(219, 227, 238, 0.8);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 74px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 8px 18px rgba(18,59,99,0.22);
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-text span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.82rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(18,59,99,0.12);
+      background: var(--surface);
+      color: var(--brand);
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(18,59,99,0.08);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .button-link:hover {
+      text-decoration: none;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(18,59,99,0.12);
+      border-color: rgba(18,59,99,0.18);
+    }
+
+    .hero {
+      padding: 4.6rem 0 2.4rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 1.4rem;
+      align-items: stretch;
+    }
+
+    .card,
+    .callout,
+    .figure-frame,
+    .equation-box,
+    .compare-card,
+    .mini-card,
+    .video-shell {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 2.2rem;
+      background:
+        radial-gradient(circle at top right, rgba(41, 90, 138, 0.11), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.34rem 0.72rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--brand);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.85rem;
+      color: #101827;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 5vw, 4.2rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 3vw, 2.2rem);
+      margin-bottom: 0.9rem;
+    }
+
+    h3 {
+      font-size: 1.18rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .lead {
+      font-size: 1.14rem;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .hero-actions {
+      margin-top: 1.4rem;
+      display: flex;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .ghost-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.82rem 1.05rem;
+      border-radius: 999px;
+      color: var(--brand);
+      border: 1px solid rgba(18,59,99,0.14);
+      background: rgba(255,255,255,0.7);
+      font-weight: 600;
+    }
+
+    .ghost-link:hover {
+      text-decoration: none;
+      background: rgba(220, 233, 246, 0.5);
+    }
+
+    .summary-panel {
+      padding: 1.3rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .summary-panel .mini-card {
+      padding: 1rem 1rem 0.95rem;
+    }
+
+    .summary-panel p,
+    .summary-panel li,
+    .content p,
+    .content li {
+      color: var(--muted);
+      margin-top: 0;
+    }
+
+    .mini-card ul,
+    .content ul,
+    .content ol {
+      padding-left: 1.2rem;
+      margin: 0.65rem 0 0;
+    }
+
+    .quick-jump {
+      margin-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    .quick-jump a {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.52rem 0.8rem;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--brand);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    section.content-section {
+      padding: 1rem 0 0.8rem;
+    }
+
+    .section-shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 1.4rem;
+      align-items: start;
+    }
+
+    .section-aside {
+      position: sticky;
+      top: 96px;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: white;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(18,59,99,0.18);
+      margin-bottom: 0.9rem;
+    }
+
+    .section-aside p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .content-card {
+      padding: 1.8rem;
+    }
+
+    .content-card p:last-child,
+    .content-card ul:last-child,
+    .content-card ol:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout {
+      padding: 1rem 1.1rem;
+      background: linear-gradient(180deg, #f9fcff 0%, #f5f9fd 100%);
+      border-color: #d6e5f4;
+      margin: 1.1rem 0;
+    }
+
+    .callout strong {
+      color: var(--brand);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .equation-box {
+      padding: 1.25rem 1.3rem;
+      background: linear-gradient(180deg, #fbfdff 0%, #f4f8fc 100%);
+      border-color: #d7e4f1;
+      overflow-x: auto;
+    }
+
+    .equation-label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--brand);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .equation {
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 1.18rem;
+      color: #122033;
+      white-space: normal;
+      line-height: 1.5;
+    }
+
+    .equation mjx-container {
+      font-size: 108% !important;
+    }
+
+    .equation-note {
+      margin-top: 0.65rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .compare-card {
+      padding: 1.25rem;
+    }
+
+    .compare-card h3 {
+      margin-bottom: 0.65rem;
+    }
+
+    .compare-card ul {
+      margin-bottom: 0;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.4rem;
+      margin-top: 1rem;
+    }
+
+    .figure-frame {
+      overflow: hidden;
+    }
+    .figure-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #f7fafc;
+    }
+
+    .figure-placeholder {
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+      background:
+        linear-gradient(180deg, rgba(220, 233, 246, 0.25), rgba(241, 245, 249, 0.65)),
+        repeating-linear-gradient(
+          45deg,
+          rgba(18,59,99,0.03) 0,
+          rgba(18,59,99,0.03) 10px,
+          transparent 10px,
+          transparent 20px
+        );
+      text-align: center;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .figure-frame figcaption {
+      padding: 0.95rem 1rem 1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .video-shell {
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .video-shell video,
+    .video-shell iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 0;
+      display: block;
+      background: #dfe7f0;
+    }
+
+    .quote-block {
+      padding: 1.15rem 1.25rem;
+      border-left: 4px solid var(--brand);
+      background: #f9fbfe;
+      border-radius: 0 14px 14px 0;
+      margin: 1rem 0;
+      color: #243246;
+      font-size: 1.03rem;
+    }
+
+    .footer-cta {
+      padding: 1.3rem 1.4rem;
+      background: linear-gradient(135deg, rgba(18,59,99,0.06), rgba(41,90,138,0.08));
+      border: 1px solid #d9e4ef;
+      border-radius: var(--radius);
+      margin-top: 1rem;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.9rem;
+    }
+
+    .site-footer {
+      padding: 2.7rem 0 3.4rem;
+      color: var(--muted);
+    }
+
+    .site-footer .container {
+      border-top: 1px solid var(--line);
+      padding-top: 1.2rem;
+    }
+
+    @media (max-width: 1000px) {
+      .hero-grid,
+      .section-shell,
+      .compare-grid,
+      .figure-grid,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .section-aside {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.9rem 0;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding-top: 3.2rem;
+      }
+
+      .hero-card,
+      .content-card {
+        padding: 1.35rem;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+
+  <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="brand-wrap">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-text">
+          <strong>CPNS Lab</strong>
+          <span>Computational Psychiatry &amp; Neuropharmacological Systems</span>
+        </div>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/consulting/">Consulting</a>
+        <a href="#figures">Figures</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <article class="hero-card card">
+          <div class="eyebrow">Active Inference</div>
+          <h1>What is active inference, and how is it different from other AI?</h1>
+          <p class="lead">
+            Active inference is a way of building intelligent systems that starts from a simple but powerful idea:
+            an agent should not just react to the world, or chase rewards, but continually build predictions about
+            the world and then update itself, and act, to reduce the mismatch between what it expects and what it senses.
+          </p>
+          <p class="lead">
+            Put differently: rather than treating perception, learning, and action as separate problems, active inference
+            tries to explain them as parts of the same loop.
+          </p>
+          <div class="hero-actions">
+            <a class="button-link" href="#simple">Start simple</a>
+            <a class="ghost-link" href="#maths">Jump to the maths</a>
+            <a class="ghost-link" href="/consulting/">Related consulting work</a>
+          </div>
+        </article>
+
+        <aside class="summary-panel card">
+          <div class="mini-card">
+            <h3>In one sentence</h3>
+            <p>
+              Active inference treats intelligence as an ongoing process of <strong>predicting</strong>,
+              <strong>updating beliefs</strong>, and <strong>acting</strong> to make the world more in line with those predictions.
+            </p>
+          </div>
+          <div class="mini-card">
+            <h3>What makes it interesting?</h3>
+            <ul>
+              <li>Perception and action come from the same underlying principle</li>
+              <li>Uncertainty is built in, not bolted on afterward</li>
+              <li>It connects AI, robotics, neuroscience, and behaviour</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <div class="container quick-jump" aria-label="Section links">
+        <a href="#simple">The simple version</a>
+        <a href="#intuition">Deeper intuition</a>
+        <a href="#example">A concrete example</a>
+        <a href="#maths">The maths</a>
+        <a href="#comparison">Compared with other AI</a>
+        <a href="#figures">Figures &amp; visualisations</a>
+      </div>
+    </section>
+
+    <section id="simple" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">1</div>
+          <h2>The simple version</h2>
+
+        </aside>
+        <article class="content-card card content">
+          <p>
+            Imagine a robot moving around a room looking for an object.
+          </p>
+          <p>
+            A lot of AI is framed in one of two ways. Either the system learns to map inputs to outputs,
+            or it learns which actions tend to produce rewards.
+          </p>
+          <p>
+            Active inference starts somewhere else. It says the agent should build an internal model of the world,
+            use that model to predict what it ought to sense next, and then reduce the gap between prediction and reality.
+          </p>
+          <div class="quote-block">
+            In that sense, the agent is not just <em>reacting</em> to the world. It is constantly trying to make sense of it,
+            and acting so that what it senses becomes less surprising.
+          </div>
+          <p>
+            When there is a mismatch, two things can happen:
+          </p>
+          <ol>
+            <li>the agent can update its beliefs about what is going on, or</li>
+            <li>it can act to change what happens next.</li>
+          </ol>
+          <p>
+            That is the key move. Perception and action are not really separate. They are two ways of reducing prediction error.
+          </p>
+          <div class="callout">
+            <strong>Very short version:</strong> active inference says intelligent behaviour can emerge from a system that continually predicts,
+            checks those predictions against reality, and updates beliefs or actions to reduce the mismatch.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="intuition" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">2</div>
+          <h2>Deeper intuition</h2>
+
+        </aside>
+        <article class="content-card card content">
+          <p>
+            At any moment, an agent does not directly observe the hidden causes of the world. It does not observe
+            “where the object really is” in any perfect sense. It observes data: pixels, distances, touch signals,
+            sound, motion cues, and so on.
+          </p>
+          <p>
+            So the agent has to infer the hidden state of the world from those observations. That is the perceptual part.
+            But because the agent is embodied, it can also move, sample the world differently, and place itself somewhere
+            new. That is the action part.
+          </p>
+          <p>
+            Active inference ties these together. The agent carries around beliefs about:
+          </p>
+          <ul>
+            <li>what state the world is in</li>
+            <li>how states generate observations</li>
+            <li>how actions change states over time</li>
+            <li>which outcomes it expects or prefers to encounter</li>
+          </ul>
+          <p>
+            Those beliefs are usually probabilistic. Not “the object is exactly here”, but “it is probably here,
+            with some uncertainty”. That matters because uncertainty is not a minor detail. It changes behaviour.
+          </p>
+          <div class="two-col">
+            <div class="callout">
+              <strong>When uncertainty is high</strong><br />
+              the agent is naturally pushed toward information-gathering behaviour: looking, moving, sampling, checking.
+            </div>
+            <div class="callout">
+              <strong>When beliefs are strong</strong><br />
+              the agent can act more decisively, because it has a sharper internal picture of what is going on.
+            </div>
+          </div>
+          <p>
+            This is one reason active inference is appealing. Exploration is not something awkwardly added later.
+            It falls out of the same principle as perception and action.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="example" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">3</div>
+          <h2>A concrete example</h2>
+          <p>
+            The intuition becomes much clearer once you place it in a physical agent.
+          </p>
+        </aside>
+        <article class="content-card card content">
+          <p>
+            Suppose we have a robot in a room. Its task is to find an object, grasp it, and return home.
+          </p>
+          <p>
+            A reward-based system might be told something like: “get points for approaching the object; get more points for returning home with it”.
+          </p>
+          <p>
+            In active inference terms, we can frame the problem differently. The robot has beliefs about where it is, where the object might be,
+            whether the object has been grasped, and what observations it should receive if those beliefs are correct.
+          </p>
+          <p>
+            Early on, it may have a very uncertain belief about the object location. That pushes it toward exploratory actions.
+            Once evidence accumulates, beliefs sharpen. After grasping, the preferred future changes: now the “good” predicted outcomes
+            are those consistent with being back at home while retaining the object.
+          </p>
+          <div class="callout">
+            <strong>Before grasping:</strong> reduce uncertainty, find the object, bring observations in line with “the object is out there and can be reached”.
+            <br /><br />
+            <strong>After grasping:</strong> bring observations in line with “I am back at home, holding the object”.
+          </div>
+          <p>
+            This is a useful way to think about active inference. It is not magic but a concrete control-and-inference scheme where goals, uncertainty, state estimation, and action selection are all written in the same language.
+          </p>
+          <div class="video-shell">
+            <video controls preload="metadata" poster="active_inference_robot_placeholder.jpg">
+              <source src="pybullet_collect_return_arm_roomlike.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+        </article>
+      </div>
+    </section>
+
+    <section id="maths" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">4</div>
+          <h2>The maths</h2>
+          <p>
+            Here we move from intuition to the more formal picture.
+          </p>
+        </aside>
+        <article class="content-card card content">
+          <p>
+            The central quantity is variational free energy. You can think of it as a tractable quantity the agent can minimise in place of surprise itself.
+          </p>
+          <div class="equation-box">
+            <span class="equation-label">Core objective</span>
+            <div class="equation">\[
+              F[q] = \mathbb{E}_{q(s)}\left[\ln q(s) - \ln p(o, s)\right]
+              \]</div>
+            <div class="equation-note">
+              Here, <em>o</em> are observations, <em>s</em> are hidden states, <em>p(o,s)</em> is the generative model, and <em>q(s)</em> is the agent’s approximate posterior belief over states.
+            </div>
+          </div>
+          <p>
+            In practice, this quantity can be unpacked in a way that is often more intuitive:
+          </p>
+          <div class="equation-box">
+            <span class="equation-label">Accuracy–complexity form</span>
+            <div class="equation">\[
+            F \approx \text{complexity} - \text{accuracy}
+            \]</div>
+            <div class="equation-note">
+              So a good model explains the data well, but without becoming needlessly complicated.
+            </div>
+          </div>
+          <p>
+            Minimising free energy therefore does two jobs at once. It improves the fit to sensory data and regularises the beliefs used to explain those data.
+            This is why active inference is closely tied to variational Bayesian inference.
+          </p>
+          <p>
+            For action, the relevant quantity is expected free energy, which scores possible future policies.
+          </p>
+          <div class="equation-box">
+            <span class="equation-label">Expected free energy</span>
+            <div class="equation">\[
+            G(\pi) = \mathbb{E}_{q(o, s \mid \pi)}
+            \big[\ln q(s \mid \pi) - \ln p(o, s \mid \pi)\big]
+            \]</div>
+            <div class="equation-note">
+              A policy <em>\pi</em> is a candidate course of action. The agent evaluates policies by asking what sorts of outcomes and uncertainties they are expected to generate.
+            </div>
+          </div>
+          <p>
+            A common and very useful decomposition is that expected free energy captures both:
+          </p>
+          <ul>
+            <li><strong>risk</strong> — whether future outcomes are inconsistent with preferred outcomes</li>
+            <li><strong>ambiguity</strong> — whether future observations are likely to remain uninformative</li>
+          </ul>
+          <p>
+            That means active inference naturally balances exploitation and exploration. The agent seeks outcomes it prefers, but it also values information when uncertainty is high.
+          </p>
+          <div class="callout">
+            <strong>The important intuition:</strong> the same formalism that supports perception also supports planning. The agent is not switching between one system for inference and another for decision-making. It is using one probabilistic framework for both.
+          </div>
+          <p>
+            In continuous-state settings, especially in neuroscience and robotics, one often writes a generative model in state-space form:
+          </p>
+          <div class="equation-box">
+            <span class="equation-label">State-space form</span>
+            <div class="equation">\[
+            \dot{x} = f(x, u, \theta) + \omega, \qquad
+            o = g(x, \theta) + \nu
+            \]</div>
+            <div class="equation-note">
+              Hidden states <em>x</em> evolve according to dynamics <em>f</em>, observations <em>o</em> are generated by an observation model <em>g</em>, and the noise terms <em>\omega</em>, <em>\nu</em> capture uncertainty.
+            </div>
+          </div>
+          <p>
+            That is the bridge to a lot of our work at CPNS: the same formal machinery that can be used to model perception and action can also be used to model neural dynamics,
+            synaptic mechanisms, EEG or MEG signals, and the effects of drugs or pathology on hidden circuit parameters.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="comparison" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">5</div>
+          <h2>How is it different from other AI?</h2>
+
+        </aside>
+        <article class="content-card card content">
+          <p>
+            There are overlaps, of course. Active inference is not from another universe. It shares some territory with Bayesian modelling, control, reinforcement learning,
+            and model-based planning. But it frames the whole problem differently.
+          </p>
+          <div class="compare-grid">
+            <div class="compare-card">
+              <h3>Supervised learning</h3>
+              <ul>
+                <li>learns a mapping from inputs to outputs</li>
+                <li>typically static once trained</li>
+                <li>does not usually treat action, uncertainty, and perception as one loop</li>
+              </ul>
+            </div>
+            <div class="compare-card">
+              <h3>Reinforcement learning</h3>
+              <ul>
+                <li>learns which actions maximise reward</li>
+                <li>usually depends on a reward function being specified</li>
+                <li>often treats exploration as a separate design problem</li>
+              </ul>
+            </div>
+            <div class="compare-card">
+              <h3>Active inference</h3>
+              <ul>
+                <li>uses a generative model of hidden states and observations</li>
+                <li>casts perception and action as coupled inference problems</li>
+                <li>bakes uncertainty, preferences, and information-seeking into the same formalism</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="quote-block">
+            Many AI systems are built to maximise reward or minimise task error. Active inference is built around explaining sensory data,
+            inferring hidden causes, and selecting actions that make preferred futures more probable.
+          </div>
+          <p>
+            That sounds subtle, but it changes a lot. It changes how you represent uncertainty. It changes how you think about exploration.
+            And it makes it much easier to connect AI with theories of biological intelligence.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="why-cpns" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">6</div>
+          <h2>Why this matters for CPNS</h2>
+
+        </aside>
+        <article class="content-card card content">
+          <p>
+            At CPNS, we are interested in models that connect hidden mechanisms to observable behaviour and data.
+            In neuroscience, those hidden mechanisms may be synaptic gains, receptor dynamics, or circuit interactions.
+            In AI and robotics, they may be latent states, policies, uncertainty, and control dynamics.
+          </p>
+          <p>
+            Active inference is valuable because it offers a common language for these domains. It lets us think about brain function,
+            perception, action, uncertainty, and intelligent behaviour within one probabilistic framework.
+          </p>
+          <div class="callout">
+            It gives us a principled way to move between brains, behaviour, and intelligent systems without treating them as unrelated topics.
+          </div>
+          <p>
+            That is part of why active inference matters to us. It is not only a way to build interesting agents. It is also a way to formalise the link between neural mechanisms,
+            cognitive function, psychiatric disorder, and adaptive behaviour in the world.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="figures" class="content-section">
+      <div class="container section-shell">
+        <aside class="section-aside">
+          <div class="section-number">7</div>
+          <h2>Figures &amp; visualisations</h2>
+          
+        </aside>
+        <article class="content-card card content">
+
+          <div class="figure-grid">
+          <figure class="figure-frame">
+            <img src="active-inference-core-loop.png" alt="Diagram of the active inference loop showing predictions, sensory input, prediction error, generative model, and actions." />
+            <figcaption>
+              A simple view of the active inference loop: predictions are compared against sensory input, mismatches generate prediction error, beliefs are updated, and actions are selected to reduce future mismatch.
+            </figcaption>
+          </figure>
+          <figure class="figure-frame">
+            <img src="active-inference-vs-rl.png" alt="Side-by-side comparison of reinforcement learning and active inference." />
+            <figcaption>
+              Reinforcement learning is typically framed around reward maximisation, whereas active inference is framed around prediction, belief updating, action, and the minimisation of surprise.
+            </figcaption>
+          </figure>
+        </div>
+
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        Computational Psychiatry &amp; Neuropharmacological Systems (CPNS) Lab · University of Exeter
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
