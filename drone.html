@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Polyphonic Active Inference Drone | CPNS Lab</title>
-  <meta name="description" content="A hierarchical polyphonic active inference drone in PyBullet with belief updates, uncertainty-sensitive control, and latent scene/context inference." />
+  <meta name="description" content="A hierarchical polyphonic active inference drone in PyBullet with online belief updates, discrete mode inference, and scene-level epistemic policy evaluation." />
   <style>
     :root {
       --bg: #f6f8fb;
@@ -26,7 +26,7 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 220px, var(--bg) 100%);
       color: var(--ink);
-      line-height: 1.65;
+      line-height: 1.68;
     }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -40,30 +40,14 @@
       background: rgba(248, 251, 255, 0.85);
       border-bottom: 1px solid rgba(216, 225, 234, 0.8);
     }
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-    .brand {
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: var(--ink);
-    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+    .brand { font-weight: 700; letter-spacing: 0.01em; color: var(--ink); }
     .brand span { color: var(--accent); }
-    .navlinks {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
+    .navlinks { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.95rem; color: var(--muted); }
     .hero {
       padding: 46px 0 28px;
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1.12fr 0.88fr;
       gap: 28px;
       align-items: start;
     }
@@ -86,18 +70,8 @@
       line-height: 1.05;
       letter-spacing: -0.03em;
     }
-    .lede {
-      font-size: 1.08rem;
-      color: var(--muted);
-      max-width: 68ch;
-      margin-bottom: 18px;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 18px 0 22px;
-    }
+    .lede { font-size: 1.08rem; color: var(--muted); max-width: 70ch; margin-bottom: 18px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 22px; }
     .chip {
       padding: 8px 12px;
       border: 1px solid var(--line);
@@ -106,12 +80,7 @@
       font-size: 0.92rem;
       color: var(--muted);
     }
-    .ctarow {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
+    .ctarow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
     .btn {
       display: inline-flex;
       align-items: center;
@@ -122,70 +91,23 @@
       font-weight: 600;
       border: 1px solid transparent;
     }
-    .btn.primary {
-      background: var(--accent);
-      color: white;
-      box-shadow: var(--shadow);
-    }
-    .btn.secondary {
-      background: white;
-      color: var(--ink);
-      border-color: var(--line);
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(216, 225, 234, 0.9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+    .btn.primary { background: var(--accent); color: white; box-shadow: var(--shadow); }
+    .btn.secondary { background: white; color: var(--ink); border-color: var(--line); }
+    .card { background: var(--card); border: 1px solid rgba(216, 225, 234, 0.9); border-radius: var(--radius); box-shadow: var(--shadow); }
     .video-card { overflow: hidden; }
-    .video-card video, .video-card img {
-      display: block;
-      width: 100%;
-      height: auto;
-      background: #0f1723;
-    }
-    .video-meta {
-      padding: 16px 18px 18px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin: 14px 0 42px;
-    }
-    .stat {
-      padding: 18px;
-    }
-    .stat .k {
-      font-size: 1.8rem;
-      font-weight: 750;
-      line-height: 1;
-      margin-bottom: 8px;
-      color: var(--ink);
-    }
+    .video-card video { display: block; width: 100%; height: auto; background: #0f1723; }
+    .video-meta { padding: 16px 18px 18px; color: var(--muted); font-size: 0.95rem; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 14px 0 42px; }
+    .stat { padding: 18px; }
+    .stat .k { font-size: 1.8rem; font-weight: 750; line-height: 1; margin-bottom: 8px; color: var(--ink); }
     .stat .label { color: var(--muted); font-size: 0.94rem; }
     main section { padding: 10px 0 28px; }
-    h2 {
-      font-size: clamp(1.55rem, 2.2vw, 2.2rem);
-      margin: 0 0 14px;
-      letter-spacing: -0.02em;
-    }
-    h3 {
-      font-size: 1.14rem;
-      margin: 24px 0 10px;
-    }
+    h2 { font-size: clamp(1.55rem, 2.2vw, 2.2rem); margin: 0 0 14px; letter-spacing: -0.02em; }
+    h3 { font-size: 1.14rem; margin: 24px 0 10px; }
     p { margin: 0 0 14px; }
     ul { margin: 10px 0 16px 22px; }
     li { margin-bottom: 8px; }
-    .two-col {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
-      align-items: start;
-    }
+    .two-col { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 24px; align-items: start; }
     .panel { padding: 22px 22px 18px; }
     .note {
       padding: 14px 16px;
@@ -203,12 +125,7 @@
       margin: 16px 0;
       overflow-x: auto;
     }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-    .stack > * + * { margin-top: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .muted { color: var(--muted); }
     .code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -220,16 +137,8 @@
       overflow-x: auto;
       white-space: pre-wrap;
     }
-    .callout-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-    footer {
-      padding: 26px 0 44px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    .callout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    footer { padding: 26px 0 44px; color: var(--muted); font-size: 0.95rem; }
     @media (max-width: 960px) {
       .hero, .two-col, .grid-3, .stats, .callout-grid { grid-template-columns: 1fr; }
       header { position: static; }
@@ -237,10 +146,7 @@
   </style>
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-      },
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
       svg: { fontCache: 'global' }
     };
   </script>
@@ -257,7 +163,6 @@
         <a href="#maths">Equations</a>
         <a href="#implementation">Implementation</a>
         <a href="#results">Results</a>
-        <a href="#next">Next steps</a>
       </nav>
     </div>
   </header>
@@ -265,21 +170,21 @@
   <div class="wrap">
     <section class="hero" id="overview">
       <div>
-        <div class="eyebrow">Hierarchical polyphonic active inference in a 3D PyBullet world</div>
-        <h1>A drone that acts on beliefs, not truth</h1>
+        <div class="eyebrow">Hierarchical polyphonic active inference in a 3D PyBullet environment</div>
+        <h1>An embodied drone controller built around belief dynamics and scene disambiguation</h1>
         <p class="lede">
-          This project implements a physically embodied drone agent that pursues a beacon in a cluttered 3D environment using a polyphonic active-inference-style architecture. The agent does not act directly on simulator truth. Instead, simulator state is converted into noisy observations, posterior beliefs are updated online, and action is selected by a short-horizon controller whose objectives are modulated by a slower hierarchical latent layer over visibility, progress, affordance, and behavioural context.
+          This project implements a drone agent that must reach a target beacon in a cluttered three-dimensional world under partial observability. The controller does not operate on simulator truth. Instead, latent state estimates are updated online from noisy self-observations, egocentric target cues, and ray-based obstacle sensing, and action is selected from those beliefs by a polyphonic control architecture whose pressures are modulated by a slower scene and context layer.
         </p>
         <p class="lede">
-          The result is an interpretable control system that can maintain a remembered target under occlusion, switch between search, approach, repositioning, recovery, and stabilisation, and use uncertainty and scene interpretation to arbitrate behaviour in a way that is much closer to a real inferential agent than a hand-scripted planner.
+          The resulting system combines continuous state estimation, discrete behavioural arbitration, short-horizon expected-free-energy-style rollout, and higher-order scene disambiguation. In practice this allows the drone to maintain a remembered target under occlusion, distinguish between poor vantage and genuine blockage, shift between search and exploitation, and recover from deadlocks without ever being handed the target state directly.
         </p>
         <div class="chips">
           <div class="chip">PyBullet</div>
           <div class="chip">Belief-state control</div>
           <div class="chip">Egocentric sensing</div>
-          <div class="chip">Approximate VMP / Laplace updates</div>
-          <div class="chip">Polyphonic control</div>
-          <div class="chip">Hierarchical latent scene inference</div>
+          <div class="chip">Gaussian/Laplace filtering</div>
+          <div class="chip">Discrete mode inference</div>
+          <div class="chip">Scene-level epistemic control</div>
         </div>
         <div class="ctarow">
           <a class="btn primary" href="#video">Watch the demo</a>
@@ -288,36 +193,36 @@
       </div>
 
       <div class="card video-card" id="video">
-        <video controls preload="metadata" poster="poster.jpg">
-          <source src="polyphonic_drone_demo.mp4" type="video/mp4" />
+        <video controls preload="metadata">
+          <source src="polyphonic_drone_demo_latest.mp4" type="video/mp4" />
           Your browser does not support embedded video.
         </video>
         <div class="video-meta">
-          Demonstration run from the final Stage C1.1 controller. The overlay shows target belief, observation status, and higher-level latent context driving behavioural arbitration.
+          Demonstration run of the current controller. The overlay shows target belief, target confidence, observation status, behavioural mode, and the slower scene/context variables that bias exploration, exploitation, and repositioning.
         </div>
       </div>
     </section>
 
     <section>
       <div class="stats">
-        <div class="card stat"><div class="k">1152</div><div class="label">control steps in the attached successful run</div></div>
+        <div class="card stat"><div class="k">1096</div><div class="label">control steps in the attached successful run</div></div>
         <div class="card stat"><div class="k">0.27 m</div><div class="label">minimum distance to target achieved</div></div>
         <div class="card stat"><div class="k">538</div><div class="label">steps with direct target visibility</div></div>
-        <div class="card stat"><div class="k">6</div><div class="label">distinct behavioural regimes represented in the mode layer</div></div>
+        <div class="card stat"><div class="k">4</div><div class="label">dominant behavioural regimes expressed during pursuit</div></div>
       </div>
     </section>
 
-    <section class="one-col">
+    <section>
       <div class="card panel">
         <h2>Why this system is interesting</h2>
         <p>
-          Many active inference demos either operate in very small discrete worlds or rely on hidden shortcuts that make control easier than it first appears. This system was built to push beyond that. The drone lives in a continuous 3D environment, receives imperfect local observations, and must maintain a target belief under partial occlusion while avoiding obstacles and stabilising flight. It does not simply chase ground-truth coordinates.
+          Many active inference demonstrations remain either highly discrete or unrealistically privileged. This system was designed to move beyond that. The drone inhabits a continuous 3D environment, receives only local noisy cues, and must reach a target while maintaining a coherent belief state through periods of occlusion, clutter, and changing line-of-sight geometry. The policy does not reduce to direct pursuit of a known coordinate.
         </p>
         <p>
-          The more distinctive ingredient is the <em>polyphonic</em> control architecture. Instead of reducing behaviour to a single scalar objective, the controller combines multiple pressures: pragmatic target pursuit, safety, altitude and heading stabilisation, open-space preference, uncertainty reduction, and mode-specific contextual drives. These pressures do not remain fixed. In the final version, they are modulated by a slower latent layer that tries to infer what kind of situation the agent is currently in.
+          The more distinctive feature is the way uncertainty is organised. The agent maintains a fast belief layer over self state, target state, and local obstacle structure; a discrete arbitration layer over behavioural modes; and a slower scene/context layer that summarises whether the world currently looks visible, soft-occluded, lost, advancing, stalled, trapped, open, or blocked. Policies are then scored not only for goal progress and safety, but also for how much they are expected to reduce uncertainty over these higher-order latent scene variables.
         </p>
         <div class="note">
-          In other words, the agent does not only ask “where is the target?”. It also asks “am I stalled?”, “is the target merely occluded or effectively lost?”, and “should I exploit my current target memory or gather better evidence first?”.
+          In practical terms, the controller asks not only “where is the target?” but also “am I merely occluded, genuinely blocked, or stuck in a poor vantage region?”, and then uses that answer to bias action selection.
         </div>
       </div>
     </section>
@@ -325,34 +230,34 @@
     <section id="architecture">
       <h2>System architecture</h2>
       <div class="grid-3">
-        <div class="card panel stack">
-          <h3>1. World and sensors</h3>
-          <p>The drone moves in a PyBullet environment with obstacles and a target beacon. The simulator provides truth internally, but the controller only receives noisy derived observations.</p>
+        <div class="card panel">
+          <h3>1. Observation interface</h3>
+          <p>The simulator retains ground truth internally, but the controller sees only noisy observations generated from that truth.</p>
           <ul>
-            <li>noisy self-pose and yaw observation</li>
-            <li>egocentric target cues: range, bearing, elevation</li>
+            <li>noisy self pose, velocity and yaw cues</li>
+            <li>egocentric target observations: range, bearing, elevation</li>
             <li>ray-based obstacle distances</li>
-            <li>soft target cues under chronic occlusion</li>
+            <li>soft target evidence when the beacon is broadly localised but occluded</li>
           </ul>
         </div>
-        <div class="card panel stack">
-          <h3>2. Fast belief layer</h3>
-          <p>Posterior beliefs are maintained over self state, target state, and local obstacle structure. This is the first layer that converts raw observations into hidden-state estimates.</p>
+        <div class="card panel">
+          <h3>2. Fast inferential layer</h3>
+          <p>The first inferential layer converts observations into posterior summaries over hidden state.</p>
           <ul>
-            <li>self belief: pose, velocity, yaw</li>
-            <li>target belief: mean, covariance, confidence</li>
-            <li>local map belief: ray-space free-space structure</li>
-            <li>mode beliefs: search, rollout, reposition, recovery, hold, hover</li>
+            <li>self belief: mean and covariance over pose and motion state</li>
+            <li>target belief: mean, covariance, confidence and occlusion history</li>
+            <li>local map belief: ray-wise structure of nearby free space</li>
+            <li>diagnostics: variance traces, confidence, visibility, deadlock signals</li>
           </ul>
         </div>
-        <div class="card panel stack">
+        <div class="card panel">
           <h3>3. Slow scene/context layer</h3>
-          <p>A slower latent layer summarises what kind of situation the agent is in and feeds top-down biases back into control.</p>
+          <p>A slower latent layer interprets the current situation and modulates control rather than replacing it.</p>
           <ul>
             <li>visibility regime: visible / soft-occluded / lost</li>
             <li>progress regime: advancing / stalled / trapped</li>
             <li>affordance regime: good-vantage / poor-vantage / blocked</li>
-            <li>context precisions: exploit vs explore, memory, safety, epistemic, goal</li>
+            <li>context precisions: explore, memory, safety, epistemic, goal</li>
           </ul>
         </div>
       </div>
@@ -360,50 +265,51 @@
 
     <section class="two-col">
       <div class="card panel">
-        <h2>Behavioural modes</h2>
+        <h2>Behavioural arbitration</h2>
         <p>
-          The controller does not issue commands from a single global optimiser. It arbitrates among a small family of interpretable behavioural regimes, each of which can dominate under different belief and context conditions.
+          Action is not issued by a single monolithic controller. The system maintains posterior-like scores over a compact family of behavioural regimes, and the current regime is selected from those beliefs under the influence of target confidence, visibility, progress, local geometry, and scene/context interpretation.
         </p>
         <ul>
-          <li><strong>search_reacquire</strong>: broad scanning when target memory is weak</li>
-          <li><strong>efe_rollout</strong>: short-horizon forward evaluation of candidate commands</li>
-          <li><strong>vantage_reposition</strong>: sidestepping or reorientation to recover line of sight</li>
-          <li><strong>recovery</strong>: conservative control under poor local geometry</li>
-          <li><strong>goal_hold</strong>: local stabilisation near target</li>
-          <li><strong>success_hover</strong>: terminal hovering once the success condition is satisfied</li>
+          <li><strong>search_reacquire</strong>: broad exploratory movement when target memory is weak or evidence is poor</li>
+          <li><strong>efe_rollout</strong>: short-horizon forward evaluation of candidate controls under current beliefs</li>
+          <li><strong>vantage_reposition</strong>: lateral or rotational manoeuvres that seek improved line of sight</li>
+          <li><strong>recovery</strong>: conservative behaviour under poor local geometry or control deadlock</li>
+          <li><strong>goal_hold</strong>: local stabilisation near the target</li>
+          <li><strong>success_hover</strong>: terminal behaviour after the success condition is reached</li>
         </ul>
         <p>
-          The key point is that these are no longer brittle if-else switches. In the Stage B5 and Stage C variants, the controller maintains posterior-like probabilities over modes and uses those probabilities as an arbitration layer.
+          This makes the controller interpretable. Different modes dominate at different moments in the run, rather than the drone always appearing to do the same thing under slightly different parameter values.
         </p>
       </div>
       <div class="card panel">
         <h2>Polyphonic control</h2>
         <p>
-          “Polyphonic” here means that action is not determined by one monolithic score. Several behavioural voices contribute pressure simultaneously, and their relative influence changes with the inferred situation.
+          Polyphony here means that candidate actions are evaluated under several concurrent behavioural pressures rather than one fixed objective. These pressures have their own effective precisions, and those precisions are shaped by the slower scene/context layer.
         </p>
         <ul>
-          <li><strong>pragmatic voice</strong>: reduce distance and alignment error to the beacon</li>
-          <li><strong>safety voice</strong>: avoid local obstacle risk and high-collision trajectories</li>
-          <li><strong>stability voice</strong>: maintain altitude, heading, and smooth control</li>
-          <li><strong>epistemic voice</strong>: prefer actions expected to reduce uncertainty or improve visibility</li>
-          <li><strong>open-space voice</strong>: drift toward more informative / less constrained local geometry</li>
+          <li><strong>goal pressure</strong>: reduce target distance and alignment error</li>
+          <li><strong>safety pressure</strong>: avoid collision-prone trajectories and cluttered local geometry</li>
+          <li><strong>stability pressure</strong>: maintain altitude, heading and smooth control</li>
+          <li><strong>epistemic pressure</strong>: reduce uncertainty over target and scene state</li>
+          <li><strong>open-space pressure</strong>: prefer trajectories that improve geometry for future observations</li>
         </ul>
         <p>
-          The scene/context layer acts mainly by modulating the effective precision of these voices, rather than replacing the controller with a second heavy planner.
+          The important point is that the controller does not merely chase the target. It can choose to move in ways that are temporarily suboptimal for distance reduction but useful for information gathering or scene disambiguation.
         </p>
       </div>
     </section>
 
     <section id="maths">
       <h2>Mathematical formulation</h2>
+
       <div class="callout-grid">
         <div class="card panel">
           <h3>Fast hidden states</h3>
-          <p>Let the fast hidden state factor as</p>
+          <p>The fast latent state is factorised as</p>
           <div class="equation-block">
             $$x_t = \{x_t^{\mathrm{self}},\; x_t^{\mathrm{target}},\; x_t^{\mathrm{map}}\}.$$
           </div>
-          <p>In the current implementation these correspond approximately to:</p>
+          <p>In the current implementation these are approximated by</p>
           <div class="equation-block">
             $$x_t^{\mathrm{self}} = [p_x,p_y,p_z,v_x,v_y,v_z,\psi,\dot\psi],$$
             $$x_t^{\mathrm{target}} = [g_x,g_y,g_z],$$
@@ -413,47 +319,70 @@
         </div>
         <div class="card panel">
           <h3>Observations</h3>
-          <p>The controller sees a noisy observation vector</p>
+          <p>The observation vector is</p>
           <div class="equation-block">
             $$o_t = \{o_t^{\mathrm{self}},\; o_t^{\mathrm{target}},\; o_t^{\mathrm{rays}}\}.$$
           </div>
-          <p>These are generated from simulator truth but presented to the controller as noisy measurements:</p>
+          <p>It is generated from truth but consumed by the controller as noisy evidence:</p>
           <div class="equation-block">
             $$o_t^{\mathrm{self}} = H_s x_t^{\mathrm{self}} + \omega_t^{s},$$
             $$o_t^{\mathrm{rays}} = x_t^{\mathrm{map}} + \omega_t^{r},$$
-            $$o_t^{\mathrm{target}} = h(x_t^{\mathrm{self}}, x_t^{\mathrm{target}}) + \omega_t^{g},$$
+            $$o_t^{\mathrm{target}} = h(x_t^{\mathrm{self}},x_t^{\mathrm{target}}) + \omega_t^{g}.$$
           </div>
-          <p>where $h(\cdot)$ returns egocentric range, bearing, and elevation when the target is visible or softly observable.</p>
+          <p>Here $h(\cdot)$ returns egocentric range, bearing and elevation, with weaker soft observations when the target is broadly localised but occluded.</p>
         </div>
       </div>
 
       <div class="card panel">
-        <h3>Approximate posterior updates</h3>
+        <h3>Continuous belief updates</h3>
         <p>
-          The fast belief layer maintains approximate Gaussian posteriors over continuous latent states,
+          The fast inferential layer maintains approximate Gaussian beliefs over self and target state,
         </p>
         <div class="equation-block">
-          $$q(x_t^{\mathrm{self}}) = \mathcal{N}(\mu_t^{s}, \Sigma_t^{s}), \qquad
-          q(x_t^{\mathrm{target}}) = \mathcal{N}(\mu_t^{g}, \Sigma_t^{g}).$$
+          $$q(x_t^{\mathrm{self}}) = \mathcal{N}(\mu_t^{s},\Sigma_t^{s}), \qquad
+          q(x_t^{\mathrm{target}}) = \mathcal{N}(\mu_t^{g},\Sigma_t^{g}).$$
         </div>
         <p>
-          In the implementation, these are updated by lightweight prediction-correction steps rather than a fully general symbolic message-passing engine. The spirit is variational: beliefs are predicted forward under a transition model, corrected by precision-weighted observation errors, and retained as the sufficient statistics driving control.
+          Beliefs are predicted forward under a local transition model and then corrected by precision-weighted prediction errors. A stylised form is
         </p>
         <div class="equation-block">
-          $$\mu_{t|t-1} = f(\mu_{t-1}, u_{t-1}),$$
-          $$\Sigma_{t|t-1} = A_t \Sigma_{t-1} A_t^\top + Q,$$
-          $$\mu_t = \mu_{t|t-1} + K_t \big(o_t - h(\mu_{t|t-1})\big),$$
-          $$\Sigma_t = (I - K_t H_t)\Sigma_{t|t-1}.$$
+          $$\mu_{t|t-1} = f(\mu_{t-1},u_{t-1}),$$
+          $$\Sigma_{t|t-1} = A_t\Sigma_{t-1}A_t^\top + Q,$$
+          $$\mu_t = \mu_{t|t-1} + K_t\big(o_t - h(\mu_{t|t-1})\big),$$
+          $$\Sigma_t = (I-K_tH_t)\Sigma_{t|t-1}.$$
         </div>
         <p>
-          For the target, egocentric cues are reconstructed into world-frame target estimates using the current self belief. Under chronic occlusion, soft cues are treated as weak evidence: confidence decays, covariance inflates, and the system is prevented from becoming overconfident under poor visibility.
+          For the target state, egocentric cues are reconstructed into world coordinates using the current self belief. Under prolonged soft occlusion, target confidence decays and covariance inflates, which prevents the agent from becoming spuriously certain about an unseen target.
         </p>
       </div>
 
+      <div class="callout-grid">
+        <div class="card panel">
+          <h3>Discrete mode beliefs</h3>
+          <p>Behavioural arbitration is represented by a posterior-like belief over controller modes,</p>
+          <div class="equation-block">
+            $$q(m_t) = \mathrm{softmax}(\ell_t),$$
+          </div>
+          <p>
+            where the logits $\ell_t$ depend on target confidence, visibility, local obstacle structure, progress, deadlock signals and proximity to target. This creates a compact inferential layer over regime selection rather than a brittle cascade of hard-coded switches.
+          </p>
+        </div>
+        <div class="card panel">
+          <h3>Slow scene/context state</h3>
+          <p>The slower latent scene state is factorised as</p>
+          <div class="equation-block">
+            $$z_t = \{z_t^{\mathrm{vis}},\; z_t^{\mathrm{prog}},\; z_t^{\mathrm{aff}},\; z_t^{\mathrm{ctx}}\}.$$
+          </div>
+          <p>
+            These variables summarise visibility regime, progress regime, affordance regime and contextual precision control. In implementation they are updated from smoothed evidence accumulated over several timesteps and feed back into control through precision-like variables controlling exploration, target-memory trust, safety, epistemic pressure and goal drive.
+          </p>
+        </div>
+      </div>
+
       <div class="card panel">
-        <h3>Polyphonic policy scoring</h3>
+        <h3>Polyphonic expected-free-energy-style scoring</h3>
         <p>
-          For each candidate short-horizon control sequence $\pi_k$, the controller rolls the dynamics forward and computes a composite score with pragmatic, safety, stability, and epistemic components. A stylised form is:
+          For each candidate short-horizon control sequence $\pi_k$, the controller rolls the dynamics forward from the current belief state and computes a composite score. A stylised expression is
         </p>
         <div class="equation-block">
           $$G(\pi_k) = w_g J_{\mathrm{goal}}(\pi_k)
@@ -462,66 +391,49 @@
           + w_e J_{\mathrm{epistemic}}(\pi_k)
           + w_o J_{\mathrm{open}}(\pi_k).$$
         </div>
-        <p>Representative terms include:</p>
+        <p>Representative terms are</p>
         <div class="equation-block">
-          $$J_{\mathrm{goal}}(\pi_k) \approx \mathbb{E}_{q}[\,\|p_t - g_t\|\,],$$
-          $$J_{\mathrm{safety}}(\pi_k) \approx \mathbb{E}_{q}[\,\phi(d_{\min})\,],$$
-          $$J_{\mathrm{epistemic}}(\pi_k) \approx \mathrm{tr}(\Sigma_{t+H}^{g}) + \lambda_{\mathrm{occ}}\,C_{\mathrm{occ}}(\pi_k),$$
+          $$J_{\mathrm{goal}}(\pi_k) \approx \mathbb{E}_{q}[\|p_t-g_t\|],$$
+          $$J_{\mathrm{safety}}(\pi_k) \approx \mathbb{E}_{q}[\phi(d_{\min})],$$
+          $$J_{\mathrm{epistemic}}(\pi_k) \approx \mathrm{tr}(\Sigma_{t+H}^{g}) + \lambda_{\mathrm{occ}} C_{\mathrm{occ}}(\pi_k) - \lambda_{\mathrm{scene}} I_{\mathrm{scene}}(\pi_k).$$
         </div>
         <p>
-          where $C_{\mathrm{occ}}$ is an occlusion proxy and the weights are modulated by the slow latent context state. Lower $G(\pi_k)$ is preferred.
+          Here $C_{\mathrm{occ}}$ is an occlusion proxy and $I_{\mathrm{scene}}(\pi_k)$ is a policy-level scene disambiguation term. This term rewards trajectories expected to reduce uncertainty over the slow scene variables, especially the ambiguity between poor vantage and genuine blockage.
         </p>
-      </div>
-
-      <div class="callout-grid">
-        <div class="card panel">
-          <h3>Discrete mode beliefs</h3>
-          <p>
-            Behaviour is also mediated by a discrete posterior-like belief over controller modes,
-          </p>
-          <div class="equation-block">
-            $$q(m_t) = \mathrm{softmax}(\ell_t),$$
-          </div>
-          <p>
-            where the mode logits $\ell_t$ depend on target confidence, visibility status, occlusion duration, local free-space structure, progress, and proximity to the target. This gives a compact inferential layer over behavioural regime selection.
-          </p>
-        </div>
-        <div class="card panel">
-          <h3>Slow scene and context inference</h3>
-          <p>
-            The Stage C extension introduces a slower latent state
-          </p>
-          <div class="equation-block">
-            $$z_t = \{z_t^{\mathrm{vis}},\; z_t^{\mathrm{prog}},\; z_t^{\mathrm{aff}},\; z_t^{\mathrm{ctx}}\},$$
-          </div>
-          <p>
-            capturing visibility regime, progress regime, affordance regime, and contextual precision control. In practice this layer is updated from smoothed evidence over multiple timesteps and feeds back into control via precision-like variables such as exploit-vs-explore balance, target-memory precision, epistemic precision, safety precision, and goal precision.
-          </p>
-          <div class="equation-block">
-            $$w_i^{\mathrm{eff}} = w_i \cdot \rho_i(z_t),$$
-          </div>
-          <p>
-            so the higher layer changes how strongly different control voices are trusted without replacing the lower layer entirely.
-          </p>
-        </div>
       </div>
 
       <div class="card panel">
-        <h3>Variational free energy view</h3>
+        <h3>Scene-level epistemic value</h3>
         <p>
-          Although the implementation is deliberately lightweight, the architecture can be interpreted in standard active inference terms. The fast layer minimises a variational free energy over hidden states,
+          The distinctive feature of the current controller is that epistemic value is not limited to target localisation. The controller also estimates whether an imagined action sequence is likely to clarify the latent scene state. A schematic form is
         </p>
         <div class="equation-block">
-          $$F[q] = \mathbb{E}_{q(x_t)}\big[\ln q(x_t) - \ln p(o_t, x_t \mid u_{1:t-1})\big],$$
+          $$I_{\mathrm{scene}}(\pi_k)
+          \approx \Delta H\big(z_t^{\mathrm{vis}}\big)
+          + \Delta H\big(z_t^{\mathrm{aff}}\big)
+          + \lambda_{\mathrm{dis}}\,\Delta D_{\mathrm{blocked\;vs\;poor}}.$$
         </div>
         <p>
-          while action selection approximately minimises an expected free energy surrogate over candidate policies,
+          Intuitively, policies are favoured when they are expected to improve visibility, distinguish blocked corridors from poor vantage points, or otherwise make the world more interpretable at the slower scene level. This is what gives the drone a more convincing active-inference flavour than simple target chasing.
+        </p>
+      </div>
+
+      <div class="card panel">
+        <h3>Free-energy interpretation</h3>
+        <p>
+          The system can be read in standard active inference terms. The fast layer approximately minimises a variational free energy over hidden state,
+        </p>
+        <div class="equation-block">
+          $$F[q] = \mathbb{E}_{q(x_t)}\big[\ln q(x_t) - \ln p(o_t,x_t\mid u_{1:t-1})\big],$$
+        </div>
+        <p>
+          while action is selected by approximately minimising a structured expected-free-energy surrogate,
         </p>
         <div class="equation-block">
           $$\pi^* = \arg\min_{\pi} G(\pi).$$
         </div>
         <p>
-          In the present system, $G(\pi)$ is not derived from a fully exact deep generative model, but it is close enough in form and function to support the key active inference intuition: policies are selected not only for immediate pragmatic value, but also for their relationship to uncertainty, visibility, safety, and future evidence.
+          The implementation is intentionally lightweight rather than a full symbolic factor-graph engine, but it preserves the core active inference logic: actions are chosen for pragmatic value, safety, uncertainty reduction and future evidence, all conditioned on an evolving belief state rather than direct access to truth.
         </p>
       </div>
     </section>
@@ -529,22 +441,21 @@
     <section id="implementation" class="two-col">
       <div class="card panel">
         <h2>Implementation sketch</h2>
-        <p>The codebase is organised around a clear separation between world, sensing, inference, and control:</p>
         <div class="code">env/
   drone.py                 # drone body and world dynamics
 sensing/
   raycast_sensor.py        # local obstacle sensing
   observation_model.py     # noisy self and target observations
 belief/
-  belief_state.py          # fast, discrete, and slow latent beliefs
-  vmp_filter.py            # approximate inference / prediction-correction
+  belief_state.py          # continuous, discrete and slow scene beliefs
+  vmp_filter.py            # approximate filtering and scene updates
 control/
   autopilot.py             # polyphonic controller and mode arbitration
 utils/
   logging_utils.py         # structured logs and overlays
-main.py                    # full loop: truth → observations → beliefs → action</div>
+main.py                    # truth → observations → beliefs → action</div>
         <p>
-          The central engineering decision is that <strong>the controller never consumes simulator truth directly</strong>. Truth exists only to generate noisy observations, which are then filtered into posterior beliefs. This is what makes the project an inferential control system rather than simply a sophisticated heuristic tracker.
+          The key engineering decision is that the controller never consumes simulator truth directly. Truth exists only to generate observations. This separation forces the policy to operate on beliefs, and it is the reason the system behaves like an inferential controller rather than a privileged tracker wrapped in active-inference language.
         </p>
       </div>
       <div class="card panel">
@@ -557,7 +468,7 @@ main.py                    # full loop: truth → observations → beliefs → a
     simulator.apply(command)
     logger.log(truth_state, observations, belief_state, diagnostics)</div>
         <p>
-          This separation proved crucial during development. Earlier versions became brittle when the target was treated as either fully known or too quickly “lost”. The final Stage C1.1 system works because the target can remain remembered under uncertainty without becoming unrealistically certain under chronic occlusion.
+          This loop makes the architecture easy to inspect and debug. It also makes the system scientifically clearer: sensing, inference, arbitration and control remain distinct, so changes to one layer can be interpreted rather than disappearing inside a black-box policy.
         </p>
       </div>
     </section>
@@ -566,21 +477,35 @@ main.py                    # full loop: truth → observations → beliefs → a
       <div class="card panel">
         <h2>Observed behaviour in the attached run</h2>
         <p>
-          In the successful demonstration run attached to this page, the drone executes a mixture of search, rollout-based pursuit, recovery, and local stabilisation. Logs from that run show:
+          In the attached run the drone successfully reaches the target while transitioning through a mixture of exploratory search, short-horizon rollout, local repositioning and target-hold behaviour. Logged summaries show:
         </p>
         <ul>
-          <li>1152 total control steps</li>
-          <li>782 steps in rollout mode</li>
-          <li>198 steps in search/reacquisition</li>
-          <li>98 steps in goal-hold stabilisation</li>
-          <li>73 steps in recovery</li>
-          <li>minimum target distance of approximately 0.27 m</li>
-          <li>direct target visibility on 538 steps and soft target cues on 614 steps</li>
+          <li>successful target reach with final distance below 0.3 m</li>
+          <li>substantial time in both search and exploitative rollout, rather than a single frozen regime</li>
+          <li>meaningful periods of direct visibility and soft occlusion</li>
+          <li>non-zero scene-level epistemic terms during action selection</li>
+          <li>context variables that remain adaptive rather than collapsing into permanent search or permanent exploitation</li>
         </ul>
         <p>
-          These numbers matter because they show that the final controller is not doing one thing all the time. It is switching intelligently between exploitative pursuit, evidence-seeking, and local stabilisation.
+          Taken together, these are good signs that the controller is using higher-order latent scene interpretation in a meaningful way rather than merely decorating a reactive planner with extra labels.
         </p>
       </div>
+      <div class="card panel">
+        <h2>What this demonstrates</h2>
+        <p>
+          This project shows that a relatively compact controller can integrate continuous latent-state estimation, discrete behavioural inference, and slower contextual scene interpretation in a single embodied agent. It is not a full general-purpose active inference engine, but it goes well beyond a hand-scripted pursuit policy.
+        </p>
+        <p>
+          For an AI/ML audience, the interesting point is not only that the drone succeeds. It is that success is achieved through a layered inferential architecture with interpretable components: beliefs over continuous state, posterior-like mode arbitration, hierarchical scene variables, and policy selection that explicitly values disambiguating the world.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        Polyphonic Active Inference Drone, CPNS Lab. This page describes the current controller as an interpretable embodied belief-based system combining approximate variational filtering, mode inference and scene-level epistemic control.
+      </div>
+    </footer>
   </div>
 </body>
 </html>
