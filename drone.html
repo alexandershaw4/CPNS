@@ -103,6 +103,10 @@
     .flow-card { padding: 22px; }
     .flow-svg { width: 100%; height: auto; display: block; background: linear-gradient(180deg, #fbfdff 0%, #f7fbff 100%); border: 1px solid var(--line); border-radius: 18px; }
     .subtle { font-size: 0.92rem; color: var(--muted); }
+
+    .plot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .plot-card img { display:block; width:100%; height:auto; background:#fff; border-bottom:1px solid var(--line); }
+    .plot-card .plot-meta { padding: 14px 16px 16px; color: var(--muted); font-size: 0.94rem; }
     footer { padding: 26px 0 44px; color: var(--muted); font-size: 0.95rem; }
     @media (max-width: 980px) {
       .hero, .two-col, .grid-3, .stats, .callout-grid { grid-template-columns: 1fr; }
@@ -129,6 +133,7 @@
         <a href="#maths">Equations</a>
         <a href="#implementation">Implementation</a>
         <a href="#results">Results</a>
+        <a href="#diagnostics">Diagnostics</a>
       </nav>
     </div>
   </header>
@@ -600,6 +605,54 @@ main.py                    # truth → observations → beliefs → action</div>
         </p>
       </div>
     </section>
+
+
+    <section id="diagnostics">
+      <div class="card panel">
+        <h2>Run diagnostics and temporal traces</h2>
+        <p>
+          Because the controller is belief-based and explicitly hierarchical, its internal state can be inspected over time rather than inferred only from visible behaviour. The plots below were generated from the attached successful run and show how target confidence, behavioural arbitration, scene beliefs, contextual precisions, and policy-level epistemic terms evolve across the trajectory.
+        </p>
+        <p>
+          These traces are useful for validating that the system is doing something mechanistically meaningful: confidence rises and falls with evidence quality, mode probabilities shift between search and exploitation, scene beliefs respond to occlusion and progress, and the epistemic and future-scene terms become active at behaviourally relevant moments.
+        </p>
+      </div>
+      <div class="plot-grid" style="margin-top:18px;">
+        <div class="card plot-card">
+          <img src="01_target_tracking_confidence.png" alt="Target tracking and confidence over time" />
+          <div class="plot-meta"><strong>Target tracking and confidence.</strong> Distance to target, raw confidence, effective confidence, and target variance trace across the run.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="02_mode_probabilities.png" alt="Behavioural mode probabilities over time" />
+          <div class="plot-meta"><strong>Behavioural mode arbitration.</strong> Posterior-like probabilities over search, rollout, vantage reposition, recovery, and goal-hold.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="03_scene_visibility_progress.png" alt="Scene visibility and progress beliefs over time" />
+          <div class="plot-meta"><strong>Slow visibility and progress beliefs.</strong> The slower scene layer tracks whether the target is softly occluded or lost, and whether the agent is advancing, stalled, or trapped.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="04_scene_affordance.png" alt="Scene affordance beliefs over time" />
+          <div class="plot-meta"><strong>Affordance regime.</strong> Beliefs over good vantage, poor vantage, and blocked local geometry.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="05_context_precisions.png" alt="Context precisions and memory reliability over time" />
+          <div class="plot-meta"><strong>Context precisions.</strong> Exploit-explore balance, target-memory precision, safety precision, epistemic precision, goal precision, and temporal memory reliability.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="06_efe_terms.png" alt="Expected free energy terms over time" />
+          <div class="plot-meta"><strong>Policy scoring terms.</strong> Decomposition of the expected-free-energy-style objective into pragmatic, risk, epistemic, scene-level, uncertainty, and occlusion terms.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="07_scene_information_gains.png" alt="Scene information gain terms over time" />
+          <div class="plot-meta"><strong>Scene-level information gain.</strong> Visibility gain, affordance gain, and blocked-vs-poor-vantage disambiguation gain under candidate policies.</div>
+        </div>
+        <div class="card plot-card">
+          <img src="09_target_visibility_softcue.png" alt="Target visibility and soft cue timing over time" />
+          <div class="plot-meta"><strong>Observation quality over time.</strong> When the target is directly visible versus only softly observed under occlusion.</div>
+        </div>
+      </div>
+    </section>
+
 
     <footer>
       <div class="wrap">
