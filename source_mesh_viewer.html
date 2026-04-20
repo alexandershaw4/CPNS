@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SourceMesh Viewer</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(20, 27, 45, 0.86);
+      --panel-border: rgba(255,255,255,0.12);
+      --text: #eef2ff;
+      --muted: #b8c0d9;
+      --accent: #8fb3ff;
+      --button: #1c2744;
+      --button-hover: #27345b;
+      --warn: #ffd37a;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    #app { position: relative; width: 100%; height: 100%; }
+    #viewer { position: absolute; inset: 0; }
+    .panel {
+      position: absolute;
+      z-index: 10;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    #header { top: 18px; left: 18px; max-width: min(460px, calc(100vw - 36px)); padding: 14px 16px; }
+    #header h1 { margin: 0 0 4px 0; font-size: 18px; line-height: 1.2; font-weight: 700; }
+    #header p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+    #controls { right: 18px; top: 18px; width: min(310px, calc(100vw - 36px)); padding: 14px; }
+    #notice { left: 18px; top: 132px; max-width: min(520px, calc(100vw - 36px)); padding: 12px 14px; display:none; }
+    #notice strong { color: var(--warn); }
+    #notice p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+    .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .row:first-child { margin-top: 0; }
+    button, input[type="color"] {
+      appearance: none; border: 1px solid rgba(255,255,255,0.12); background: var(--button); color: var(--text);
+      border-radius: 12px; padding: 9px 12px; font-size: 13px; cursor: pointer;
+    }
+    button:hover { background: var(--button-hover); }
+    button.secondary { background: transparent; }
+    label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; min-width: 86px; }
+    input[type="range"] { width: 100%; }
+    input[type="file"] { display: none; }
+    .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); user-select: none; }
+    .toggle input { width: 16px; height: 16px; }
+    #status { left: 18px; bottom: 18px; padding: 10px 12px; font-size: 12px; color: var(--muted); max-width: min(640px, calc(100vw - 36px)); }
+    #dropZone {
+      position: absolute; inset: 0; display: none; align-items: center; justify-content: center; z-index: 15;
+      background: rgba(11,16,32,0.72); border: 2px dashed rgba(255,255,255,0.22); color: #fff; font-size: 20px; text-align: center; padding: 24px;
+    }
+    .pill {
+      display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px;
+      background: rgba(143,179,255,0.16); color: var(--accent); border: 1px solid rgba(143,179,255,0.25); margin-bottom: 8px;
+    }
+    @media (max-width: 760px) {
+      #controls { top: auto; bottom: 70px; }
+      #notice { top: 150px; }
+      #header h1 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="viewer"></div>
+
+    <div id="header" class="panel">
+      <div class="pill">Interactive 3D mesh viewer</div>
+      <h1>Source localisation mesh</h1>
+      <p>Rotate, zoom, and inspect the activation map in 3D. This page can load WRL / VRML / STL files, and preserves the colour information in your WRL export.</p>
+    </div>
+
+    <div id="notice" class="panel">
+      <p><strong>Local file mode detected.</strong> If you open this page directly from disk, browsers often block automatic loading of the default mesh next to it. Use <strong>Open file</strong> or drag-and-drop the WRL onto the page. Once hosted on a website, the default mesh can load automatically.</p>
+    </div>
+
+    <div id="controls" class="panel">
+      <div class="row">
+        <button id="resetViewBtn">Reset view</button>
+        <button id="fitBtn" class="secondary">Fit to mesh</button>
+        <button id="loadBtn" class="secondary">Open file</button>
+        <input id="fileInput" type="file" accept=".wrl,.vrml,.stl" />
+      </div>
+
+      <div class="row">
+        <label class="toggle"><input type="checkbox" id="autorotate"> Auto-rotate</label>
+        <label class="toggle"><input type="checkbox" id="wireframe"> Wireframe</label>
+      </div>
+
+      <div class="row">
+        <label>Background
+          <input type="color" id="bgColor" value="#0b1020">
+        </label>
+        <label>Opacity
+          <input type="range" id="opacity" min="0.15" max="1" step="0.01" value="1">
+        </label>
+      </div>
+
+      <div class="row">
+        <label style="flex:1; min-width: 140px;">Light intensity
+          <input type="range" id="lightIntensity" min="0.2" max="2.5" step="0.05" value="1.1">
+        </label>
+      </div>
+    </div>
+
+    <div id="status" class="panel">Initialising viewer…</div>
+    <div id="dropZone">Drop a WRL / VRML / STL file here</div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.161.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/loaders/VRMLLoader.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/loaders/STLLoader.js"></script>
+  <script>
+    const viewer = document.getElementById('viewer');
+    const statusEl = document.getElementById('status');
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const bgColorInput = document.getElementById('bgColor');
+    const opacityInput = document.getElementById('opacity');
+    const wireframeInput = document.getElementById('wireframe');
+    const autorotateInput = document.getElementById('autorotate');
+    const lightIntensityInput = document.getElementById('lightIntensity');
+    const noticeEl = document.getElementById('notice');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(bgColorInput.value);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000000);
+    camera.position.set(0, 0, 250);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    viewer.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.autoRotate = false;
+    controls.autoRotateSpeed = 1.2;
+    controls.target.set(0, 0, 0);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.95);
+    scene.add(ambient);
+    const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(1, 1.5, 2); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.65); fill.position.set(-1.4, -0.8, 1.2); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.4); rim.position.set(0, -1.2, -2); scene.add(rim);
+
+    let currentObject = null;
+    let allMaterials = [];
+    let defaultCameraState = null;
+
+    function setStatus(message) { statusEl.textContent = message; }
+
+    function clearCurrentObject() {
+      if (!currentObject) return;
+      scene.remove(currentObject);
+      currentObject = null;
+      allMaterials = [];
+    }
+
+    function collectMaterials(root) {
+      const mats = [];
+      root.traverse(function(child) {
+        if (child.isMesh && child.material) {
+          if (Array.isArray(child.material)) mats.push.apply(mats, child.material);
+          else mats.push(child.material);
+        }
+      });
+      return mats;
+    }
+
+    function applyMaterialControls() {
+      const opacity = parseFloat(opacityInput.value);
+      const wireframe = wireframeInput.checked;
+      allMaterials.forEach(function(mat) {
+        mat.transparent = opacity < 0.999;
+        mat.opacity = opacity;
+        mat.wireframe = wireframe;
+        mat.side = THREE.DoubleSide;
+        mat.needsUpdate = true;
+      });
+    }
+
+    function normalizeOrientation(object) {
+      object.rotation.x = -Math.PI / 2;
+    }
+
+    function frameObject(object, rememberAsDefault) {
+      if (rememberAsDefault === undefined) rememberAsDefault = true;
+      const box = new THREE.Box3().setFromObject(object);
+      if (!Number.isFinite(box.min.x) || box.isEmpty()) {
+        setStatus('Loaded, but could not compute bounds for camera fitting.');
+        return;
+      }
+      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      controls.target.copy(sphere.center);
+      const fov = THREE.MathUtils.degToRad(camera.fov);
+      const dist = Math.max(1, sphere.radius / Math.sin(fov / 2)) * 1.25;
+      const offset = new THREE.Vector3(0.9, 0.2, 1.1).normalize().multiplyScalar(dist);
+      camera.position.copy(sphere.center.clone().add(offset));
+      camera.near = Math.max(0.01, sphere.radius / 500);
+      camera.far = Math.max(1000, sphere.radius * 20);
+      camera.updateProjectionMatrix();
+      controls.update();
+      if (rememberAsDefault) {
+        defaultCameraState = {
+          position: camera.position.clone(),
+          target: controls.target.clone(),
+          near: camera.near,
+          far: camera.far,
+        };
+      }
+    }
+
+    function finishLoad(root, label) {
+      clearCurrentObject();
+      currentObject = root;
+      normalizeOrientation(currentObject);
+      scene.add(currentObject);
+      allMaterials = collectMaterials(currentObject);
+      applyMaterialControls();
+      frameObject(currentObject, true);
+
+      let meshCount = 0;
+      currentObject.traverse(function(child) { if (child.isMesh) meshCount++; });
+      setStatus('Loaded ' + label + '. ' + meshCount + ' mesh' + (meshCount === 1 ? '' : 'es') + ' ready for inspection.');
+    }
+
+    function loadDefaultMesh() {
+      if (window.location.protocol === 'file:') {
+        noticeEl.style.display = 'block';
+        setStatus('Viewer ready. Open the WRL manually with “Open file”, or host the files on a web server for automatic loading.');
+        return;
+      }
+      try {
+        const loader = new THREE.VRMLLoader();
+        loader.load('test.wrl', function(obj) {
+          finishLoad(obj, 'default WRL');
+        }, undefined, function(err) {
+          console.error(err);
+          setStatus('Could not load test.wrl automatically. Use “Open file” to load it manually.');
+        });
+      } catch (err) {
+        console.error(err);
+        setStatus('Error while loading the default WRL.');
+      }
+    }
+
+    function parseFile(file) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const reader = new FileReader();
+      setStatus('Opening ' + file.name + '…');
+      reader.onerror = function() { setStatus('Could not read ' + file.name + '.'); };
+
+      if (ext === 'wrl' || ext === 'vrml') {
+        reader.onload = function() {
+          try {
+            const loader = new THREE.VRMLLoader();
+            const obj = loader.parse(reader.result, '');
+            finishLoad(obj, file.name);
+          } catch (err) {
+            console.error(err);
+            setStatus('Failed to parse ' + file.name + ' as VRML.');
+          }
+        };
+        reader.readAsText(file);
+      } else if (ext === 'stl') {
+        reader.onload = function() {
+          try {
+            const loader = new THREE.STLLoader();
+            const geometry = loader.parse(reader.result);
+            geometry.computeVertexNormals();
+            const material = new THREE.MeshStandardMaterial({ color: 0xd7dbe8, metalness: 0.04, roughness: 0.82, side: THREE.DoubleSide });
+            const mesh = new THREE.Mesh(geometry, material);
+            finishLoad(mesh, file.name);
+          } catch (err) {
+            console.error(err);
+            setStatus('Failed to parse ' + file.name + ' as STL.');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        setStatus('Unsupported file type. Please use WRL, VRML, or STL.');
+      }
+    }
+
+    function resetView() {
+      if (!defaultCameraState) return;
+      camera.position.copy(defaultCameraState.position);
+      controls.target.copy(defaultCameraState.target);
+      camera.near = defaultCameraState.near;
+      camera.far = defaultCameraState.far;
+      camera.updateProjectionMatrix();
+      controls.update();
+    }
+
+    document.getElementById('resetViewBtn').addEventListener('click', resetView);
+    document.getElementById('fitBtn').addEventListener('click', function() { if (currentObject) frameObject(currentObject, false); });
+    document.getElementById('loadBtn').addEventListener('click', function() { fileInput.click(); });
+
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) parseFile(file);
+      fileInput.value = '';
+    });
+
+    bgColorInput.addEventListener('input', function() { scene.background = new THREE.Color(bgColorInput.value); });
+    opacityInput.addEventListener('input', applyMaterialControls);
+    wireframeInput.addEventListener('change', applyMaterialControls);
+    autorotateInput.addEventListener('change', function() { controls.autoRotate = autorotateInput.checked; });
+    lightIntensityInput.addEventListener('input', function() {
+      const v = parseFloat(lightIntensityInput.value);
+      ambient.intensity = 0.85 * v;
+      key.intensity = 1.0 * v;
+      fill.intensity = 0.6 * v;
+      rim.intensity = 0.35 * v;
+    });
+
+    window.addEventListener('dragenter', function(e) { e.preventDefault(); dropZone.style.display = 'flex'; });
+    window.addEventListener('dragover', function(e) { e.preventDefault(); });
+    window.addEventListener('dragleave', function(e) {
+      if (e.target === document.documentElement || e.target === document.body) dropZone.style.display = 'none';
+    });
+    window.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.style.display = 'none';
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) parseFile(file);
+    });
+
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    setStatus('Initialising viewer…');
+    animate();
+    loadDefaultMesh();
+  </script>
+</body>
+</html>
