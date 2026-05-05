@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPNS Lab Research Portfolio Map</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --panel: #ffffff;
+      --ink: #1d2530;
+      --muted: #667085;
+      --line: rgba(29, 37, 48, 0.12);
+      --shadow: 0 18px 45px rgba(29, 37, 48, 0.10);
+      --shadow-soft: 0 10px 30px rgba(29, 37, 48, 0.08);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 999px;
+      --accent: #2f5f73;
+      --accent-2: #7b5f92;
+      --accent-3: #b4684d;
+      --accent-4: #4f7760;
+      --accent-5: #9a7b30;
+      --accent-6: #536a99;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(47, 95, 115, 0.16), transparent 32rem),
+        radial-gradient(circle at 80% 10%, rgba(123, 95, 146, 0.13), transparent 28rem),
+        linear-gradient(135deg, #fbfaf7 0%, var(--bg) 55%, #eee8df 100%);
+      color: var(--ink);
+      font-family: var(--font);
+    }
+
+    .portfolio-wrap {
+      width: min(1480px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 44px 0 64px;
+    }
+
+    header.hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .theme-column,
+    .legend {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-main {
+      border-radius: var(--radius-lg);
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -70px -110px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: rgba(47, 95, 115, 0.12);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(47, 95, 115, 0.10);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.35rem, 5vw, 5rem);
+      line-height: 0.96;
+      letter-spacing: -0.075em;
+      max-width: 980px;
+    }
+
+    .hero-main p {
+      max-width: 760px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .hero-side {
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.65rem;
+      letter-spacing: -0.04em;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin: 0 0 22px;
+      align-items: center;
+    }
+
+    input[type="search"],
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px 15px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+      box-shadow: 0 8px 24px rgba(29, 37, 48, 0.05);
+    }
+
+    select {
+      min-width: 180px;
+      cursor: pointer;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .theme-column {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      min-height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-column::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 7px;
+      background: var(--theme-color, var(--accent));
+    }
+
+    .theme-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 4px 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+
+    .theme-title {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    .theme-subtitle {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      margin-top: 5px;
+    }
+
+    .theme-count {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--theme-color, var(--accent)) 14%, white);
+      color: var(--theme-color, var(--accent));
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .project-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 12px 24px rgba(29, 37, 48, 0.065);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+      border-color: color-mix(in srgb, var(--theme-color, var(--accent)) 35%, rgba(29, 37, 48, 0.12));
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .project-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.22;
+      letter-spacing: -0.025em;
+    }
+
+    .status {
+      flex: none;
+      border-radius: var(--radius-sm);
+      padding: 5px 9px;
+      background: color-mix(in srgb, var(--status-color, var(--theme-color, var(--accent))) 13%, white);
+      color: var(--status-color, var(--theme-color, var(--accent)));
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .description {
+      margin: 0 0 13px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .meta {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 12px;
+      font-size: 0.81rem;
+      color: #344054;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 8px;
+    }
+
+    .meta-row b {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: var(--radius-sm);
+      padding: 5px 8px;
+      background: rgba(29, 37, 48, 0.055);
+      color: #344054;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .funder {
+      background: color-mix(in srgb, var(--theme-color, var(--accent)) 11%, white);
+      color: color-mix(in srgb, var(--theme-color, var(--accent)) 78%, black);
+    }
+
+    .legend {
+      margin-top: 18px;
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .legend-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1120px) {
+      header.hero {
+        grid-template-columns: 1fr;
+      }
+
+      .map-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .portfolio-wrap {
+        width: min(100% - 24px, 1480px);
+        padding: 24px 0 44px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .theme-column,
+      .legend {
+        border-radius: 22px;
+      }
+
+      .hero-main {
+        padding: 24px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .map-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .legend {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .legend-tags {
+        justify-content: flex-start;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .portfolio-wrap {
+        width: 100%;
+        padding: 0;
+      }
+
+      .controls {
+        display: none;
+      }
+
+      .hero-main,
+      .hero-side,
+      .theme-column,
+      .legend,
+      .project-card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="portfolio-wrap">
+    <header class="hero">
+      <section class="hero-main">
+        <div class="eyebrow">Research portfolio map</div>
+        <h1>CPNS Lab research ecosystem</h1>
+        <p>
+          Projects, people, funders and translational pathways across computational psychiatry,
+          neuropharmacology, mechanistic modelling and neuro-inspired AI.
+        </p>
+      </section>
+
+      <aside class="hero-side">
+        <div>
+          <div class="eyebrow">At a glance</div>
+          <div class="metric-grid" id="metrics"></div>
+        </div>
+        <p style="margin: 0; color: var(--muted); line-height: 1.5; font-size: 0.92rem;">
+          Edit the <strong>themes</strong> and <strong>projects</strong> arrays in the script at the bottom of this file.
+          The layout updates automatically.
+        </p>
+      </aside>
+    </header>
+
+    <section class="controls" aria-label="Portfolio filters">
+      <input id="search" type="search" placeholder="Search projects, people, funders, outputs…" />
+      <select id="themeFilter">
+        <option value="all">All themes</option>
+      </select>
+      <select id="statusFilter">
+        <option value="all">All statuses</option>
+      </select>
+    </section>
+
+    <section class="map-grid" id="portfolioMap" aria-label="Project portfolio map"></section>
+
+    <footer class="legend">
+
+      <div class="legend-tags" id="legendTags"></div>
+    </footer>
+  </main>
+
+  <script>
+    /*
+      HOW TO EDIT
+      1. Add or edit themes in the themes array.
+      2. Add project cards in the projects array.
+      3. Make sure each project theme matches one of the theme ids.
+      4. Optional fields can be left blank, but keeping the structure consistent looks best.
+    */
+
+    const themes = [
+      {
+        id: "computational-psychiatry",
+        title: "Computational Psychiatry",
+        subtitle: "EEG/MEG biomarkers, sleep, ASSR, clinical cohorts",
+        color: "#2f5f73"
+      },
+      {
+        id: "mechanistic-modelling",
+        title: "Mechanistic modelling",
+        subtitle: "DCM, neural mass models, Variational Laplace, model inversion",
+        color: "#7b5f92"
+      },
+      {
+        id: "neuropharmacology",
+        title: "Neuropharmacology",
+        subtitle: "Drug and botanical modulation of neurophysiology and cognition",
+        color: "#b4684d"
+      },
+      {
+        id: "predictive-psychiatry",
+        title: "Predictive psychiatry",
+        subtitle: "Predictive coding, computational phenotypes, psychiatric mechanisms",
+        color: "#4f7760"
+      },
+      {
+        id: "neuroai",
+        title: "Embodied neuroAI",
+        subtitle: "Active inference, robotics, agents, polyphonic intelligence",
+        color: "#536a99"
+      },
+      {
+        id: "translation-industry",
+        title: "Translation and industry",
+        subtitle: "Commercial partnerships, neurotech, pharma and consultancy",
+        color: "#9a7b30"
+      }
+    ];
+
+    const projects = [
+      {
+        theme: "computational-psychiatry",
+        title: "CNV sleep EEG and auditory biomarkers",
+        description: "The Sleep Detectives: Sleep stratification in young people at high risk of psychosis",
+        lead: "Lio Berndt, Alex Shaw",
+        people: "Alex Shaw, Lioba Berndt, Matt Jones, Jeremy Hall, Marianne Van den Bree",
+        funder: "Wellcome",
+        status: "Active",
+        outputs: ["EEG", "MEG", "DCM", "clinical translation"]
+      },
+      {
+        theme: "computational-psychiatry",
+        title: "Modelling altered sleep-spindle peak frequency in children at high risk of psychosis and autism",
+        description: "A part of The Sleep Detectives project",
+        lead: "Crow Dieble",
+        people: "Alex Shaw, Lioba Berndt, Matt Jones, Jeremy Hall, Marianne Van den Bree",
+        funder: "Wellcome",
+        status: "Active",
+        outputs: ["EEG", "MEG", "DCM", "clinical translation"]
+      },
+      {
+        theme: "mechanistic-modelling",
+        title: "Thalamocortical DCM infrastructure",
+        description: "Conductance-based thalamocortical models for sleep spindles, ASSR and synaptic mechanism inference.",
+        lead: "Alex Shaw",
+        people: "Modelling students / collaborators",
+        funder: "Internal methods development",
+        status: "Active",
+        outputs: ["MATLAB", "DCM", "neural mass model"]
+      },
+      {
+        theme: "mechanistic-modelling",
+        title: "Thermodynamic Variational Laplace",
+        description: "Extended model inversion framework with thermodynamic integration, low-rank covariance and heteroscedastic noise.",
+        lead: "Alex Shaw",
+        people: "CPNS Lab",
+        funder: "Internal methods development",
+        status: "Developing",
+        outputs: ["methods", "code", "preprint potential"]
+      },
+      {
+        theme: "mechanistic-modelling",
+        title: "Computational modelling of psychedelics and development of serotonin-equipped neuronal generative models",
+        description: "Extended conductance based models to feature neuromodulation via serotonin 5HT2A receptors.",
+        lead: "Victoria Smart",
+        people: "Victoria Smart, Alex Shaw, Marc Goodfellow",
+        funder: "EPSRC",
+        status: "Active",
+        outputs: ["methods", "code", "preprint potential"]
+      },
+      {
+        theme: "mechanistic-modelling",
+        title: "Dynamics-Informed Priors for Neural Mass Models for EEG",
+        description: "Building a hybrid variational/global inversion algorithm for neural mass models.",
+        lead: "Alessia Caccamo",
+        people: "Alessia Caccamo, Alex Shaw, Marc Goodfellow",
+        funder: "EPSRC",
+        status: "Active",
+        outputs: ["methods", "code", "preprint potential"]
+      },
+      {
+        theme: "neuropharmacology",
+        title: "Functional Drinks Neurophysiology",
+        description: "Testing neurophysiological and cognitive effects of GABAergic botanical blends and comparison with zolpidem.",
+        lead: "Alex Shaw",
+        people: "Sam Kirwan, David Nutt, Celia Morgan, Robin Tyacke",
+        funder: "GABA Labs",
+        status: "Active",
+        outputs: ["MMN", "ASSR", "resting EEG"]
+      },
+      {
+        theme: "neuropharmacology",
+        title: "Ketamine Optimisation via Strategic Mu-Opioid-Stimulation ",
+        description: "Effects Of Ketamine and Opioid System Modulation on Pain and Reinforcement in Healthy Volunteers.",
+        lead: "Joy Krecke",
+        people: "Joy Krecke, Celia Morgan, Sam Hughes, Alex Shaw",
+        funder: "GABA Labs",
+        status: "Active",
+        outputs: ["MMN", "ASSR", "resting EEG"]
+      },
+      {
+        theme: "computational-psychiatry",
+        title: "Predictive coding and computational psychiatry review",
+        description: "A mechanistic framework linking predictive coding, neural circuits and major psychiatric conditions.",
+        lead: "Alex Shaw",
+        people: "Rachael Sumner, Lioba Berndt",
+        funder: "Internal / scholarship",
+        status: "Complete",
+        outputs: ["review", "theory", "clinical implications"]
+      },
+      {
+        theme: "neuroai",
+        title: "Polyphonic active inference agents",
+        description: "Embodied agents using plural inference voices for safety, goals, uncertainty reduction and homeostasis.",
+        lead: "Alex Shaw",
+        people: "CPNS Lab",
+        funder: "Internal",
+        status: "Preprint",
+        outputs: ["Zenodo", "demos", "robotics"]
+      },
+      {
+        theme: "neuroai",
+        title: "Coordination without command drone",
+        description: "Autonomous drone controller demonstrating distributed, hierarchical and plural active inference in 3D space.",
+        lead: "Alex Shaw",
+        people: "CPNS Lab",
+        funder: "Internal",
+        status: "Preprint",
+        outputs: ["video", "website", "paper"]
+      },
+      {
+        theme: "translation-industry",
+        title: "Precision psychiatry translational pipeline",
+        description: "Using human neurophysiology, biophysical modelling and preclinical work to identify treatment mechanisms.",
+        lead: "Alex Shaw",
+        people: "Lioba Berndt, Matt Jones",
+        funder: "AstronauTx",
+        status: "In development",
+        outputs: ["partnership", "grant", "impact"]
+      },
+      {
+        theme: "translation-industry",
+        title: "NeuroAI and computational neuroscience consultancy",
+        description: "Advisory and technical work across neurotech, mental health technology, modelling and neuro-inspired AI.",
+        lead: "Alex Shaw",
+        people: "External partners",
+        funder: "Industry / consultancy",
+        status: "Open",
+        outputs: ["consulting", "due diligence", "strategy"]
+      }
+    ];
+
+    const statusColors = {
+      "Active": "#2f5f73",
+      "Developing": "#7b5f92",
+      "Writing": "#4f7760",
+      "Preprint": "#536a99",
+      "Submitted / planned": "#9a7b30",
+      "In development": "#b4684d",
+      "Open": "#667085"
+    };
+
+    const map = document.getElementById("portfolioMap");
+    const metrics = document.getElementById("metrics");
+    const searchInput = document.getElementById("search");
+    const themeFilter = document.getElementById("themeFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    const legendTags = document.getElementById("legendTags");
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function projectMatches(project) {
+      const search = searchInput.value.trim().toLowerCase();
+      const theme = themeFilter.value;
+      const status = statusFilter.value;
+      const haystack = [
+        project.title,
+        project.description,
+        project.lead,
+        project.people,
+        project.funder,
+        project.status,
+        ...(project.outputs || [])
+      ].join(" ").toLowerCase();
+
+      return (!search || haystack.includes(search)) &&
+        (theme === "all" || project.theme === theme) &&
+        (status === "all" || project.status === status);
+    }
+
+    function cardHTML(project, theme) {
+      const outputs = (project.outputs || [])
+        .map(tag => `<span class="badge">${escapeHTML(tag)}</span>`)
+        .join("");
+
+      return `
+        <article class="project-card" style="--theme-color:${theme.color}; --status-color:${statusColors[project.status] || theme.color};">
+          <div class="card-top">
+            <h3>${escapeHTML(project.title)}</h3>
+            <span class="status">${escapeHTML(project.status)}</span>
+          </div>
+          <p class="description">${escapeHTML(project.description)}</p>
+          <div class="meta">
+            <div class="meta-row"><b>Lead</b><span>${escapeHTML(project.lead)}</span></div>
+            <div class="meta-row"><b>People</b><span>${escapeHTML(project.people)}</span></div>
+            <div class="meta-row"><b>Funder</b><span>${escapeHTML(project.funder)}</span></div>
+          </div>
+          <div class="badge-row">
+            <span class="badge funder">${escapeHTML(project.funder)}</span>
+            ${outputs}
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      map.innerHTML = "";
+
+      themes.forEach(theme => {
+        const themeProjects = projects.filter(project => project.theme === theme.id && projectMatches(project));
+        if (!themeProjects.length) return;
+
+        const section = document.createElement("section");
+        section.className = "theme-column";
+        section.style.setProperty("--theme-color", theme.color);
+        section.innerHTML = `
+          <div class="theme-header">
+            <div>
+              <h2 class="theme-title">${escapeHTML(theme.title)}</h2>
+              <span class="theme-subtitle">${escapeHTML(theme.subtitle)}</span>
+            </div>
+            <div class="theme-count">${themeProjects.length}</div>
+          </div>
+          <div class="cards">
+            ${themeProjects.map(project => cardHTML(project, theme)).join("")}
+          </div>
+        `;
+        map.appendChild(section);
+      });
+
+      renderMetrics();
+    }
+
+    function renderMetrics() {
+      const visibleProjects = projects.filter(projectMatches);
+      const activeCount = visibleProjects.filter(p => /active/i.test(p.status)).length;
+      const funders = new Set(visibleProjects.map(p => p.funder).filter(Boolean));
+      const people = new Set(visibleProjects.flatMap(p => [p.lead, p.people]).filter(Boolean));
+
+      metrics.innerHTML = `
+        <div class="metric"><strong>${visibleProjects.length}</strong><span>visible projects</span></div>
+        <div class="metric"><strong>${themes.length}</strong><span>research themes</span></div>
+        <div class="metric"><strong>${funders.size}</strong><span>funder streams</span></div>
+        <div class="metric"><strong>${activeCount}</strong><span>active projects</span></div>
+      `;
+    }
+
+    function populateFilters() {
+      themes.forEach(theme => {
+        const option = document.createElement("option");
+        option.value = theme.id;
+        option.textContent = theme.title;
+        themeFilter.appendChild(option);
+      });
+
+      [...new Set(projects.map(project => project.status))].sort().forEach(status => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        statusFilter.appendChild(option);
+      });
+
+      legendTags.innerHTML = Object.entries(statusColors)
+        .map(([status, color]) => `<span class="badge" style="background: color-mix(in srgb, ${color} 13%, white); color: ${color};">${escapeHTML(status)}</span>`)
+        .join("");
+    }
+
+    [searchInput, themeFilter, statusFilter].forEach(element => {
+      element.addEventListener("input", render);
+      element.addEventListener("change", render);
+    });
+
+    populateFilters();
+    render();
+  </script>
+</body>
+</html>
