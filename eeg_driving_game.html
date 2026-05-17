@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EEG Driving Game Prototype</title>
+  <style>
+    :root {
+      --bg: #101318;
+      --panel: #171c24;
+      --panel-soft: #202734;
+      --text: #f4f7fb;
+      --muted: #aab4c3;
+      --accent: #7dd3fc;
+      --good: #86efac;
+      --warn: #facc15;
+      --bad: #fb7185;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1b2533 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .game-wrap,
+    .panel {
+      background: rgba(23, 28, 36, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      overflow: hidden;
+    }
+
+    .game-header {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .status-pill {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(125, 211, 252, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      background: #0c1118;
+    }
+
+    .panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      background: var(--panel-soft);
+      border-radius: 16px;
+      padding: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 760;
+    }
+
+    .controls,
+    .future {
+      background: rgba(255, 255, 255, 0.035);
+      border-radius: 18px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .key-row {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      align-items: center;
+      margin: 8px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    kbd {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 28px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 8px;
+      background: #0e141d;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      color: #071018;
+      background: linear-gradient(135deg, #7dd3fc, #86efac);
+      font-weight: 800;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      box-shadow: 0 12px 30px rgba(125, 211, 252, 0.18);
+    }
+
+    button.secondary {
+      background: #253042;
+      color: var(--text);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .slider-row {
+      margin-top: 10px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 920px) {
+      body {
+        padding: 14px;
+      }
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="game-wrap">
+      <div class="game-header">
+        <div>
+          <div class="title">Neuroadaptive Driving Game</div>
+          <div class="subtitle">Manual-control prototype. EEG/Muse input layer comes next.</div>
+        </div>
+        <div id="gameStatus" class="status-pill">Ready</div>
+      </div>
+      <canvas id="game" width="820" height="620"></canvas>
+    </section>
+
+    <aside class="panel">
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">Score</div>
+          <div id="score" class="metric-value">0</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Speed</div>
+          <div id="speed" class="metric-value">0</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Collisions</div>
+          <div id="collisions" class="metric-value">0</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Time</div>
+          <div id="time" class="metric-value">0.0</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <h2>Manual controls</h2>
+        <div class="key-row"><span><kbd>↑</kbd> / <kbd>W</kbd></span><span>Accelerate</span></div>
+        <div class="key-row"><span><kbd>↓</kbd> / <kbd>S</kbd></span><span>Brake / reverse</span></div>
+        <div class="key-row"><span><kbd>←</kbd> / <kbd>A</kbd></span><span>Steer left</span></div>
+        <div class="key-row"><span><kbd>→</kbd> / <kbd>D</kbd></span><span>Steer right</span></div>
+        <div class="key-row"><span><kbd>Space</kbd></span><span>Hard brake</span></div>
+      </div>
+
+      <div class="future">
+        <h2>Input source</h2>
+        <p class="note">
+          Manual controls remain active. Mock EEG can drive boost/precision now. Muse Bridge listens for real-time JSON over WebSocket, which is the cleanest way to connect UVic/LSL/UDP streams to a browser game.
+        </p>
+
+        <div class="slider-row">
+          <label><span>Mode</span><span id="inputModeLabel">Manual</span></label>
+          <select id="inputMode" style="width:100%;padding:10px;border-radius:12px;background:#0e141d;color:#f4f7fb;border:1px solid rgba(255,255,255,0.16);">
+            <option value="manual">Manual only</option>
+            <option value="mock">Mock EEG auto</option>
+            <option value="bridge">Muse WebSocket bridge</option>
+          </select>
+        </div>
+
+        <div class="slider-row">
+          <label><span>Focus / boost</span><span id="focusVal">0.50</span></label>
+          <input id="focusSlider" type="range" min="0" max="1" step="0.01" value="0.5" />
+        </div>
+        <div class="slider-row">
+          <label><span>Control precision</span><span id="precisionVal">0.70</span></label>
+          <input id="precisionSlider" type="range" min="0" max="1" step="0.01" value="0.7" />
+        </div>
+        <div class="slider-row">
+          <label><span>Steering bias</span><span id="steerVal">0.00</span></label>
+          <input id="steerSlider" type="range" min="-1" max="1" step="0.01" value="0" />
+        </div>
+
+        <div class="button-row" style="grid-template-columns:1fr; margin-top:12px;">
+          <button id="connectMuseBtn" class="secondary">Connect Muse Bridge</button>
+        </div>
+
+        <p id="museStatus" class="note">Muse status: not connected</p>
+        <p class="note">
+          Expected bridge message: <code>{"focus":0.7,"precision":0.8,"steer":-0.2,"blink":false}</code>
+        </p>
+      </div>
+
+      <div class="button-row">
+        <button id="startBtn">Start</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const ui = {
+      score: document.getElementById("score"),
+      speed: document.getElementById("speed"),
+      collisions: document.getElementById("collisions"),
+      time: document.getElementById("time"),
+      status: document.getElementById("gameStatus"),
+      startBtn: document.getElementById("startBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      focusSlider: document.getElementById("focusSlider"),
+      precisionSlider: document.getElementById("precisionSlider"),
+      steerSlider: document.getElementById("steerSlider"),
+      focusVal: document.getElementById("focusVal"),
+      precisionVal: document.getElementById("precisionVal"),
+      steerVal: document.getElementById("steerVal"),
+      inputMode: document.getElementById("inputMode"),
+      inputModeLabel: document.getElementById("inputModeLabel"),
+      connectMuseBtn: document.getElementById("connectMuseBtn"),
+      museStatus: document.getElementById("museStatus")
+    };
+
+    const keys = new Set();
+
+    const track = {
+      margin: 56,
+      roadColor: "#192231",
+      grassColor: "#0d1512",
+      laneColor: "rgba(255,255,255,0.18)",
+      boundaryColor: "rgba(125,211,252,0.45)"
+    };
+
+    const obstacles = [
+      { x: 260, y: 160, w: 95, h: 34 },
+      { x: 470, y: 250, w: 120, h: 34 },
+      { x: 210, y: 375, w: 110, h: 34 },
+      { x: 535, y: 450, w: 92, h: 34 }
+    ];
+
+    const checkpoints = [
+      { x: 120, y: 120, r: 22, taken: false },
+      { x: 700, y: 140, r: 22, taken: false },
+      { x: 695, y: 500, r: 22, taken: false },
+      { x: 125, y: 500, r: 22, taken: false }
+    ];
+
+    const car = {
+      x: 150,
+      y: 300,
+      angle: 0,
+      speed: 0,
+      width: 28,
+      height: 44,
+      maxForward: 5.2,
+      maxReverse: -2.2,
+      acceleration: 0.13,
+      brake: 0.20,
+      friction: 0.982,
+      turnRate: 0.052,
+      collisionCooldown: 0
+    };
+
+    const state = {
+      running: false,
+      lastTime: performance.now(),
+      elapsed: 0,
+      score: 0,
+      collisions: 0,
+      frame: 0
+    };
+
+    const eeg = {
+      focus: 0.5,
+      precision: 0.7,
+      steer: 0,
+      blink: false,
+      bridgeConnected: false,
+      lastBridgeMessage: 0,
+      socket: null
+    };
+
+    function smoothTowards(current, target, alpha = 0.08) {
+      return current + (target - current) * alpha;
+    }
+
+    function setMuseStatus(text) {
+      ui.museStatus.textContent = `Muse status: ${text}`;
+    }
+
+    function connectMuseBridge() {
+      if (eeg.socket && eeg.socket.readyState === WebSocket.OPEN) {
+        eeg.socket.close();
+        return;
+      }
+
+      const wsUrl = "ws://localhost:8765";
+      setMuseStatus(`connecting to ${wsUrl}`);
+
+      try {
+        eeg.socket = new WebSocket(wsUrl);
+      } catch (err) {
+        setMuseStatus(`could not create WebSocket: ${err.message}`);
+        return;
+      }
+
+      eeg.socket.onopen = () => {
+        eeg.bridgeConnected = true;
+        ui.connectMuseBtn.textContent = "Disconnect Muse Bridge";
+        setMuseStatus("connected");
+      };
+
+      eeg.socket.onmessage = event => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (Number.isFinite(msg.focus)) eeg.focus = clamp(msg.focus, 0, 1);
+          if (Number.isFinite(msg.precision)) eeg.precision = clamp(msg.precision, 0, 1);
+          if (Number.isFinite(msg.steer)) eeg.steer = clamp(msg.steer, -1, 1);
+          if (typeof msg.blink === "boolean") eeg.blink = msg.blink;
+          eeg.lastBridgeMessage = performance.now();
+        } catch (err) {
+          setMuseStatus(`bad message: ${err.message}`);
+        }
+      };
+
+      eeg.socket.onerror = () => {
+        setMuseStatus("connection error. Is the local bridge running?");
+      };
+
+      eeg.socket.onclose = () => {
+        eeg.bridgeConnected = false;
+        ui.connectMuseBtn.textContent = "Connect Muse Bridge";
+        setMuseStatus("not connected");
+      };
+    }
+
+    function updateInputLayer(now) {
+      const mode = ui.inputMode.value;
+      ui.inputModeLabel.textContent = ui.inputMode.options[ui.inputMode.selectedIndex].textContent;
+
+      if (mode === "manual") {
+        eeg.focus = Number(ui.focusSlider.value);
+        eeg.precision = Number(ui.precisionSlider.value);
+        eeg.steer = Number(ui.steerSlider.value);
+        eeg.blink = false;
+      }
+
+      if (mode === "mock") {
+        const t = now / 1000;
+        const mockFocus = 0.5 + 0.35 * Math.sin(t * 0.7) + 0.08 * Math.sin(t * 2.1);
+        const mockPrecision = 0.68 + 0.22 * Math.sin(t * 0.43 + 1.2);
+        const mockSteer = 0.35 * Math.sin(t * 0.9);
+        eeg.focus = clamp(mockFocus, 0, 1);
+        eeg.precision = clamp(mockPrecision, 0, 1);
+        eeg.steer = clamp(mockSteer, -1, 1);
+        eeg.blink = false;
+      }
+
+      if (mode === "bridge") {
+        if (!eeg.bridgeConnected) {
+          // Keep the last slider values as safe fallbacks until the bridge connects.
+          eeg.focus = Number(ui.focusSlider.value);
+          eeg.precision = Number(ui.precisionSlider.value);
+          eeg.steer = Number(ui.steerSlider.value);
+        } else if (now - eeg.lastBridgeMessage > 1500) {
+          setMuseStatus("connected, waiting for data");
+        } else {
+          setMuseStatus("streaming");
+        }
+      }
+
+      ui.focusSlider.value = eeg.focus.toFixed(2);
+      ui.precisionSlider.value = eeg.precision.toFixed(2);
+      ui.steerSlider.value = eeg.steer.toFixed(2);
+    }
+
+    function resetGame() {
+      car.x = 150;
+      car.y = 300;
+      car.angle = 0;
+      car.speed = 0;
+      car.collisionCooldown = 0;
+      state.elapsed = 0;
+      state.score = 0;
+      state.collisions = 0;
+      checkpoints.forEach(cp => cp.taken = false);
+      ui.status.textContent = "Ready";
+      updateUI();
+    }
+
+    function startGame() {
+      state.running = true;
+      state.lastTime = performance.now();
+      ui.status.textContent = "Running";
+      ui.startBtn.textContent = "Pause";
+    }
+
+    function pauseGame() {
+      state.running = false;
+      ui.status.textContent = "Paused";
+      ui.startBtn.textContent = "Start";
+    }
+
+    function updateUI() {
+      ui.score.textContent = Math.round(state.score);
+      ui.speed.textContent = Math.abs(car.speed).toFixed(1);
+      ui.collisions.textContent = state.collisions;
+      ui.time.textContent = state.elapsed.toFixed(1);
+      ui.focusVal.textContent = eeg.focus.toFixed(2);
+      ui.precisionVal.textContent = eeg.precision.toFixed(2);
+      ui.steerVal.textContent = eeg.steer.toFixed(2);
+    }
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function rectsOverlap(a, b) {
+      return a.x < b.x + b.w &&
+             a.x + a.w > b.x &&
+             a.y < b.y + b.h &&
+             a.y + a.h > b.y;
+    }
+
+    function carBounds(x = car.x, y = car.y) {
+      return {
+        x: x - car.width / 2,
+        y: y - car.height / 2,
+        w: car.width,
+        h: car.height
+      };
+    }
+
+    function isOutOfBounds(x, y) {
+      return x < track.margin || x > canvas.width - track.margin ||
+             y < track.margin || y > canvas.height - track.margin;
+    }
+
+    function hitsObstacle(x, y) {
+      const cb = carBounds(x, y);
+      return obstacles.some(o => rectsOverlap(cb, o));
+    }
+
+    function handleCollision(prevX, prevY) {
+      car.x = prevX;
+      car.y = prevY;
+      car.speed *= -0.32;
+
+      if (car.collisionCooldown <= 0) {
+        state.collisions += 1;
+        state.score = Math.max(0, state.score - 20);
+        car.collisionCooldown = 30;
+      }
+    }
+
+    function updateCar(dt) {
+      const boost = 0.85 + eeg.focus * 0.35;
+      const precision = 0.45 + eeg.precision * 0.55;
+
+      const accelerating = keys.has("ArrowUp") || keys.has("w");
+      const reversing = keys.has("ArrowDown") || keys.has("s");
+      const left = keys.has("ArrowLeft") || keys.has("a");
+      const right = keys.has("ArrowRight") || keys.has("d");
+      const hardBrake = keys.has(" ");
+
+      if (accelerating) car.speed += car.acceleration * boost * dt;
+      if (reversing) car.speed -= car.brake * dt;
+      if (hardBrake) car.speed *= Math.pow(0.86, dt);
+
+      car.speed *= Math.pow(car.friction, dt);
+      car.speed = clamp(car.speed, car.maxReverse, car.maxForward * boost);
+
+      let steerDirection = (right ? 1 : 0) - (left ? 1 : 0);
+      steerDirection += eeg.steer * 0.65;
+      steerDirection = clamp(steerDirection, -1, 1);
+
+      if (eeg.blink) {
+        car.speed *= Math.pow(0.72, dt);
+        eeg.blink = false;
+      }
+      const speedFactor = clamp(Math.abs(car.speed) / car.maxForward, 0.25, 1.0);
+      car.angle += steerDirection * car.turnRate * speedFactor * precision * dt * Math.sign(car.speed || 1);
+
+      const prevX = car.x;
+      const prevY = car.y;
+
+      car.x += Math.cos(car.angle) * car.speed * dt;
+      car.y += Math.sin(car.angle) * car.speed * dt;
+
+      if (isOutOfBounds(car.x, car.y) || hitsObstacle(car.x, car.y)) {
+        handleCollision(prevX, prevY);
+      }
+
+      if (car.collisionCooldown > 0) car.collisionCooldown -= dt;
+
+      checkpoints.forEach(cp => {
+        if (!cp.taken) {
+          const dx = car.x - cp.x;
+          const dy = car.y - cp.y;
+          if (Math.sqrt(dx * dx + dy * dy) < cp.r + 18) {
+            cp.taken = true;
+            state.score += 100;
+          }
+        }
+      });
+
+      if (checkpoints.every(cp => cp.taken)) {
+        checkpoints.forEach(cp => cp.taken = false);
+        state.score += 250;
+      }
+
+      state.score += Math.max(0, car.speed) * 0.035 * dt;
+    }
+
+    function drawTrack() {
+      ctx.fillStyle = track.grassColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const roadX = track.margin;
+      const roadY = track.margin;
+      const roadW = canvas.width - track.margin * 2;
+      const roadH = canvas.height - track.margin * 2;
+
+      ctx.fillStyle = track.roadColor;
+      roundRect(ctx, roadX, roadY, roadW, roadH, 28, true, false);
+
+      ctx.strokeStyle = track.boundaryColor;
+      ctx.lineWidth = 3;
+      roundRect(ctx, roadX, roadY, roadW, roadH, 28, false, true);
+
+      ctx.setLineDash([20, 18]);
+      ctx.strokeStyle = track.laneColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, roadY + 24);
+      ctx.lineTo(canvas.width / 2, roadY + roadH - 24);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      obstacles.forEach(o => {
+        ctx.fillStyle = "#2c3545";
+        roundRect(ctx, o.x, o.y, o.w, o.h, 12, true, false);
+        ctx.strokeStyle = "rgba(251,113,133,0.55)";
+        ctx.lineWidth = 2;
+        roundRect(ctx, o.x, o.y, o.w, o.h, 12, false, true);
+      });
+    }
+
+    function drawCheckpoints() {
+      checkpoints.forEach((cp, i) => {
+        ctx.beginPath();
+        ctx.arc(cp.x, cp.y, cp.r, 0, Math.PI * 2);
+        ctx.fillStyle = cp.taken ? "rgba(134,239,172,0.18)" : "rgba(125,211,252,0.20)";
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = cp.taken ? "rgba(134,239,172,0.80)" : "rgba(125,211,252,0.75)";
+        ctx.stroke();
+        ctx.fillStyle = cp.taken ? "#86efac" : "#7dd3fc";
+        ctx.font = "bold 13px system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(String(i + 1), cp.x, cp.y);
+      });
+    }
+
+    function drawCar() {
+      ctx.save();
+      ctx.translate(car.x, car.y);
+      ctx.rotate(car.angle + Math.PI / 2);
+
+      const flash = car.collisionCooldown > 0 && Math.floor(state.frame / 4) % 2 === 0;
+
+      ctx.fillStyle = flash ? "#fb7185" : "#7dd3fc";
+      roundRect(ctx, -car.width / 2, -car.height / 2, car.width, car.height, 8, true, false);
+
+      ctx.fillStyle = "rgba(7,16,24,0.8)";
+      roundRect(ctx, -car.width / 2 + 5, -car.height / 2 + 7, car.width - 10, 12, 5, true, false);
+
+      ctx.fillStyle = "#86efac";
+      ctx.beginPath();
+      ctx.moveTo(0, -car.height / 2 - 6);
+      ctx.lineTo(-7, -car.height / 2 + 7);
+      ctx.lineTo(7, -car.height / 2 + 7);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawHudOverlay() {
+      if (!state.running) {
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.38)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#f4f7fb";
+        ctx.font = "800 32px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText("Press Start", canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillStyle = "#aab4c3";
+        ctx.font = "15px system-ui";
+        ctx.fillText("Keyboard first. Muse control layer next.", canvas.width / 2, canvas.height / 2 + 24);
+        ctx.restore();
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + w, y, x + w, y + h, radius);
+      ctx.arcTo(x + w, y + h, x, y + h, radius);
+      ctx.arcTo(x, y + h, x, y, radius);
+      ctx.arcTo(x, y, x + w, y, radius);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function draw() {
+      drawTrack();
+      drawCheckpoints();
+      drawCar();
+      drawHudOverlay();
+    }
+
+    function loop(now) {
+      const rawDt = (now - state.lastTime) / 16.6667;
+      const dt = clamp(rawDt, 0, 2.5);
+      state.lastTime = now;
+      state.frame += 1;
+
+      updateInputLayer(now);
+
+      if (state.running) {
+        state.elapsed += dt / 60;
+        updateCar(dt);
+      }
+
+      draw();
+      updateUI();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener("keydown", event => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      keys.add(key);
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+    });
+
+    window.addEventListener("keyup", event => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      keys.delete(key);
+    });
+
+    ui.startBtn.addEventListener("click", () => {
+      state.running ? pauseGame() : startGame();
+    });
+
+    ui.resetBtn.addEventListener("click", () => {
+      pauseGame();
+      resetGame();
+    });
+
+    ui.connectMuseBtn.addEventListener("click", connectMuseBridge);
+
+    resetGame();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
