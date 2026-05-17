@@ -110,22 +110,34 @@ class EEGSteeringDecoder:
     """
     Convert noisy left-right EEG asymmetry into a usable controller.
 
-    This uses an adaptive baseline, a dead-zone, hysteresis and smoothing.
+    This uses either:
+    1. an adaptive baseline / dead-zone / hysteresis controller, or
+    2. a calibrated neutral-left-right mapping if calibration is supplied.
+
     The output is not 'thought decoding' in the strong sense. It is a practical
     BCI-style left/neutral/right control signal based on sustained asymmetry.
     """
 
-    def __init__(self, baseline_alpha: float = 0.01, smooth_alpha: float = 0.18):
+    def __init__(self, baseline_alpha: float = 0.01, smooth_alpha: float = 0.18, calibration=None):
         self.baseline_alpha = baseline_alpha
         self.smooth_alpha = smooth_alpha
         self.mean = 0.0
         self.var = 0.02
         self.output = 0.0
         self.state = 0
+        self.calibration = calibration
 
     def update(self, asymmetry: float, quality: float = 1.0) -> float:
         asymmetry = float(np.clip(asymmetry, -1.0, 1.0))
         quality = float(np.clip(quality, 0.0, 1.0))
+
+        if self.calibration is not None:
+            target = self.calibration.steer_from_asymmetry(asymmetry)
+            # Reject extreme control updates when contact/artefact quality is poor.
+            if quality < self.calibration.quality_floor:
+                target *= 0.25
+            self.output = (1 - self.smooth_alpha) * self.output + self.smooth_alpha * target
+            return float(np.clip(self.output, -1.0, 1.0))
 
         # Update baseline only when signal quality is reasonable and the current
         # asymmetry is not too extreme. This lets the neutral point drift slowly
@@ -155,8 +167,54 @@ class EEGSteeringDecoder:
         # that has both graded steering and clear left/right commitment.
         continuous = float(np.clip(z / 2.5, -1.0, 1.0))
         target = 0.65 * self.state + 0.35 * continuous
-        self.output = smoothTowards(self.output, target, self.smooth_alpha)
+        self.output = (1 - self.smooth_alpha) * self.output + self.smooth_alpha * target
         return float(np.clip(self.output, -1.0, 1.0))
+
+
+@dataclass
+class CalibrationProfile:
+    neutral_asym: float
+    left_asym: float
+    right_asym: float
+    blink_threshold: float
+    focus_low: float
+    focus_high: float
+    precision_low: float
+    precision_high: float
+    quality_floor: float = 0.20
+    steer_gain: float = 2.5
+    deadzone: float = 0.004
+
+    def steer_from_asymmetry(self, asymmetry: float) -> float:
+        """Piecewise calibrated mapping: left posture -> -1, neutral -> 0, right -> +1."""
+        n = self.neutral_asym
+        l = self.left_asym
+        r = self.right_asym
+        a = float(asymmetry)
+
+        # If left and right are reversed in raw feature space, this still works
+        # because each side uses the direction observed during calibration.
+        if abs(a - n) < self.deadzone:
+            return 0.0
+
+        # Decide whether current asymmetry is more left-like or right-like by
+        # normalised displacement along each calibrated vector.
+        dl = l - n
+        dr = r - n
+        left_score = self.steer_gain * ((a - n) / dl) if abs(dl) > 1e-6 else 0.0
+        right_score = self.steer_gain * ((a - n) / dr) if abs(dr) > 1e-6 else 0.0
+
+        if left_score > 0 and left_score >= right_score:
+            return float(np.clip(-left_score, -1.0, 0.0))
+        if right_score > 0:
+            return float(np.clip(right_score, 0.0, 1.0))
+        return 0.0
+
+    def scale_focus(self, raw_focus: float) -> float:
+        return float(np.clip((raw_focus - self.focus_low) / (self.focus_high - self.focus_low + 1e-9), 0.0, 1.0))
+
+    def scale_precision(self, raw_precision: float) -> float:
+        return float(np.clip((raw_precision - self.precision_low) / (self.precision_high - self.precision_low + 1e-9), 0.0, 1.0))
 
 
 def parse_numeric_packet(text: str) -> Optional[list[float]]:
@@ -309,7 +367,7 @@ async def udp_source(port: int = 5000, hz: float = 20.0) -> AsyncGenerator[Contr
             await asyncio.sleep(0.01)
 
 
-async def lsl_source(hz: float = 20.0, window_seconds: float = 2.0) -> AsyncGenerator[ControlState, None]:
+async def lsl_source(hz: float = 20.0, window_seconds: float = 2.0, calibrate: bool = False, steer_gain: float = 2.5) -> AsyncGenerator[ControlState, None]:
     """
     Optional LSL source. Looks for an EEG stream and computes bandpower features.
     Requires pylsl and scipy.
@@ -323,7 +381,7 @@ async def lsl_source(hz: float = 20.0, window_seconds: float = 2.0) -> AsyncGene
     print("Searching for LSL EEG stream...")
     streams = resolve_byprop("type", "EEG", timeout=10)
     if not streams:
-        raise RuntimeError("No LSL EEG stream found. Start uvicMuse or muselsl first.")
+        raise RuntimeError("No LSL EEG stream found. Start muselsl first.")
 
     inlet = StreamInlet(streams[0], max_buflen=10)
     info = inlet.info()
@@ -334,12 +392,148 @@ async def lsl_source(hz: float = 20.0, window_seconds: float = 2.0) -> AsyncGene
     n_window = int(window_seconds * fs)
     buffer = deque(maxlen=max(n_window, 64))
     smoother = FeatureSmoother(alpha=0.15)
+    calibration = None
     steering_decoder = EEGSteeringDecoder(baseline_alpha=0.01, smooth_alpha=0.22)
 
     def bandpower(x: np.ndarray, lo: float, hi: float) -> float:
         freqs, psd = welch(x, fs=fs, nperseg=min(len(x), int(fs)))
         idx = (freqs >= lo) & (freqs <= hi)
         return float(np.trapezoid(psd[idx], freqs[idx])) if np.any(idx) else 0.0
+
+    def features_from_buffer():
+        """Return current features from the rolling LSL buffer, or None until enough data are available."""
+        if len(buffer) < max(64, int(0.75 * fs)):
+            return None
+
+        arr = np.asarray(buffer, dtype=float)
+        arr = arr - np.nanmedian(arr, axis=0, keepdims=True)
+
+        theta = np.median([bandpower(arr[:, ch], 4, 7) for ch in range(arr.shape[1])])
+        alpha = np.median([bandpower(arr[:, ch], 8, 12) for ch in range(arr.shape[1])])
+        beta = np.median([bandpower(arr[:, ch], 13, 30) for ch in range(arr.shape[1])])
+
+        alpha_theta = alpha / (theta + 1e-9)
+        beta_alpha = beta / (alpha + 1e-9)
+
+        raw_focus = robust_scale(alpha_theta, centre=1.2, width=0.55)
+        raw_precision = 1.0 - robust_scale(beta_alpha, centre=1.8, width=0.7)
+
+        amp = float(np.nanmax(np.abs(arr[-int(0.20 * fs):, : min(2, arr.shape[1])])) if arr.shape[1] else 0.0)
+        quality = 1.0 - robust_scale(float(np.nanmedian(np.abs(arr))), centre=150.0, width=80.0)
+
+        raw_asym = 0.0
+        if arr.shape[1] >= 4:
+            # muselsl Muse order is usually TP9, AF7, AF8, TP10, AUX.
+            af7_alpha = bandpower(arr[:, 1], 8, 12)
+            af8_alpha = bandpower(arr[:, 2], 8, 12)
+            tp9_alpha = bandpower(arr[:, 0], 8, 12)
+            tp10_alpha = bandpower(arr[:, 3], 8, 12)
+
+            frontal_asym = (af8_alpha - af7_alpha) / (af8_alpha + af7_alpha + 1e-9)
+            temporal_asym = (tp10_alpha - tp9_alpha) / (tp10_alpha + tp9_alpha + 1e-9)
+            raw_asym = 0.80 * frontal_asym + 0.20 * temporal_asym
+
+        return {
+            "raw_focus": float(raw_focus),
+            "raw_precision": float(raw_precision),
+            "amp": float(amp),
+            "quality": float(quality),
+            "raw_asym": float(raw_asym),
+        }
+
+    async def fill_buffer_until_ready():
+        """Pull samples until we have enough data for one feature window."""
+        while len(buffer) < max(64, int(0.75 * fs)):
+            sample, _ts = inlet.pull_sample(timeout=0.05)
+            if sample is not None:
+                buffer.append([float(v) for v in sample[:n_channels]])
+            await asyncio.sleep(0.001)
+
+    async def collect_calibration_block(label: str, seconds: float = 8.0):
+        print()
+        print(f"Calibration: {label} for {seconds:g} seconds...")
+        t_end = time.time() + seconds
+
+        asym_values = []
+        focus_values = []
+        precision_values = []
+        amp_values = []
+        quality_values = []
+
+        while time.time() < t_end:
+            sample, _ts = inlet.pull_sample(timeout=0.01)
+            if sample is not None:
+                buffer.append([float(v) for v in sample[:n_channels]])
+
+            feats = features_from_buffer()
+            if feats is not None:
+                asym_values.append(feats["raw_asym"])
+                focus_values.append(feats["raw_focus"])
+                precision_values.append(feats["raw_precision"])
+                amp_values.append(feats["amp"])
+                quality_values.append(feats["quality"])
+
+            await asyncio.sleep(0.02)
+
+        def med(xs, fallback=0.0):
+            return float(np.nanmedian(xs)) if len(xs) else fallback
+
+        return {
+            "asym": med(asym_values),
+            "focus": med(focus_values, 0.5),
+            "precision": med(precision_values, 0.7),
+            "amp95": float(np.nanpercentile(amp_values, 95)) if len(amp_values) else 180.0,
+            "quality": med(quality_values, 0.8),
+        }
+
+    if calibrate:
+        print()
+        print("=== Muse driving calibration ===")
+        print("Keep the headset settled. The bridge will learn neutral, left, right and blink values.")
+        print("Warming up the rolling EEG buffer...")
+        await fill_buffer_until_ready()
+
+        input("Press Enter, then sit NEUTRAL / eyes forward...")
+        neutral = await collect_calibration_block("NEUTRAL: eyes forward, relaxed face", seconds=8.0)
+
+        input("Press Enter, then hold your LEFT control state. Try gaze/attention left, no head movement...")
+        left = await collect_calibration_block("LEFT: gaze/attention left", seconds=8.0)
+
+        input("Press Enter, then hold your RIGHT control state. Try gaze/attention right, no head movement...")
+        right = await collect_calibration_block("RIGHT: gaze/attention right", seconds=8.0)
+
+        input("Press Enter, then blink deliberately several times...")
+        blink_block = await collect_calibration_block("BLINK: deliberate blinks", seconds=5.0)
+
+        focus_vals = sorted([neutral["focus"], left["focus"], right["focus"]])
+        precision_vals = sorted([neutral["precision"], left["precision"], right["precision"]])
+        blink_threshold = max(300.0, neutral["amp95"] * 1.75, blink_block["amp95"] * 0.55)
+
+        calibration = CalibrationProfile(
+            neutral_asym=neutral["asym"],
+            left_asym=left["asym"],
+            right_asym=right["asym"],
+            blink_threshold=blink_threshold,
+            focus_low=max(0.0, focus_vals[0] - 0.05),
+            focus_high=min(1.0, focus_vals[-1] + 0.05),
+            precision_low=max(0.0, precision_vals[0] - 0.05),
+            precision_high=min(1.0, precision_vals[-1] + 0.05),
+            quality_floor=max(0.10, min(0.45, neutral["quality"] * 0.55)),
+            steer_gain=steer_gain,
+            deadzone=0.004,
+        )
+        steering_decoder = EEGSteeringDecoder(baseline_alpha=0.003, smooth_alpha=0.26, calibration=calibration)
+
+        print()
+        print("Calibration complete:")
+        print(f"  asym neutral={calibration.neutral_asym:+0.4f} left={calibration.left_asym:+0.4f} right={calibration.right_asym:+0.4f}")
+        print(f"  blink threshold={calibration.blink_threshold:0.1f}")
+        print(f"  focus range={calibration.focus_low:0.2f}..{calibration.focus_high:0.2f}")
+        print(f"  precision range={calibration.precision_low:0.2f}..{calibration.precision_high:0.2f}")
+        print(f"  steer gain={calibration.steer_gain:0.2f} deadzone={calibration.deadzone:0.4f}")
+        print()
+        print("Start driving. Re-run calibration if steering feels reversed, too weak, or too twitchy.")
+        print()
 
     last_emit = 0.0
 
@@ -349,49 +543,28 @@ async def lsl_source(hz: float = 20.0, window_seconds: float = 2.0) -> AsyncGene
             buffer.append([float(v) for v in sample[:n_channels]])
 
         now = time.time()
-        if now - last_emit >= 1.0 / hz and len(buffer) >= max(64, int(0.75 * fs)):
-            arr = np.asarray(buffer, dtype=float)
-            arr = arr - np.nanmedian(arr, axis=0, keepdims=True)
+        if now - last_emit >= 1.0 / hz:
+            feats = features_from_buffer()
+            if feats is not None:
+                focus = feats["raw_focus"]
+                precision = feats["raw_precision"]
+                quality = feats["quality"]
+                amp = feats["amp"]
 
-            # Use median across channels for robust global spectral indices.
-            theta = np.median([bandpower(arr[:, ch], 4, 7) for ch in range(arr.shape[1])])
-            alpha = np.median([bandpower(arr[:, ch], 8, 12) for ch in range(arr.shape[1])])
-            beta = np.median([bandpower(arr[:, ch], 13, 30) for ch in range(arr.shape[1])])
+                if calibration is not None:
+                    focus = calibration.scale_focus(focus)
+                    precision = calibration.scale_precision(precision)
 
-            alpha_theta = alpha / (theta + 1e-9)
-            beta_alpha = beta / (alpha + 1e-9)
+                blink_threshold = calibration.blink_threshold if calibration is not None else 500.0
+                blink = amp > blink_threshold
 
-            focus = robust_scale(alpha_theta, centre=1.2, width=0.55)
-            precision = 1.0 - robust_scale(beta_alpha, centre=1.8, width=0.7)
+                steer = steering_decoder.update(feats["raw_asym"], quality=quality)
 
-            # Muse-ish channel convention often: TP9, AF7, AF8, TP10.
-            if arr.shape[1] >= 4:
-                # Muse channel order from muselsl is usually TP9, AF7, AF8, TP10, AUX.
-                # For steering, use frontal alpha asymmetry first because AF7/AF8 are
-                # more likely to pick up eye/attention/lateral artefact differences.
-                # Fallback temporal channels are blended in lightly.
-                af7_alpha = bandpower(arr[:, 1], 8, 12)
-                af8_alpha = bandpower(arr[:, 2], 8, 12)
-                tp9_alpha = bandpower(arr[:, 0], 8, 12)
-                tp10_alpha = bandpower(arr[:, 3], 8, 12)
-
-                frontal_asym = (af8_alpha - af7_alpha) / (af8_alpha + af7_alpha + 1e-9)
-                temporal_asym = (tp10_alpha - tp9_alpha) / (tp10_alpha + tp9_alpha + 1e-9)
-                raw_asym = 0.80 * frontal_asym + 0.20 * temporal_asym
-                steer = steering_decoder.update(raw_asym, quality=quality)
-            else:
-                steer = 0.0
-
-            amp = float(np.nanmax(np.abs(arr[-int(0.20 * fs):, : min(2, arr.shape[1])])) if arr.shape[1] else 0.0)
-            blink = amp > 180.0
-            quality = 1.0 - robust_scale(float(np.nanmedian(np.abs(arr))), centre=150.0, width=80.0)
-
-            target = ControlState(focus, precision, float(steer), blink, quality, "lsl").clipped()
-            yield smoother.update(target)
-            last_emit = now
+                target = ControlState(focus, precision, float(steer), blink, quality, "lsl").clipped()
+                yield smoother.update(target)
+                last_emit = now
 
         await asyncio.sleep(0.001)
-
 
 class BridgeServer:
     def __init__(self, host: str, port: int):
@@ -445,6 +618,8 @@ def build_argparser() -> argparse.ArgumentParser:
     p.add_argument("--ws-port", type=int, default=8765)
     p.add_argument("--udp-port", type=int, default=5000)
     p.add_argument("--hz", type=float, default=20.0)
+    p.add_argument("--calibrate", action="store_true", help="Run a short neutral/left/right/blink calibration before streaming controls")
+    p.add_argument("--steer-gain", type=float, default=2.5, help="Gain applied to calibrated EEG steering; try 4 or 6 if steering is too weak")
     return p
 
 
@@ -454,7 +629,7 @@ async def main_async(args: argparse.Namespace):
     elif args.source == "udp":
         source = udp_source(port=args.udp_port, hz=args.hz)
     elif args.source == "lsl":
-        source = lsl_source(hz=args.hz)
+        source = lsl_source(hz=args.hz, calibrate=args.calibrate, steer_gain=args.steer_gain)
     else:
         raise ValueError(args.source)
 

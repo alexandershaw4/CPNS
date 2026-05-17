@@ -224,7 +224,6 @@
       <div class="game-header">
         <div>
           <div class="title">Neuroadaptive Driving Game</div>
-          <div class="subtitle">Manual-control prototype. EEG/Muse input layer comes next.</div>
         </div>
         <div id="gameStatus" class="status-pill">Ready</div>
       </div>
@@ -579,7 +578,7 @@
       car.speed = clamp(car.speed, car.maxReverse, car.maxForward * boost);
 
       let steerDirection = (right ? 1 : 0) - (left ? 1 : 0);
-      steerDirection += eeg.steer * 0.65;
+      steerDirection += eeg.steer * 1.5;
       steerDirection = clamp(steerDirection, -1, 1);
 
       if (eeg.blink) {
