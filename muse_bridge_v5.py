@@ -2,7 +2,7 @@
 """
 Muse -> WebSocket bridge for the Neuroadaptive Driving Game.
 
-v4: adds safer Muse accelerometer steering with auto-axis selection, dead-zone, and diagnostics.
+v5: adds longer configurable calibration, adaptive neutral correction, and safer steering decay.
 
 Recommended running order:
 
@@ -10,7 +10,7 @@ Terminal 1:
     muselsl stream --acc
 
 Terminal 2:
-    python muse_bridge_motion_v4.py --source lsl --control-mode motion --calibrate --debug-motion
+    python muse_bridge_v5.py --source lsl --control-mode motion --calibrate --debug-motion
 
 Browser:
     Input source -> Muse WebSocket bridge -> Connect Muse Bridge
@@ -209,6 +209,12 @@ class MotionSteeringDecoder:
             value = -value
 
         if self.calibration is not None and self.calibration.has_acc:
+            # Use the learned neutral/left/right map, but let neutral drift very slowly
+            # when the user is close to centre. This prevents a small posture shift
+            # from becoming a permanent steering command after calibration.
+            err_from_neutral = value - self.calibration.neutral_acc
+            if abs(err_from_neutral) < max(self.calibration.acc_deadzone * 0.75, 1e-4):
+                self.calibration.neutral_acc = 0.995 * self.calibration.neutral_acc + 0.005 * value
             target = self.calibration.steer_from_acc(value, gain=self.gain)
         else:
             if not self.initialised:
@@ -223,7 +229,8 @@ class MotionSteeringDecoder:
                 target = np.sign(err) * max(0.0, abs(err) - self.deadzone) * self.gain
                 target = np.clip(target, -self.max_steer, self.max_steer)
 
-        self.output = (1 - self.smooth_alpha) * self.output + self.smooth_alpha * float(target)
+        alpha = self.smooth_alpha if abs(target) > 0 else max(self.smooth_alpha, 0.35)
+        self.output = (1 - alpha) * self.output + alpha * float(target)
         if abs(self.output) < 0.03:
             self.output = 0.0
         return float(np.clip(self.output, -self.max_steer, self.max_steer))
@@ -399,6 +406,9 @@ async def lsl_source(
     motion_deadzone: float = 0.10,
     max_steer: float = 0.75,
     debug_motion: bool = False,
+    neutral_seconds: float = 10.0,
+    side_seconds: float = 8.0,
+    blink_seconds: float = 6.0,
 ) -> AsyncGenerator[ControlState, None]:
     try:
         from pylsl import StreamInlet, resolve_byprop
@@ -554,16 +564,16 @@ async def lsl_source(
         await warmup(1.5)
 
         input("Press Enter, then hold NEUTRAL: eyes forward, head straight...")
-        neutral = await collect_calibration_block("NEUTRAL: head straight, relaxed face", seconds=7.0)
+        neutral = await collect_calibration_block("NEUTRAL: head straight, relaxed face", seconds=neutral_seconds)
 
         input("Press Enter, then hold LEFT: gently tilt/lean head left, no big movement...")
-        left = await collect_calibration_block("LEFT: head tilt left", seconds=6.0)
+        left = await collect_calibration_block("LEFT: head tilt left", seconds=side_seconds)
 
         input("Press Enter, then hold RIGHT: gently tilt/lean head right, no big movement...")
-        right = await collect_calibration_block("RIGHT: head tilt right", seconds=6.0)
+        right = await collect_calibration_block("RIGHT: head tilt right", seconds=side_seconds)
 
         input("Press Enter, then BLINK several times...")
-        blink_block = await collect_calibration_block("BLINK: deliberate blinks", seconds=5.0)
+        blink_block = await collect_calibration_block("BLINK: deliberate blinks", seconds=blink_seconds)
 
         focus_vals = sorted([neutral["focus"], left["focus"], right["focus"]])
         precision_vals = sorted([neutral["precision"], left["precision"], right["precision"]])
@@ -744,6 +754,9 @@ def build_argparser() -> argparse.ArgumentParser:
     p.add_argument("--motion-deadzone", type=float, default=0.10, help="Neutral dead-zone for head-tilt steering")
     p.add_argument("--max-steer", type=float, default=0.75, help="Maximum absolute steering sent to the game")
     p.add_argument("--debug-motion", action="store_true", help="Print raw ACC values and steering diagnostics")
+    p.add_argument("--neutral-seconds", type=float, default=10.0, help="Neutral calibration duration")
+    p.add_argument("--side-seconds", type=float, default=8.0, help="Left/right calibration duration")
+    p.add_argument("--blink-seconds", type=float, default=6.0, help="Blink calibration duration")
     return p
 
 
@@ -764,6 +777,9 @@ async def main_async(args: argparse.Namespace):
             motion_deadzone=args.motion_deadzone,
             max_steer=args.max_steer,
             debug_motion=args.debug_motion,
+            neutral_seconds=args.neutral_seconds,
+            side_seconds=args.side_seconds,
+            blink_seconds=args.blink_seconds,
         )
     else:
         raise ValueError(args.source)
