@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EEG Driving Game Prototype</title>
+  <title>EEG Driving Game v7.1 - Motor Imagery EEG</title>
   <style>
     :root {
       --bg: #101318;
@@ -208,6 +208,50 @@
       line-height: 1.45;
     }
 
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 8px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      background: #0e141d;
+      color: #f4f7fb;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .calib-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .calib-grid button {
+      padding: 10px 8px;
+      font-size: 12px;
+    }
+
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #0e141d;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, rgba(251,113,133,0.75), rgba(125,211,252,0.9), rgba(134,239,172,0.75));
+      transform-origin: left center;
+    }
+
     @media (max-width: 920px) {
       body {
         padding: 14px;
@@ -223,7 +267,7 @@
     <section class="game-wrap">
       <div class="game-header">
         <div>
-          <div class="title">Neuroadaptive Driving Game</div>
+          <div class="title">Neuroadaptive Driving Game v7 v7</div>
         </div>
         <div id="gameStatus" class="status-pill">Ready</div>
       </div>
@@ -262,15 +306,26 @@
       <div class="future">
         <h2>Input source</h2>
         <p class="note">
-          Manual controls remain active. In Mock or Muse Bridge mode, the car now has a gentle auto-throttle and uses a dead-zoned, smoothed steering signal so small head-position drift does not turn into endless spinning.
+          v7.1 uses EEG-channel data only and adds longer motor-imagery calibration. This patch makes left/right decoder evidence actively steer the car rather than being hidden behind a conservative pulse gate. The intended control is: rest, imagine steering left, imagine steering right. Artefact-informed modes remain available as a fallback. No accelerometer is used.
         </p>
 
         <div class="slider-row">
           <label><span>Mode</span><span id="inputModeLabel">Manual</span></label>
-          <select id="inputMode" style="width:100%;padding:10px;border-radius:12px;background:#0e141d;color:#f4f7fb;border:1px solid rgba(255,255,255,0.16);">
+          <select id="inputMode">
             <option value="manual">Manual only</option>
             <option value="mock">Mock EEG auto</option>
-            <option value="bridge">Muse WebSocket bridge</option>
+            <option value="bridge">Muse EEG bridge</option>
+          </select>
+        </div>
+
+        <div class="slider-row">
+          <label><span>EEG control strategy</span><span id="featureModeLabel">EOG / wink</span></label>
+          <select id="featureMode">
+            <option value="motor" selected>Motor imagery, EEG-only experimental</option>
+            <option value="hybrid">Hybrid broad EEG features</option>
+            <option value="alpha">Alpha asymmetry, experimental</option>
+            <option value="eog">AF7-AF8 gaze / wink fallback</option>
+            <option value="jaw">TP9-TP10 jaw/temporal fallback</option>
           </select>
         </div>
 
@@ -283,17 +338,41 @@
           <input id="precisionSlider" type="range" min="0" max="1" step="0.01" value="0.7" />
         </div>
         <div class="slider-row">
-          <label><span>Steering bias</span><span id="steerVal">0.00</span></label>
+          <label><span>Steering</span><span id="steerVal">0.00</span></label>
+          <div class="bar"><span id="steerBar"></span></div>
           <input id="steerSlider" type="range" min="-1" max="1" step="0.01" value="0" />
         </div>
 
         <div class="button-row" style="grid-template-columns:1fr; margin-top:12px;">
-          <button id="connectMuseBtn" class="secondary">Connect Muse Bridge</button>
+          <button id="connectMuseBtn" class="secondary">Connect Muse EEG Bridge</button>
+        </div>
+
+        <div class="calib-grid">
+          <button id="calibRestBtn" class="secondary">Cal rest</button>
+          <button id="calibLeftBtn" class="secondary">Cal left imagery</button>
+          <button id="calibRightBtn" class="secondary">Cal right imagery</button>
+        </div>
+
+        <div class="calib-grid">
+          <button id="trainImageryBtn">Start long imagery training</button>
+          <button id="stopTrainingBtn" class="secondary">Stop training</button>
+        </div>
+
+        <div class="slider-row">
+          <label><span>Imagery block length</span><span id="imageryBlockVal">12 s</span></label>
+          <input id="imageryBlockSlider" type="range" min="6" max="24" step="1" value="12" />
+        </div>
+        <div class="slider-row">
+          <label><span>Training repetitions</span><span id="trainingRepsVal">5</span></label>
+          <input id="trainingRepsSlider" type="range" min="2" max="10" step="1" value="5" />
         </div>
 
         <p id="museStatus" class="note">Muse status: not connected</p>
-        <p class="note">
-          Expected bridge message: <code>{"focus":0.7,"precision":0.8,"steer":-0.2,"blink":false}</code>
+        <p id="calibStatus" class="small-note">Calibration: use long training. LEFT = vividly imagine pulling/turning the wheel left. RIGHT = vividly imagine pulling/turning the wheel right. Keep eyes still and jaw relaxed.</p>
+        <p id="decoderReadout" class="small-note">Decoder: not calibrated</p>
+        <p id="featureReadout" class="small-note">EEG features: waiting for data</p>
+        <p class="small-note">
+          Preferred bridge message: <code>{"fs":256,"channels":["TP9","AF7","AF8","TP10"],"samples":[[tp9,af7,af8,tp10],...]}</code>
         </p>
       </div>
 
@@ -319,13 +398,28 @@
       focusSlider: document.getElementById("focusSlider"),
       precisionSlider: document.getElementById("precisionSlider"),
       steerSlider: document.getElementById("steerSlider"),
+      steerBar: document.getElementById("steerBar"),
       focusVal: document.getElementById("focusVal"),
       precisionVal: document.getElementById("precisionVal"),
       steerVal: document.getElementById("steerVal"),
       inputMode: document.getElementById("inputMode"),
       inputModeLabel: document.getElementById("inputModeLabel"),
+      featureMode: document.getElementById("featureMode"),
+      featureModeLabel: document.getElementById("featureModeLabel"),
       connectMuseBtn: document.getElementById("connectMuseBtn"),
-      museStatus: document.getElementById("museStatus")
+      museStatus: document.getElementById("museStatus"),
+      calibStatus: document.getElementById("calibStatus"),
+      featureReadout: document.getElementById("featureReadout"),
+      calibRestBtn: document.getElementById("calibRestBtn"),
+      calibLeftBtn: document.getElementById("calibLeftBtn"),
+      calibRightBtn: document.getElementById("calibRightBtn"),
+      trainImageryBtn: document.getElementById("trainImageryBtn"),
+      stopTrainingBtn: document.getElementById("stopTrainingBtn"),
+      imageryBlockSlider: document.getElementById("imageryBlockSlider"),
+      trainingRepsSlider: document.getElementById("trainingRepsSlider"),
+      imageryBlockVal: document.getElementById("imageryBlockVal"),
+      trainingRepsVal: document.getElementById("trainingRepsVal"),
+      decoderReadout: document.getElementById("decoderReadout")
     };
 
     const keys = new Set();
@@ -364,7 +458,7 @@
       acceleration: 0.13,
       brake: 0.20,
       friction: 0.982,
-      turnRate: 0.052,
+      turnRate: 0.072,
       collisionCooldown: 0
     };
 
@@ -382,18 +476,44 @@
       precision: 0.7,
       steer: 0,
       steerFiltered: 0,
-      quality: 1.0,
+      quality: 0,
       source: "none",
       blink: false,
       bridgeConnected: false,
       lastBridgeMessage: 0,
-      socket: null
+      lastRawMessage: 0,
+      socket: null,
+      fs: 256,
+      rawBuffer: [],
+      maxBufferSeconds: 5,
+      latestFeatures: null,
+      lastClass: "none"
+    };
+
+    const eegDecoder = {
+      labels: ["rest", "left", "right"],
+      samples: { rest: [], left: [], right: [] },
+      centroids: null,
+      scales: null,
+      activeLabel: null,
+      activeUntil: 0,
+      durationMs: 12000,
+      minVectors: 30,
+      confidence: 0,
+      calibrated: false,
+      probs: { rest: 1, left: 0, right: 0 },
+      trainingQueue: [],
+      trainingIndex: 0,
+      steeringMode: "continuous",
+      pulseSteer: 0,
+      pulseUntil: 0,
+      lastPulseAt: 0
     };
 
     const neuroControl = {
-      steerDeadzone: 0.12,
-      steerSmooth: 0.16,
-      steerGain: 1.05,
+      steerDeadzone: 0.035,
+      steerSmooth: 0.34,
+      steerGain: 2.25,
       autoCruise: true,
       minCruise: 1.25,
       maxCruise: 3.65
@@ -411,13 +531,17 @@
 
     function updateFilteredSteer() {
       const target = clamp(applyDeadzone(eeg.steer, neuroControl.steerDeadzone) * neuroControl.steerGain, -1, 1);
-      const alpha = target === 0 ? 0.26 : neuroControl.steerSmooth;
+      const alpha = target === 0 ? 0.30 : neuroControl.steerSmooth;
       eeg.steerFiltered = smoothTowards(eeg.steerFiltered, target, alpha);
       if (Math.abs(eeg.steerFiltered) < 0.025) eeg.steerFiltered = 0;
     }
 
     function setMuseStatus(text) {
       ui.museStatus.textContent = `Muse status: ${text}`;
+    }
+
+    function setCalibStatus(text) {
+      ui.calibStatus.textContent = `Calibration: ${text}`;
     }
 
     function connectMuseBridge() {
@@ -438,19 +562,14 @@
 
       eeg.socket.onopen = () => {
         eeg.bridgeConnected = true;
-        ui.connectMuseBtn.textContent = "Disconnect Muse Bridge";
+        ui.connectMuseBtn.textContent = "Disconnect Muse EEG Bridge";
         setMuseStatus("connected");
       };
 
       eeg.socket.onmessage = event => {
         try {
           const msg = JSON.parse(event.data);
-          if (Number.isFinite(msg.focus)) eeg.focus = clamp(msg.focus, 0, 1);
-          if (Number.isFinite(msg.precision)) eeg.precision = clamp(msg.precision, 0, 1);
-          if (Number.isFinite(msg.steer)) eeg.steer = clamp(msg.steer, -1, 1);
-          if (Number.isFinite(msg.quality)) eeg.quality = clamp(msg.quality, 0, 1);
-          if (typeof msg.source === "string") eeg.source = msg.source;
-          if (typeof msg.blink === "boolean") eeg.blink = msg.blink;
+          ingestBridgeMessage(msg);
           eeg.lastBridgeMessage = performance.now();
         } catch (err) {
           setMuseStatus(`bad message: ${err.message}`);
@@ -463,14 +582,355 @@
 
       eeg.socket.onclose = () => {
         eeg.bridgeConnected = false;
-        ui.connectMuseBtn.textContent = "Connect Muse Bridge";
+        ui.connectMuseBtn.textContent = "Connect Muse EEG Bridge";
         setMuseStatus("not connected");
       };
+    }
+
+    function channelIndexMap(channels) {
+      const out = {};
+      channels.forEach((c, i) => out[String(c).toUpperCase()] = i);
+      return out;
+    }
+
+    function pushRawSample(tp9, af7, af8, tp10, t = performance.now()) {
+      if (![tp9, af7, af8, tp10].every(Number.isFinite)) return;
+      eeg.rawBuffer.push({ t, TP9: tp9, AF7: af7, AF8: af8, TP10: tp10 });
+      const cutoff = t - eeg.maxBufferSeconds * 1000;
+      while (eeg.rawBuffer.length && eeg.rawBuffer[0].t < cutoff) eeg.rawBuffer.shift();
+      eeg.lastRawMessage = performance.now();
+      eeg.quality = clamp(eeg.rawBuffer.length / Math.max(20, eeg.fs * 1.5), 0, 1);
+    }
+
+    function ingestBridgeMessage(msg) {
+      if (Number.isFinite(msg.fs)) eeg.fs = msg.fs;
+      if (typeof msg.source === "string") eeg.source = msg.source;
+
+      // Backwards-compatible: if an external EEG-only bridge already sends decoded features,
+      // accept them. The v7 browser decoder below ignores accelerometer messages.
+      if (Number.isFinite(msg.focus)) eeg.focus = clamp(msg.focus, 0, 1);
+      if (Number.isFinite(msg.precision)) eeg.precision = clamp(msg.precision, 0, 1);
+      if (Number.isFinite(msg.steer) && msg.source !== "accelerometer") eeg.steer = clamp(msg.steer, -1, 1);
+      if (typeof msg.blink === "boolean") eeg.blink = msg.blink;
+
+      const now = performance.now();
+
+      if (Array.isArray(msg.channels) && Array.isArray(msg.samples)) {
+        const ix = channelIndexMap(msg.channels);
+        msg.samples.forEach((row, k) => {
+          if (!Array.isArray(row)) return;
+          pushRawSample(row[ix.TP9], row[ix.AF7], row[ix.AF8], row[ix.TP10], now - (msg.samples.length - k) * 1000 / eeg.fs);
+        });
+        return;
+      }
+
+      if (Array.isArray(msg.eeg)) {
+        const row = msg.eeg;
+        pushRawSample(row[0], row[1], row[2], row[3], now);
+        return;
+      }
+
+      if (msg.eeg && typeof msg.eeg === "object") {
+        pushRawSample(msg.eeg.TP9, msg.eeg.AF7, msg.eeg.AF8, msg.eeg.TP10, now);
+        return;
+      }
+
+      pushRawSample(msg.TP9, msg.AF7, msg.AF8, msg.TP10, now);
+    }
+
+    function mean(xs) {
+      return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+    }
+
+    function variance(xs) {
+      if (xs.length < 2) return 0;
+      const m = mean(xs);
+      return mean(xs.map(x => (x - m) * (x - m)));
+    }
+
+    function rms(xs) {
+      return Math.sqrt(mean(xs.map(x => x * x)) || 0);
+    }
+
+    function std(xs) {
+      return Math.sqrt(variance(xs));
+    }
+
+    function safeLogPower(xs, fs, lo, hi) {
+      return Math.log(1e-6 + bandPower(xs, fs, lo, hi));
+    }
+
+    function diff(xs) {
+      const out = [];
+      for (let i = 1; i < xs.length; i++) out.push(xs[i] - xs[i - 1]);
+      return out;
+    }
+
+    function demean(xs) {
+      const m = mean(xs);
+      return xs.map(x => x - m);
+    }
+
+    function bandPower(xs, fs, fLo, fHi) {
+      const x = demean(xs);
+      const n = x.length;
+      if (n < 16) return 0;
+      let total = 0;
+      let bins = 0;
+      const kLo = Math.max(1, Math.floor(fLo * n / fs));
+      const kHi = Math.min(Math.floor(n / 2), Math.ceil(fHi * n / fs));
+      for (let k = kLo; k <= kHi; k++) {
+        let re = 0, im = 0;
+        for (let i = 0; i < n; i++) {
+          const phase = -2 * Math.PI * k * i / n;
+          re += x[i] * Math.cos(phase);
+          im += x[i] * Math.sin(phase);
+        }
+        total += (re * re + im * im) / n;
+        bins += 1;
+      }
+      return bins ? total / bins : 0;
+    }
+
+    function recentWindow(seconds = 0.85) {
+      const cutoff = performance.now() - seconds * 1000;
+      return eeg.rawBuffer.filter(s => s.t >= cutoff);
+    }
+
+    function currentFeatureVector() {
+      // Slightly longer windows help motor-imagery decoding. The steering layer
+      // then smooths/pulses the output so the car does not spin on single noisy windows.
+      const win = recentWindow(1.35);
+      if (win.length < 24) return null;
+
+      const TP9 = win.map(s => s.TP9);
+      const AF7 = win.map(s => s.AF7);
+      const AF8 = win.map(s => s.AF8);
+      const TP10 = win.map(s => s.TP10);
+      const mode = ui.featureMode.value;
+
+      const frontDiff = mean(AF7) - mean(AF8);
+      const frontAbs = rms(demean(AF7)) - rms(demean(AF8));
+      const frontFast = rms(diff(AF7)) - rms(diff(AF8));
+      const jawHF = rms(diff(TP9)) - rms(diff(TP10));
+      const tempAbs = rms(demean(TP9)) - rms(demean(TP10));
+
+      const theta = ch => safeLogPower(ch, eeg.fs, 4, 7);
+      const alpha = ch => safeLogPower(ch, eeg.fs, 8, 13);
+      const beta1 = ch => safeLogPower(ch, eeg.fs, 13, 20);
+      const beta2 = ch => safeLogPower(ch, eeg.fs, 20, 30);
+      const gammaish = ch => safeLogPower(ch, eeg.fs, 30, 42);
+
+      const alphaFront = alpha(AF8) - alpha(AF7);
+      const alphaTemp = alpha(TP10) - alpha(TP9);
+      const betaFront = beta1(AF8) - beta1(AF7);
+      const betaTemp = beta1(TP10) - beta1(TP9);
+      const thetaFront = theta(AF8) - theta(AF7);
+      const thetaTemp = theta(TP10) - theta(TP9);
+
+      if (mode === "eog") return [frontDiff, frontAbs, frontFast];
+      if (mode === "jaw") return [jawHF, tempAbs, beta1(TP9) - beta1(TP10), gammaish(TP9) - gammaish(TP10)];
+      if (mode === "alpha") return [alphaFront, alphaTemp, alpha(AF7), alpha(AF8), alpha(TP9), alpha(TP10)];
+
+      // Motor imagery with a frontal/temporal Muse montage is exploratory. We use
+      // broad spectral asymmetry and power features rather than pretending we have C3/C4 mu rhythms.
+      const motorFeatures = [
+        alphaFront, alphaTemp, betaFront, betaTemp, thetaFront, thetaTemp,
+        alpha(AF7), alpha(AF8), alpha(TP9), alpha(TP10),
+        beta1(AF7), beta1(AF8), beta1(TP9), beta1(TP10),
+        beta2(AF7), beta2(AF8), beta2(TP9), beta2(TP10),
+        theta(AF7), theta(AF8), theta(TP9), theta(TP10),
+        std(AF7), std(AF8), std(TP9), std(TP10),
+        rms(diff(AF7)), rms(diff(AF8)), rms(diff(TP9)), rms(diff(TP10))
+      ];
+
+      if (mode === "motor") return motorFeatures;
+      return [frontDiff, frontAbs, frontFast, jawHF, tempAbs, ...motorFeatures];
+    }
+
+    function beginCalibration(label, durationMs = null, append = false) {
+      if (ui.inputMode.value !== "bridge") ui.inputMode.value = "bridge";
+      if (!append) eegDecoder.samples[label] = [];
+      eegDecoder.activeLabel = label;
+      eegDecoder.activeUntil = performance.now() + (durationMs || eegDecoder.durationMs);
+      const cue = label === "rest"
+        ? "REST: relax, eyes forward, jaw loose"
+        : label === "left"
+          ? "LEFT: vividly imagine pulling / turning the wheel left"
+          : "RIGHT: vividly imagine pulling / turning the wheel right";
+      setCalibStatus(`${label.toUpperCase()} recording: ${cue}`);
+    }
+
+    function startLongImageryTraining() {
+      if (ui.inputMode.value !== "bridge") ui.inputMode.value = "bridge";
+      const imagerySec = Number(ui.imageryBlockSlider.value || 12);
+      const reps = Number(ui.trainingRepsSlider.value || 5);
+      const restSec = Math.max(6, Math.round(imagerySec * 0.70));
+
+      eegDecoder.samples = { rest: [], left: [], right: [] };
+      eegDecoder.centroids = null;
+      eegDecoder.scales = null;
+      eegDecoder.calibrated = false;
+      eegDecoder.trainingQueue = [];
+      eegDecoder.trainingIndex = 0;
+      eeg.steer = 0;
+      eeg.steerFiltered = 0;
+
+      for (let r = 0; r < reps; r++) {
+        eegDecoder.trainingQueue.push({ label: "rest", ms: restSec * 1000, cue: `Cycle ${r + 1}/${reps}: rest` });
+        eegDecoder.trainingQueue.push({ label: "left", ms: imagerySec * 1000, cue: `Cycle ${r + 1}/${reps}: LEFT imagery` });
+        eegDecoder.trainingQueue.push({ label: "rest", ms: restSec * 1000, cue: `Cycle ${r + 1}/${reps}: rest` });
+        eegDecoder.trainingQueue.push({ label: "right", ms: imagerySec * 1000, cue: `Cycle ${r + 1}/${reps}: RIGHT imagery` });
+      }
+      startNextTrainingPhase();
+    }
+
+    function stopLongImageryTraining() {
+      eegDecoder.trainingQueue = [];
+      eegDecoder.trainingIndex = 0;
+      eegDecoder.activeLabel = null;
+      recomputeDecoder();
+      setCalibStatus(eegDecoder.calibrated ? "training stopped; decoder is ready." : "training stopped; not enough data yet.");
+    }
+
+    function startNextTrainingPhase() {
+      if (!eegDecoder.trainingQueue.length) return;
+      if (eegDecoder.trainingIndex >= eegDecoder.trainingQueue.length) {
+        eegDecoder.trainingQueue = [];
+        eegDecoder.trainingIndex = 0;
+        recomputeDecoder();
+        setCalibStatus(eegDecoder.calibrated ? "long training complete. Start driving." : "training complete, but not enough clean windows. Try again with longer blocks.");
+        return;
+      }
+      const phase = eegDecoder.trainingQueue[eegDecoder.trainingIndex];
+      beginCalibration(phase.label, phase.ms, true);
+      setCalibStatus(`${phase.cue}. ${phase.label === "rest" ? "Relax and keep still." : phase.label === "left" ? "Imagine the left-hand steering action." : "Imagine the right-hand steering action."}`);
+    }
+
+    function finishCalibrationIfNeeded(now) {
+      if (!eegDecoder.activeLabel) return;
+      const f = currentFeatureVector();
+      if (f) eegDecoder.samples[eegDecoder.activeLabel].push(f);
+      const remaining = Math.max(0, (eegDecoder.activeUntil - now) / 1000);
+      const queueText = eegDecoder.trainingQueue.length ? ` | block ${eegDecoder.trainingIndex + 1}/${eegDecoder.trainingQueue.length}` : "";
+      setCalibStatus(`${eegDecoder.activeLabel.toUpperCase()} recording ${remaining.toFixed(1)} s${queueText}`);
+      if (now < eegDecoder.activeUntil) return;
+
+      const label = eegDecoder.activeLabel;
+      eegDecoder.activeLabel = null;
+      recomputeDecoder();
+      const n = eegDecoder.samples[label].length;
+
+      if (eegDecoder.trainingQueue.length) {
+        eegDecoder.trainingIndex += 1;
+        startNextTrainingPhase();
+        return;
+      }
+
+      if (eegDecoder.calibrated) {
+        setCalibStatus(`ready. Rest/left/right learned. Last ${label}: ${n} feature windows.`);
+      } else {
+        setCalibStatus(`${label} saved (${n} windows). Need rest, left and right. Long training is recommended.`);
+      }
+    }
+
+    function recomputeDecoder() {
+      const ok = eegDecoder.labels.every(l => eegDecoder.samples[l].length >= eegDecoder.minVectors);
+      if (!ok) {
+        eegDecoder.calibrated = false;
+        return;
+      }
+      const dims = eegDecoder.samples.rest[0].length;
+      const centroids = {};
+      eegDecoder.labels.forEach(label => {
+        centroids[label] = Array(dims).fill(0);
+        eegDecoder.samples[label].forEach(v => v.forEach((x, i) => centroids[label][i] += x));
+        centroids[label] = centroids[label].map(x => x / eegDecoder.samples[label].length);
+      });
+      const all = eegDecoder.labels.flatMap(l => eegDecoder.samples[l]);
+      const scales = Array(dims).fill(0).map((_, i) => {
+        const sd = Math.sqrt(variance(all.map(v => v[i])));
+        return Math.max(sd, 1e-3);
+      });
+      eegDecoder.centroids = centroids;
+      eegDecoder.scales = scales;
+      eegDecoder.calibrated = true;
+    }
+
+    function distanceScaled(a, b, scales) {
+      let d = 0;
+      for (let i = 0; i < a.length; i++) {
+        const z = (a[i] - b[i]) / scales[i];
+        d += z * z;
+      }
+      return Math.sqrt(d / Math.max(1, a.length));
+    }
+
+    function decodeEEGControl(now) {
+      finishCalibrationIfNeeded(now);
+      const f = currentFeatureVector();
+      eeg.latestFeatures = f;
+      if (!f) return;
+
+      const featureText = f.slice(0, 5).map(x => x.toFixed(2)).join(", ");
+      ui.featureReadout.textContent = `EEG features: [${featureText}${f.length > 5 ? ", ..." : ""}] | buffer ${eeg.rawBuffer.length} samples`;
+
+      if (!eegDecoder.calibrated) {
+        eeg.steer = smoothTowards(eeg.steer, 0, 0.10);
+        eeg.precision = 0.40 + 0.25 * eeg.quality;
+        eeg.focus = 0.50;
+        eeg.lastClass = eegDecoder.activeLabel ? `training ${eegDecoder.activeLabel}` : "uncalibrated";
+        if (ui.decoderReadout) ui.decoderReadout.textContent = `Decoder: ${eeg.lastClass}; rest ${eegDecoder.samples.rest.length}, left ${eegDecoder.samples.left.length}, right ${eegDecoder.samples.right.length}`;
+        return;
+      }
+
+      const d = {};
+      eegDecoder.labels.forEach(label => d[label] = distanceScaled(f, eegDecoder.centroids[label], eegDecoder.scales));
+      const temp = ui.featureMode.value === "motor" ? 1.55 : 1.20;
+      const eRest = Math.exp(-d.rest / temp);
+      const eLeft = Math.exp(-d.left / temp);
+      const eRight = Math.exp(-d.right / temp);
+      const z = eRest + eLeft + eRight + 1e-9;
+      const pRest = eRest / z;
+      const pLeft = eLeft / z;
+      const pRight = eRight / z;
+      eegDecoder.probs = { rest: pRest, left: pLeft, right: pRight };
+
+      const best = pRest > Math.max(pLeft, pRight) ? "rest" : pLeft > pRight ? "left" : "right";
+      const lateralDiff = pRight - pLeft;
+      const lateralAbs = Math.abs(lateralDiff);
+      const lateralMax = Math.max(pLeft, pRight);
+      const lateralSign = lateralDiff >= 0 ? 1 : -1;
+
+      // v7.1 fix: the earlier pulse gate was too conservative. If the decoder is
+      // visibly detecting LEFT/RIGHT, convert that evidence into an actual steering
+      // command. REST only damps steering when it clearly dominates.
+      let steer = 0;
+      if (best === "left" || best === "right") {
+        const classDrive = clamp((lateralMax - pRest * 0.30) * 1.85, 0, 1);
+        const diffDrive = clamp(lateralAbs * 2.60, 0, 1);
+        steer = lateralSign * Math.max(0.38, classDrive, diffDrive);
+      } else {
+        // Even during REST, allow strong lateral evidence through rather than
+        // completely blocking the car.
+        steer = lateralAbs > 0.18 ? lateralSign * clamp(lateralAbs * 1.70, 0, 0.65) : 0;
+      }
+
+      eeg.steer = clamp(smoothTowards(eeg.steer, steer, 0.42), -1, 1);
+      eegDecoder.confidence = clamp(Math.max(lateralMax, lateralAbs * 2.0) * (1 - 0.25 * pRest), 0, 1);
+      eeg.precision = clamp(0.62 + 0.35 * eegDecoder.confidence, 0, 1);
+      eeg.focus = clamp(0.58 + 0.28 * eegDecoder.confidence, 0, 1);
+      eeg.lastClass = best;
+
+      if (ui.decoderReadout) {
+        ui.decoderReadout.textContent = `Decoder: ${best.toUpperCase()} | rest ${pRest.toFixed(2)} left ${pLeft.toFixed(2)} right ${pRight.toFixed(2)} | steer ${eeg.steer.toFixed(2)} | conf ${eegDecoder.confidence.toFixed(2)}`;
+      }
     }
 
     function updateInputLayer(now) {
       const mode = ui.inputMode.value;
       ui.inputModeLabel.textContent = ui.inputMode.options[ui.inputMode.selectedIndex].textContent;
+      ui.featureModeLabel.textContent = ui.featureMode.options[ui.featureMode.selectedIndex].textContent.split(",")[0];
 
       if (mode === "manual") {
         eeg.focus = Number(ui.focusSlider.value);
@@ -483,7 +943,7 @@
         const t = now / 1000;
         const mockFocus = 0.5 + 0.35 * Math.sin(t * 0.7) + 0.08 * Math.sin(t * 2.1);
         const mockPrecision = 0.68 + 0.22 * Math.sin(t * 0.43 + 1.2);
-        const mockSteer = 0.35 * Math.sin(t * 0.9);
+        const mockSteer = 0.65 * Math.sin(t * 0.55);
         eeg.focus = clamp(mockFocus, 0, 1);
         eeg.precision = clamp(mockPrecision, 0, 1);
         eeg.steer = clamp(mockSteer, -1, 1);
@@ -492,14 +952,15 @@
 
       if (mode === "bridge") {
         if (!eeg.bridgeConnected) {
-          // Keep the last slider values as safe fallbacks until the bridge connects.
           eeg.focus = Number(ui.focusSlider.value);
           eeg.precision = Number(ui.precisionSlider.value);
           eeg.steer = Number(ui.steerSlider.value);
         } else if (now - eeg.lastBridgeMessage > 1500) {
-          setMuseStatus("connected, waiting for data");
+          setMuseStatus("connected, waiting for EEG data");
         } else {
-          setMuseStatus("streaming");
+          const rawFresh = now - eeg.lastRawMessage < 1500;
+          setMuseStatus(rawFresh ? `streaming EEG | ${eeg.lastClass}` : "streaming decoded values only");
+          if (rawFresh) decodeEEGControl(now);
         }
       }
 
@@ -545,6 +1006,10 @@
       ui.focusVal.textContent = eeg.focus.toFixed(2);
       ui.precisionVal.textContent = eeg.precision.toFixed(2);
       ui.steerVal.textContent = `${eeg.steerFiltered.toFixed(2)} / raw ${eeg.steer.toFixed(2)}`;
+      if (ui.steerBar) {
+        const width = 50 + eeg.steerFiltered * 50;
+        ui.steerBar.style.width = `${clamp(width, 0, 100)}%`;
+      }
     }
 
     function clamp(v, lo, hi) {
@@ -746,6 +1211,7 @@
         ctx.fillText("Press Start", canvas.width / 2, canvas.height / 2 - 10);
         ctx.fillStyle = "#aab4c3";
         ctx.font = "15px system-ui";
+        ctx.fillText("v7 motor imagery EEG: long-calibrate rest, imagined left and imagined right", canvas.width / 2, canvas.height / 2 + 24);
         ctx.restore();
       }
     }
@@ -811,6 +1277,20 @@
     });
 
     ui.connectMuseBtn.addEventListener("click", connectMuseBridge);
+    ui.calibRestBtn.addEventListener("click", () => beginCalibration("rest"));
+    ui.calibLeftBtn.addEventListener("click", () => beginCalibration("left"));
+    ui.calibRightBtn.addEventListener("click", () => beginCalibration("right"));
+    ui.trainImageryBtn.addEventListener("click", startLongImageryTraining);
+    ui.stopTrainingBtn.addEventListener("click", stopLongImageryTraining);
+    ui.imageryBlockSlider.addEventListener("input", () => { ui.imageryBlockVal.textContent = `${ui.imageryBlockSlider.value} s`; });
+    ui.trainingRepsSlider.addEventListener("input", () => { ui.trainingRepsVal.textContent = ui.trainingRepsSlider.value; });
+    ui.featureMode.addEventListener("change", () => {
+      eegDecoder.samples = { rest: [], left: [], right: [] };
+      eegDecoder.centroids = null;
+      eegDecoder.scales = null;
+      eegDecoder.calibrated = false;
+      setCalibStatus("strategy changed. Recalibrate rest, left and right. Long training is recommended.");
+    });
 
     resetGame();
     requestAnimationFrame(loop);

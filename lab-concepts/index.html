@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visual Concepts in Computational Psychiatry</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/landing.css" />
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero landing-hero">
+      <p class="eyebrow">Interactive lab resources</p>
+      <h1>Visual Concepts in Computational Psychiatry</h1>
+      <p class="subtitle">
+        Animated and interactive explainers for the mathematical, computational and modelling ideas behind our work:
+        oscillations, Bayesian inference, predictive coding, free energy, active inference and group-level model fitting.
+      </p>
+    </header>
+
+    <section class="concept-card intro-card">
+      <div>
+        <h2>Start here</h2>
+        <p>
+          These pages are designed as short visual introductions. Each page focuses on one concept, gives the minimum formal machinery,
+          and then links the idea to computational psychiatry, EEG/MEG, Dynamic Causal Modelling or embodied intelligence.
+        </p>
+      </div>
+      <a class="primary-link" href="fourier/unit-circle-to-fourier.html">Begin with Fourier →</a>
+    </section>
+
+    <section class="concept-card">
+      <div class="section-heading">
+        <p class="eyebrow">Concept pathway</p>
+        <h2>From waves to inference to action</h2>
+        <p>
+          A suggested route through the resources. You can also jump straight to any page below.
+        </p>
+      </div>
+
+      <div class="concept-grid">
+        <a class="concept-tile" href="fourier/unit-circle-to-fourier.html">
+          <span class="tile-number">01</span>
+          <h3>From the Unit Circle to the Fourier Transform</h3>
+          <p>
+            See how circular motion creates sine and cosine waves, then use rotating templates to understand Fourier spectra.
+          </p>
+          <span class="tile-tag">oscillations · spectra · EEG/MEG</span>
+        </a>
+
+        <a class="concept-tile" href="bayes/bayesian-updating.html">
+          <span class="tile-number">02</span>
+          <h3>Bayesian Updating and Precision</h3>
+          <p>
+            Combine prior beliefs with new evidence, and see how uncertainty controls the posterior update.
+          </p>
+          <span class="tile-tag">priors · likelihoods · precision</span>
+        </a>
+
+        <a class="concept-tile" href="predictive-coding/predictive-coding.html">
+          <span class="tile-number">03</span>
+          <h3>Predictive Coding</h3>
+          <p>
+            Understand prediction error, precision weighting and belief updating as a simple dynamic loop.
+          </p>
+          <span class="tile-tag">prediction error · hierarchy</span>
+        </a>
+
+        <a class="concept-tile" href="free-energy/free-energy.html">
+          <span class="tile-number">04</span>
+          <h3>The Free Energy Principle</h3>
+          <p>
+            Explore free energy as a balance between prediction error and model complexity.
+          </p>
+          <span class="tile-tag">accuracy · complexity · evidence</span>
+        </a>
+
+        <a class="concept-tile" href="active-inference/active-inference.html">
+          <span class="tile-number">05</span>
+          <h3>Active Inference and Expected Free Energy</h3>
+          <p>
+            Watch an agent select policies by balancing goal-seeking, information gain and action cost.
+          </p>
+          <span class="tile-tag">policies · exploration · action</span>
+        </a>
+
+        <a class="concept-tile featured" href="active-inference-pong/active-inference-pong.html">
+          <span class="tile-number">06</span>
+          <h3>Active Inference Pong</h3>
+          <p>
+            A concrete embodied example: predict the ball crossing point, score paddle actions and act to minimise expected free energy.
+          </p>
+          <span class="tile-tag">embodied intelligence · Pong</span>
+        </a>
+
+        <a class="concept-tile" href="parametric-empirical-bayes/peb.html">
+          <span class="tile-number">07</span>
+          <h3>Parametric Empirical Bayes</h3>
+          <p>
+            Link subject-level DCM parameters to group effects, uncertainty, empirical priors and shrinkage.
+          </p>
+          <span class="tile-tag">DCM · PEB · group effects</span>
+        </a>
+
+        <div class="concept-tile coming-soon">
+          <span class="tile-number">08</span>
+          <h3>Neural Mass Models and DCM</h3>
+          <p>
+            A future page connecting synaptic parameters, simulated rhythms, spectra and model fitting.
+          </p>
+          <span class="tile-tag">coming soon</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="section-heading">
+        <p class="eyebrow">How to use these pages</p>
+        <h2>For students, collaborators and talks</h2>
+      </div>
+
+      <div class="use-grid">
+        <div>
+          <h3>Teaching</h3>
+          <p>
+            Use each page as a short pre-reading or live demonstration before introducing the formal equations.
+          </p>
+        </div>
+        <div>
+          <h3>Collaboration</h3>
+          <p>
+            Send a specific page to collaborators when a concept such as precision, shrinkage or expected free energy needs a shared intuition.
+          </p>
+        </div>
+        <div>
+          <h3>Presentations</h3>
+          <p>
+            The interactive figures can be used as visual anchors for talks on computational psychiatry and embodied intelligence.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer">
+      <p>
+        Computational Psychiatry and Neuroscience Lab · Interactive Concepts
+      </p>
+    </footer>
+  </main>
+</body>
+</html>

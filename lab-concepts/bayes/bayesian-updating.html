@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bayesian Updating and Precision | Visual Concepts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="breadcrumb">
+      <a href="../index.html">Interactive Concepts</a>
+      <span>›</span>
+      <span>Bayesian Updating</span>
+    </nav>
+
+    <header class="hero">
+      <p class="kicker">Bayes, precision and belief updating</p>
+      <h1>Bayesian updating: how beliefs change when evidence arrives</h1>
+      <p class="lede">
+        Bayesian updating is a formal way to combine what we already believe with new evidence.
+        The key idea is not just whether the evidence points one way or another, but how precise
+        each source of information is.
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="two-column">
+        <div>
+          <h2>1. The basic idea</h2>
+          <p>
+            A prior belief describes what we expected before seeing the data. A likelihood describes
+            how compatible the new evidence is with different possible hidden states. The posterior
+            is the updated belief after combining both.
+          </p>
+
+          <div class="equation-block">
+            $$p(\theta \mid y) = \frac{p(y \mid \theta)p(\theta)}{p(y)}$$
+          </div>
+
+          <p>
+            In this page, we use Gaussian beliefs because they are visually intuitive: each curve has
+            a centre and a width. Narrow curves mean high precision. Wide curves mean low precision.
+          </p>
+        </div>
+
+        <aside class="side-note">
+          <h3>Translation</h3>
+          <p>
+            Prior: what I expected.<br />
+            Evidence: what the data suggest.<br />
+            Posterior: what I now believe.<br />
+            Precision: how certain or reliable a belief is.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <h2>2. Interactive Bayesian updating</h2>
+      <p>
+        Move the sliders to see how prior belief and sensory evidence combine. Notice that a precise
+        prior resists change, while precise evidence pulls the posterior strongly.
+      </p>
+
+      <div class="interactive-panel">
+        <canvas id="bayesCanvas" width="980" height="520" aria-label="Bayesian updating animation"></canvas>
+
+        <div class="controls-grid">
+          <label>
+            Prior mean
+            <input id="priorMean" type="range" min="-4" max="4" step="0.1" value="-1.2" />
+            <output id="priorMeanOut">-1.2</output>
+          </label>
+
+          <label>
+            Prior uncertainty
+            <input id="priorSd" type="range" min="0.25" max="2.5" step="0.05" value="1.1" />
+            <output id="priorSdOut">1.1</output>
+          </label>
+
+          <label>
+            Evidence value
+            <input id="likeMean" type="range" min="-4" max="4" step="0.1" value="1.4" />
+            <output id="likeMeanOut">1.4</output>
+          </label>
+
+          <label>
+            Evidence uncertainty
+            <input id="likeSd" type="range" min="0.25" max="2.5" step="0.05" value="0.65" />
+            <output id="likeSdOut">0.65</output>
+          </label>
+        </div>
+
+        <div class="readout">
+          <div>
+            <strong>Posterior mean</strong>
+            <span id="posteriorMeanOut">0.66</span>
+          </div>
+          <div>
+            <strong>Posterior uncertainty</strong>
+            <span id="posteriorSdOut">0.56</span>
+          </div>
+          <div>
+            <strong>Interpretation</strong>
+            <span id="interpretationOut">Evidence is more precise than the prior, so the posterior moves toward the evidence.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <h2>3. Precision weighting</h2>
+      <p>
+        For Gaussian beliefs, updating can be written in terms of precision. Precision is the inverse
+        of variance:
+      </p>
+
+      <div class="equation-block">
+        $$\pi = \frac{1}{\sigma^2}$$
+      </div>
+
+      <p>
+        The posterior mean is a precision-weighted compromise between the prior and the evidence:
+      </p>
+
+      <div class="equation-block">
+        $$\mu_{\text{post}} =
+        \frac{\pi_{\text{prior}}\mu_{\text{prior}} + \pi_{\text{evidence}}\mu_{\text{evidence}}}
+        {\pi_{\text{prior}} + \pi_{\text{evidence}}}$$
+      </div>
+
+      <p>
+        This is one of the most useful bridges into computational neuroscience. In predictive coding,
+        the brain is often described as updating beliefs in proportion to precision-weighted
+        prediction errors.
+      </p>
+    </section>
+
+    <section class="concept-card">
+      <h2>4. Why this matters for our lab</h2>
+      <p>
+        Many of our models estimate hidden causes from noisy biological data. EEG and MEG signals are
+        indirect measurements of neural activity and psychiatric symptoms are indirect measurements
+        of underlying mechanisms. Bayesian updating gives us a principled way to combine prior
+        assumptions, empirical data and uncertainty.
+      </p>
+
+      <p>
+        In Dynamic Causal Modelling and Parametric Empirical Bayes, this logic appears repeatedly:
+        subject-level parameters are estimated with uncertainty, group-level effects update beliefs
+        about those parameters and posterior probabilities express how confident we are that a
+        mechanism changed.
+      </p>
+    </section>
+
+
+  </main>
+
+  <script src="../assets/bayes-updating.js"></script>
+</body>
+</html>

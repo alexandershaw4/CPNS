@@ -1,0 +1,112 @@
+/*
+  Free Energy Principle page-specific styles.
+  Load after assets/styles.css.
+*/
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--accent-2);
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+}
+
+.subtitle {
+  max-width: 850px;
+  font-size: 1.18rem;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.text-block {
+  max-width: 980px;
+}
+
+.equation {
+  display: inline-block;
+  margin: 8px 0 18px;
+  font-size: 1.08rem;
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+.fep-demo canvas,
+#fepCanvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  background: linear-gradient(180deg, #ffffff, #f5f7f5);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.fep-readout {
+  grid-template-columns: 180px 180px minmax(0, 1fr);
+}
+
+.mini-explainer {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.mini-explainer > div {
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.mini-explainer h3 {
+  margin: 0 0 8px;
+  color: var(--accent);
+}
+
+.mini-explainer p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.fep-two-paths {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.path-card {
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+.path-card h3 {
+  color: var(--accent);
+}
+
+.path-equation {
+  display: inline-block;
+  background: var(--soft);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 850;
+  color: var(--accent);
+}
+
+.lab-link {
+  background: linear-gradient(135deg, rgba(39, 76, 94, 0.08), rgba(107, 143, 113, 0.12));
+}
+
+@media (max-width: 900px) {
+  .fep-readout,
+  .mini-explainer,
+  .fep-two-paths {
+    grid-template-columns: 1fr;
+  }
+}

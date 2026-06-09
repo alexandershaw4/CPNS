@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From the Unit Circle to the Fourier Transform</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/fourier.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Visual Concepts in Computational Psychiatry</p>
+      <h1>From the Unit Circle to the Fourier Transform</h1>
+      <p class="subtitle">
+        A Fourier transform is not magic. It asks: <strong>how much of each rotating wave is hidden inside this signal?</strong>
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>1. A rotating point contains two waves</h2>
+        <p>
+          Move around the unit circle at a constant angular speed. The horizontal coordinate traces a cosine wave,
+          while the vertical coordinate traces a sine wave. This is the bridge between circular motion and oscillations.
+        </p>
+        <p class="equation">$e^{i\theta} = \cos(\theta) + i\sin(\theta)$</p>
+      </div>
+
+      <div class="interactive-grid two-col">
+        <div class="panel">
+          <canvas id="circleCanvas" width="420" height="420" aria-label="Unit circle animation"></canvas>
+        </div>
+        <div class="panel">
+          <canvas id="waveCanvas" width="640" height="420" aria-label="Cosine and sine trace animation"></canvas>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label>
+          Angular speed
+          <input id="speedSlider" type="range" min="0.2" max="3.5" step="0.1" value="1.0" />
+          <span id="speedReadout">1.0×</span>
+        </label>
+        <button id="pauseButton" type="button">Pause</button>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>2. Real and imaginary parts are just two coordinates</h2>
+        <p>
+          In Fourier analysis, the word <em>imaginary</em> can make things sound more mysterious than they are.
+          The real part is the cosine-like component. The imaginary part is the sine-like component. Together they
+          describe the amplitude and phase of a rotating vector.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Real part</h3>
+          <p>$\mathrm{Re}(e^{i\theta}) = \cos(\theta)$</p>
+        </div>
+        <div>
+          <h3>Imaginary part</h3>
+          <p>$\mathrm{Im}(e^{i\theta}) = \sin(\theta)$</p>
+        </div>
+        <div>
+          <h3>Magnitude</h3>
+          <p>$|z| = \sqrt{\mathrm{Re}(z)^2 + \mathrm{Im}(z)^2}$</p>
+        </div>
+        <div>
+          <h3>Phase</h3>
+          <p>$\phi = \tan^{-1}\left(\frac{\mathrm{Im}(z)}{\mathrm{Re}(z)}\right)$</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. The Fourier transform matches the signal with rotating templates</h2>
+        <p>
+          Imagine testing many rotating circles against a signal. When the rotation frequency matches a rhythm in the
+          signal, the rotating template accumulates structure rather than cancelling itself out. The resulting strength
+          tells us how much of that frequency is present.
+        </p>
+        <p class="equation">$X(f) = \sum_t x(t)e^{-i2\pi ft}$</p>
+      </div>
+
+      <div class="interactive-grid two-col">
+        <div class="panel wide-panel">
+          <canvas id="signalCanvas" width="720" height="360" aria-label="Signal made of multiple sine waves"></canvas>
+        </div>
+        <div class="panel wide-panel">
+          <canvas id="spectrumCanvas" width="720" height="360" aria-label="Fourier spectrum of the signal"></canvas>
+        </div>
+      </div>
+
+      <div class="controls stacked-controls">
+        <label>
+          Component A frequency
+          <input id="freqASlider" type="range" min="1" max="12" step="1" value="3" />
+          <span id="freqAReadout">3 Hz</span>
+        </label>
+        <label>
+          Component B frequency
+          <input id="freqBSlider" type="range" min="1" max="12" step="1" value="7" />
+          <span id="freqBReadout">7 Hz</span>
+        </label>
+        <label>
+          Noise
+          <input id="noiseSlider" type="range" min="0" max="1" step="0.05" value="0.20" />
+          <span id="noiseReadout">0.20</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="concept-card lab-link">
+      <h2>Why this matters for our lab</h2>
+      <p>
+        EEG and MEG signals are mixtures of rhythms. Fourier methods let us ask which rhythms are present, how strong
+        they are and how they relate across brain regions. In our modelling work, spectra become the data that neural
+        mass models try to explain mechanistically: changes in synaptic gain, time constants, delays and receptor dynamics
+        should leave structured fingerprints in the frequency domain.
+      </p>
+    </section>
+
+  
+  </main>
+
+  <script src="../assets/fourier-unit-circle.js"></script>
+</body>
+</html>

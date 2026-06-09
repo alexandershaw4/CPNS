@@ -1,0 +1,24 @@
+/*
+  Bayesian updating page-specific layout.
+*/
+
+.bayes-demo canvas,
+#bayesCanvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  background: linear-gradient(180deg, #ffffff, #f5f7f5);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.bayes-demo .readout {
+  grid-template-columns: 180px 210px minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .bayes-demo .readout {
+    grid-template-columns: 1fr;
+  }
+}

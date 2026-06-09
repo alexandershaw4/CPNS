@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parametric Empirical Bayes | Visual Concepts</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/peb.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="breadcrumb">
+      <a href="../index.html">Interactive Concepts</a>
+      <span>›</span>
+      <span>Parametric Empirical Bayes</span>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow">Group effects, uncertainty and shrinkage</p>
+      <h1>Parametric Empirical Bayes</h1>
+      <p class="subtitle">
+        Parametric Empirical Bayes lets us ask whether model parameters differ across people, groups or symptoms,
+        while respecting the uncertainty in each person's parameter estimates.
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>1. The problem</h2>
+        <p>
+          In Dynamic Causal Modelling, each participant has estimated parameters: for example synaptic gain, receptor time constants,
+          connection strengths or delays. But these estimates are uncertain. PEB gives us a principled way to model how subject-level
+          parameters depend on group-level predictors.
+        </p>
+
+        <p class="equation">
+          $\theta_i = X_i\beta + \varepsilon_i$
+        </p>
+
+        <p>
+          Here, $\theta_i$ is a subject-level parameter, $X_i$ contains group or symptom predictors, and $\beta$ contains the group-level effects.
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>2. Interactive PEB intuition</h2>
+        <p>
+          Each point is a subject-level parameter estimate. The vertical bars show uncertainty. The coloured dots show the shrinkage estimate:
+          uncertain subjects are pulled more strongly toward the empirical group model.
+        </p>
+      </div>
+
+      <div class="interactive-panel peb-demo">
+        <canvas id="pebCanvas" width="1080" height="660" aria-label="Parametric Empirical Bayes interactive visualisation"></canvas>
+
+        <div class="controls-grid">
+          <label>
+            Group effect size
+            <input id="effectSlider" type="range" min="-1.5" max="1.5" step="0.05" value="0.65" />
+            <output id="effectOut">0.65</output>
+          </label>
+
+          <label>
+            Subject uncertainty
+            <input id="uncertaintySlider" type="range" min="0.1" max="1.4" step="0.05" value="0.55" />
+            <output id="uncertaintyOut">0.55</output>
+          </label>
+
+          <label>
+            Between-subject variation
+            <input id="variationSlider" type="range" min="0.05" max="1.2" step="0.05" value="0.45" />
+            <output id="variationOut">0.45</output>
+          </label>
+
+          <label>
+            Number of subjects
+            <input id="nSlider" type="range" min="12" max="60" step="2" value="34" />
+            <output id="nOut">34</output>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="resampleButton" type="button">Resample subjects</button>
+          <button id="toggleShrinkageButton" type="button">Hide shrinkage</button>
+        </div>
+
+        <div class="readout peb-readout">
+          <div>
+            <strong>Estimated group effect</strong>
+            <span id="betaOut">0.00</span>
+          </div>
+          <div>
+            <strong>Posterior probability</strong>
+            <span id="ppOut">0.50</span>
+          </div>
+          <div>
+            <strong>Interpretation</strong>
+            <span id="interpretationOut">PEB estimates the group effect while accounting for uncertainty in subject-level parameters.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. Shrinkage is a feature, not a bug</h2>
+        <p>
+          Empirical Bayes uses the group-level model to provide empirical priors on subject-level parameters.
+          Noisy estimates are not trusted blindly. Instead, they are partially pulled toward the group-informed expectation.
+        </p>
+
+        <p class="equation">
+          $\theta_i^{\text{PEB}} = w_i\theta_i^{\text{subject}} + (1-w_i)\theta_i^{\text{group}}$
+        </p>
+
+        <p>
+          The weight $w_i$ is larger when the subject-level estimate is precise and smaller when it is uncertain.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Subject level</h3>
+          <p>Estimate each person's model parameters and uncertainty.</p>
+        </div>
+        <div>
+          <h3>Group level</h3>
+          <p>Explain parameters using predictors such as group, drug or symptoms.</p>
+        </div>
+        <div>
+          <h3>Empirical priors</h3>
+          <p>Use group structure to regularise individual estimates.</p>
+        </div>
+        <div>
+          <h3>Posterior probability</h3>
+          <p>Quantify confidence that an effect is positive or negative.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>4. PEB as a hierarchy</h2>
+        <p>
+          PEB is easiest to understand as a hierarchy: data inform subject-level parameters, subject-level parameters inform group-level
+          effects, and the group-level model feeds back as empirical priors.
+        </p>
+      </div>
+
+      <div class="peb-hierarchy">
+        <div class="hierarchy-node">Data<br /><span>EEG, MEG, spectra</span></div>
+        <div class="hierarchy-arrow">fit DCM</div>
+        <div class="hierarchy-node">Subject parameters<br /><span>with uncertainty</span></div>
+        <div class="hierarchy-arrow">PEB</div>
+        <div class="hierarchy-node">Group effects<br /><span>β parameters</span></div>
+        <div class="hierarchy-arrow">empirical priors</div>
+      </div>
+    </section>
+
+    <section class="concept-card lab-link">
+      <h2>Why this matters for our lab</h2>
+      <p>
+        PEB is central when we want to connect mechanistic model parameters to clinical or experimental variables. For example,
+        we might ask whether NMDA gain differs between groups, whether GABA time constants predict symptoms, or whether a drug changes
+        synaptic parameters after administration. PEB lets us make these inferences while propagating uncertainty from the first-level DCMs.
+      </p>
+    </section>
+
+  </main>
+
+  <script src="../assets/peb.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Active Inference and Expected Free Energy | Visual Concepts</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/active-inference.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="breadcrumb">
+      <a href="../index.html">Interactive Concepts</a>
+      <span>›</span>
+      <span>Active Inference</span>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow">Action, uncertainty and policy selection</p>
+      <h1>Active inference and expected free energy</h1>
+      <p class="subtitle">
+        Active inference extends perception-as-inference into action. An agent does not only update beliefs about the world;
+        it chooses actions that are expected to reduce uncertainty and bring about preferred outcomes.
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>1. From free energy to action</h2>
+        <p>
+          In the previous page, free energy described how a belief can be updated to better explain sensory input.
+          Active inference adds policy selection: the agent asks which action is expected to produce the best future evidence.
+        </p>
+
+        <p class="equation">
+          $\pi^\* = \arg\min_{\pi} G(\pi)$
+        </p>
+
+        <p>
+          Here, $\pi$ is a policy: a possible course of action. $G(\pi)$ is expected free energy: a score for how good or bad
+          that policy is expected to be before the agent acts.
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>2. Interactive policy selection</h2>
+        <p>
+          The agent can move left, right, up or down. Some locations are informative because they reveal hidden state information.
+          One location is preferred because it contains the goal. The selected action is the one with the lowest expected free energy.
+        </p>
+      </div>
+
+      <div class="interactive-panel ai-demo">
+        <canvas id="aiCanvas" width="1040" height="660" aria-label="Active inference policy selection animation"></canvas>
+
+        <div class="controls-grid">
+          <label>
+            Goal value
+            <input id="goalValueSlider" type="range" min="0.5" max="3" step="0.1" value="1.8" />
+            <output id="goalValueOut">1.8</output>
+          </label>
+
+          <label>
+            Information value
+            <input id="infoValueSlider" type="range" min="0" max="3" step="0.1" value="1.4" />
+            <output id="infoValueOut">1.4</output>
+          </label>
+
+          <label>
+            Action cost
+            <input id="costSlider" type="range" min="0" max="1.5" step="0.05" value="0.35" />
+            <output id="costOut">0.35</output>
+          </label>
+
+          <label>
+            Policy precision
+            <input id="precisionSlider" type="range" min="0.5" max="8" step="0.1" value="3.5" />
+            <output id="precisionOut">3.5</output>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="stepButton" type="button">Take selected action</button>
+          <button id="resetButton" type="button">Reset agent</button>
+          <button id="toggleInfoButton" type="button">Move hidden clue</button>
+        </div>
+
+        <div class="readout ai-readout">
+          <div>
+            <strong>Selected action</strong>
+            <span id="actionOut">right</span>
+          </div>
+          <div>
+            <strong>Lowest expected free energy</strong>
+            <span id="gOut">0.00</span>
+          </div>
+          <div>
+            <strong>Interpretation</strong>
+            <span id="interpretationOut">The agent favours the policy with the best balance of goal value, information gain and cost.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. Pragmatic and epistemic value</h2>
+        <p>
+          A useful teaching decomposition of expected free energy is:
+        </p>
+
+        <p class="equation">
+          $G(\pi) \approx \text{expected cost} - \text{expected information gain}$
+        </p>
+
+        <p>
+          Policies are attractive when they are expected to reach preferred outcomes and reduce uncertainty.
+          This gives active inference its characteristic balance between exploitation and exploration.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Pragmatic value</h3>
+          <p>Will this action lead to preferred outcomes?</p>
+        </div>
+        <div>
+          <h3>Epistemic value</h3>
+          <p>Will this action reduce uncertainty?</p>
+        </div>
+        <div>
+          <h3>Expected free energy</h3>
+          <p>A policy score combining future cost and information gain.</p>
+        </div>
+        <div>
+          <h3>Policy precision</h3>
+          <p>How strongly the agent commits to the best-scoring policy.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>4. Perception, action and the world</h2>
+        <p>
+          Active inference closes the loop. The agent has beliefs about hidden states, uses those beliefs to predict future outcomes,
+          selects actions, samples the world and then updates its beliefs again.
+        </p>
+      </div>
+
+      <div class="loop-diagram">
+        <div class="loop-node">Beliefs<br /><span>hidden state estimates</span></div>
+        <div class="loop-arrow">predict</div>
+        <div class="loop-node">Policies<br /><span>possible actions</span></div>
+        <div class="loop-arrow">act</div>
+        <div class="loop-node">Sensations<br /><span>new evidence</span></div>
+        <div class="loop-arrow">update</div>
+      </div>
+    </section>
+
+    <section class="concept-card lab-link">
+      <h2>Why this matters for our lab</h2>
+      <p>
+        Active inference provides a computational language for embodied intelligence, adaptive behaviour and psychiatric symptoms.
+        In our work, the same principles can be used to think about perception, decision-making, motor control and model fitting.
+        For example, a Pong agent can select paddle movements by minimising expected free energy, while a clinical model can ask
+        how altered precision or synaptic gain changes the way beliefs and actions are updated.
+      </p>
+    </section>
+
+  </main>
+
+  <script src="../assets/active-inference.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Free Energy Principle | Visual Concepts</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/free-energy.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="breadcrumb">
+      <a href="../index.html">Interactive Concepts</a>
+      <span>›</span>
+      <span>Free Energy Principle</span>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow">Prediction, uncertainty and model evidence</p>
+      <h1>The Free Energy Principle</h1>
+      <p class="subtitle">
+        Free energy is a way of measuring how well a model explains sensory data, while also penalising overly flexible or implausible explanations.
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>1. From prediction error to free energy</h2>
+        <p>
+          Predictive coding focuses on reducing prediction error. The Free Energy Principle generalises this idea:
+          organisms act and perceive in ways that keep their sensory states predictable under their own model of the world.
+        </p>
+
+        <p>
+          A simple teaching version is:
+        </p>
+
+        <p class="equation">
+          $F \approx \text{prediction error} + \text{complexity penalty}$
+        </p>
+
+        <p>
+          The first term rewards accurate explanations. The second term prevents the system from explaining everything by making beliefs arbitrarily complicated.
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>2. Interactive free energy landscape</h2>
+        <p>
+          The dot is the current belief. The target is the sensory input. Moving the belief closer to the target reduces error.
+          But strong prior confidence creates a cost for moving too far from what the model expected.
+        </p>
+      </div>
+
+      <div class="interactive-panel fep-demo">
+        <canvas id="fepCanvas" width="1040" height="620" aria-label="Free energy landscape animation"></canvas>
+
+        <div class="controls-grid">
+          <label>
+            Sensory input
+            <input id="sensorySlider" type="range" min="-3" max="3" step="0.1" value="1.6" />
+            <output id="sensoryOut">1.6</output>
+          </label>
+
+          <label>
+            Prior expectation
+            <input id="priorSlider" type="range" min="-3" max="3" step="0.1" value="-0.8" />
+            <output id="priorOut">-0.8</output>
+          </label>
+
+          <label>
+            Sensory precision
+            <input id="sensoryPrecisionSlider" type="range" min="0.2" max="3" step="0.05" value="1.4" />
+            <output id="sensoryPrecisionOut">1.40</output>
+          </label>
+
+          <label>
+            Prior precision
+            <input id="priorPrecisionSlider" type="range" min="0.2" max="3" step="0.05" value="0.9" />
+            <output id="priorPrecisionOut">0.90</output>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="runButton" type="button">Run descent</button>
+          <button id="resetButton" type="button">Reset belief</button>
+        </div>
+
+        <div class="readout fep-readout">
+          <div>
+            <strong>Current belief</strong>
+            <span id="beliefOut">-0.80</span>
+          </div>
+          <div>
+            <strong>Free energy</strong>
+            <span id="freeEnergyOut">0.00</span>
+          </div>
+          <div>
+            <strong>Interpretation</strong>
+            <span id="interpretationOut">The belief is pulled between sensory evidence and prior expectation.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. Accuracy and complexity</h2>
+        <p>
+          In variational formulations, free energy is often described as a balance between accuracy and complexity:
+        </p>
+
+        <p class="equation">
+          $F = \text{complexity} - \text{accuracy}$
+        </p>
+
+        <p>
+          Accuracy means the model predicts the data well. Complexity means the posterior beliefs have moved away from the prior.
+          A good explanation should fit the data, but not by inventing an unnecessarily complicated story.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Accuracy</h3>
+          <p>How well does the model predict the observed data?</p>
+        </div>
+        <div>
+          <h3>Complexity</h3>
+          <p>How far did beliefs move from the prior?</p>
+        </div>
+        <div>
+          <h3>Precision</h3>
+          <p>How strongly should errors influence belief updating?</p>
+        </div>
+        <div>
+          <h3>Evidence</h3>
+          <p>How plausible is this model as an explanation of the data?</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>4. Perception and action</h2>
+        <p>
+          There are two broad ways to reduce free energy. Perception changes beliefs to better explain sensory input.
+          Action changes sensory input so it better matches predictions.
+        </p>
+      </div>
+
+      <div class="fep-two-paths">
+        <div class="path-card">
+          <h3>Perception</h3>
+          <p>Update beliefs so predictions better match the world.</p>
+          <p class="path-equation">beliefs → predictions → lower error</p>
+        </div>
+
+        <div class="path-card">
+          <h3>Action</h3>
+          <p>Change the world, or sample the world, so sensations better match predictions.</p>
+          <p class="path-equation">actions → sensations → lower error</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card lab-link">
+      <h2>Why this matters for our lab</h2>
+      <p>
+        Free energy gives a shared language for model fitting, predictive coding, active inference and computational psychiatry.
+        In DCM and Variational Laplace, we estimate hidden parameters by optimising a free-energy objective. In active inference,
+        agents choose actions expected to reduce future uncertainty and fulfil preferred states. In psychiatry, altered precision,
+        priors or synaptic gain may change how prediction errors influence perception, action and belief.
+      </p>
+    </section>
+
+    
+  </main>
+
+  <script src="../assets/free-energy.js"></script>
+</body>
+</html>

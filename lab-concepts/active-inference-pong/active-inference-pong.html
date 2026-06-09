@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Active Inference Pong | Visual Concepts</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/active-inference-pong.css" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="breadcrumb">
+      <a href="../index.html">Interactive Concepts</a>
+      <span>›</span>
+      <span>Active Inference Pong</span>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow">Embodied intelligence, prediction and action</p>
+      <h1>Active Inference Pong</h1>
+      <p class="subtitle">
+        A simple embodied agent must keep a paddle aligned with a moving ball. It predicts where the ball will cross the paddle line,
+        compares candidate actions and selects the movement with lowest expected free energy.
+      </p>
+    </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>1. The task</h2>
+        <p>
+          The agent does not need to memorise a teacher's response. It needs to infer the future sensory consequence of the ball's
+          trajectory: where will the ball cross the paddle? Action then becomes a way of reducing expected mismatch between the
+          paddle and the predicted crossing point.
+        </p>
+
+        <p class="equation">
+          $\text{prediction error} = y_{\text{crossing}} - y_{\text{paddle}}$
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>2. Interactive Pong agent</h2>
+        <p>
+          The dashed trajectory shows the predicted ball path. The horizontal marker on the paddle line shows where the ball is expected
+          to cross. The agent evaluates up, stay and down, then moves according to the lowest expected free energy.
+        </p>
+      </div>
+
+      <div class="interactive-panel pong-demo">
+        <canvas id="pongCanvas" width="1080" height="660" aria-label="Active inference Pong animation"></canvas>
+
+        <div class="controls-grid">
+          <label>
+            Ball speed
+            <input id="speedSlider" type="range" min="0.7" max="3.2" step="0.1" value="1.6" />
+            <output id="speedOut">1.6</output>
+          </label>
+
+          <label>
+            Sensory noise
+            <input id="noiseSlider" type="range" min="0" max="1.5" step="0.05" value="0.35" />
+            <output id="noiseOut">0.35</output>
+          </label>
+
+          <label>
+            Goal precision
+            <input id="goalPrecisionSlider" type="range" min="0.3" max="4" step="0.1" value="2.0" />
+            <output id="goalPrecisionOut">2.0</output>
+          </label>
+
+          <label>
+            Policy precision
+            <input id="policyPrecisionSlider" type="range" min="0.5" max="8" step="0.1" value="3.5" />
+            <output id="policyPrecisionOut">3.5</output>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="pauseButton" type="button">Pause</button>
+          <button id="resetButton" type="button">Reset rally</button>
+          <button id="serveButton" type="button">Random serve</button>
+        </div>
+
+        <div class="readout pong-readout">
+          <div>
+            <strong>Predicted crossing</strong>
+            <span id="crossingOut">0</span>
+          </div>
+          <div>
+            <strong>Selected action</strong>
+            <span id="actionOut">stay</span>
+          </div>
+          <div>
+            <strong>Lowest expected free energy</strong>
+            <span id="gOut">0.00</span>
+          </div>
+          <div>
+            <strong>Interpretation</strong>
+            <span id="interpretationOut">The paddle moves toward the predicted crossing point.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. Expected free energy for paddle actions</h2>
+        <p>
+          In this simplified demo, each action is scored by the expected future mismatch between paddle and predicted crossing point,
+          plus a small cost for unnecessary movement.
+        </p>
+
+        <p class="equation">
+          $G(a) \approx \lambda \left(y_{\text{crossing}} - y_{\text{paddle after }a}\right)^2 + c(a)$
+        </p>
+
+        <p>
+          Lower $G$ means the action is expected to produce better future evidence: the sensory outcome of the ball arriving near the paddle.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Prediction</h3>
+          <p>Estimate where the moving ball will cross the paddle line.</p>
+        </div>
+        <div>
+          <h3>Policy evaluation</h3>
+          <p>Score up, stay and down by their expected future mismatch.</p>
+        </div>
+        <div>
+          <h3>Precision</h3>
+          <p>Controls how strongly the agent commits to the best action.</p>
+        </div>
+        <div>
+          <h3>Embodiment</h3>
+          <p>Action changes future sensory input, not just internal belief.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>4. Why this is active inference</h2>
+        <p>
+          The agent is not just reacting to the current ball position. It uses a simple generative model of ball motion to predict a
+          future sensory state. It then chooses an action that is expected to make future sensations match preferred outcomes:
+          the ball arriving where the paddle can intercept it.
+        </p>
+      </div>
+
+      <div class="loop-diagram">
+        <div class="loop-node">Observe<br /><span>ball position and velocity</span></div>
+        <div class="loop-arrow">predict</div>
+        <div class="loop-node">Imagine policies<br /><span>up, stay, down</span></div>
+        <div class="loop-arrow">score</div>
+        <div class="loop-node">Act<br /><span>move paddle</span></div>
+        <div class="loop-arrow">sample</div>
+      </div>
+    </section>
+
+    <section class="concept-card lab-link">
+      <h2>Why this matters for our lab</h2>
+      <p>
+        Pong is a compact demonstration of embodied active inference. The agent must infer a hidden future state, select actions and
+        continuously close the loop between prediction and sensation. The same conceptual machinery scales up to richer problems:
+        navigation, sensorimotor control, active sampling, neuro-inspired AI and psychiatric models in which altered precision changes
+        how strongly beliefs and actions are updated.
+      </p>
+    </section>
+
+
+  </main>
+
+  <script src="../assets/active-inference-pong.js"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+/*
+  Landing page-specific styles.
+  Load after assets/styles.css.
+*/
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--accent-2);
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+}
+
+.subtitle {
+  max-width: 900px;
+  font-size: 1.18rem;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.landing-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-hero::after {
+  content: "";
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 280px;
+  height: 280px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(107,143,113,0.22), rgba(107,143,113,0));
+  pointer-events: none;
+}
+
+.intro-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
+  color: #ffffff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 850;
+  box-shadow: 0 10px 24px rgba(39, 76, 94, 0.16);
+}
+
+.primary-link:hover {
+  transform: translateY(-1px);
+}
+
+.section-heading {
+  max-width: 850px;
+  margin-bottom: 22px;
+}
+
+.section-heading p:last-child {
+  color: var(--muted);
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.concept-tile {
+  position: relative;
+  display: block;
+  min-height: 230px;
+  padding: 24px;
+  text-decoration: none;
+  color: var(--ink);
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 8px 20px rgba(19, 32, 38, 0.04);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+a.concept-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(39, 76, 94, 0.35);
+  box-shadow: 0 16px 32px rgba(19, 32, 38, 0.08);
+}
+
+.concept-tile.featured {
+  background:
+    radial-gradient(circle at top right, rgba(107, 143, 113, 0.20), transparent 13rem),
+    #fbfcfb;
+  border-color: rgba(107, 143, 113, 0.45);
+}
+
+.concept-tile.coming-soon {
+  opacity: 0.72;
+  background: rgba(238, 242, 240, 0.7);
+}
+
+.tile-number {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--accent);
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+.concept-tile h3 {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.concept-tile p {
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.tile-tag {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  right: 24px;
+  color: var(--accent-2);
+  font-size: 0.85rem;
+  font-weight: 850;
+}
+
+.use-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.use-grid > div {
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+.use-grid h3 {
+  color: var(--accent);
+}
+
+.use-grid p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.landing-footer {
+  color: var(--muted);
+  text-align: center;
+  padding: 18px 0 0;
+}
+
+@media (max-width: 850px) {
+  .intro-card,
+  .concept-grid,
+  .use-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .primary-link {
+    width: 100%;
+  }
+
+  .concept-tile {
+    min-height: 250px;
+  }
+}
