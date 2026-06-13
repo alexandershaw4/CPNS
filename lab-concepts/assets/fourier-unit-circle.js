@@ -289,3 +289,338 @@ window.addEventListener('resize', () => {
 
 updateReadouts();
 requestAnimationFrame(animate);
+
+/* ============================================================
+   Extra Fourier teaching animations:
+   1. Winding the signal around a circle
+   2. Signal reconstruction from Fourier components
+
+   Safe to append to fourier-unit-circle.js
+   ============================================================ */
+
+(function () {
+  const windingCanvas = document.getElementById("windingCanvas");
+  const windingSpectrumCanvas = document.getElementById("windingSpectrumCanvas");
+  const windingFreqSlider = document.getElementById("windingFreqSlider");
+  const windingFreqReadout = document.getElementById("windingFreqReadout");
+
+  const reconstructionCanvas = document.getElementById("reconstructionCanvas");
+  const reconstructionSlider = document.getElementById("reconstructionSlider");
+  const reconstructionReadout = document.getElementById("reconstructionReadout");
+
+  function setupCanvas(canvas) {
+    if (!canvas) return null;
+
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    return ctx;
+  }
+
+  const windingCtx = setupCanvas(windingCanvas);
+  const windingSpectrumCtx = setupCanvas(windingSpectrumCanvas);
+  const reconstructionCtx = setupCanvas(reconstructionCanvas);
+
+  function getCanvasSize(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      w: rect.width,
+      h: rect.height
+    };
+  }
+
+  function signalAt(t) {
+    /*
+      Teaching signal:
+      A mixture of a strong 3 Hz rhythm and a smaller 7 Hz rhythm.
+      t is in seconds over a 1-second window.
+    */
+    return (
+      1.0 * Math.sin(2 * Math.PI * 3 * t) +
+      0.45 * Math.sin(2 * Math.PI * 7 * t + 0.7)
+    );
+  }
+
+  function drawAxes(ctx, w, h, x0, y0, x1, y1) {
+    ctx.strokeStyle = "rgba(40, 50, 45, 0.25)";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y0);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x0, y1);
+    ctx.stroke();
+  }
+
+  function drawWinding() {
+    if (!windingCanvas || !windingCtx || !windingFreqSlider) return;
+
+    const ctx = windingCtx;
+    const { w, h } = getCanvasSize(windingCanvas);
+
+    const testFreq = parseFloat(windingFreqSlider.value);
+    if (windingFreqReadout) {
+      windingFreqReadout.textContent = `${testFreq.toFixed(1)} Hz`;
+    }
+
+    ctx.clearRect(0, 0, w, h);
+
+    const cx = w * 0.5;
+    const cy = h * 0.5;
+    const baseR = Math.min(w, h) * 0.24;
+    const scale = Math.min(w, h) * 0.10;
+
+    // Background circle
+    ctx.strokeStyle = "rgba(40, 50, 45, 0.25)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, baseR, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    const n = 400;
+    let sx = 0;
+    let sy = 0;
+
+    ctx.beginPath();
+
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const x = signalAt(t);
+
+      // Winding: rotate signal around the circle at the test frequency.
+      const theta = -2 * Math.PI * testFreq * t;
+      const r = baseR + scale * x;
+
+      const px = cx + r * Math.cos(theta);
+      const py = cy + r * Math.sin(theta);
+
+      sx += px;
+      sy += py;
+
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+
+    ctx.strokeStyle = "rgba(39, 76, 94, 0.9)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const mx = sx / n;
+    const my = sy / n;
+
+    // Centre of mass marker
+    ctx.fillStyle = "rgba(180, 80, 70, 0.95)";
+    ctx.beginPath();
+    ctx.arc(mx, my, 6, 0, 2 * Math.PI);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(180, 80, 70, 0.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(mx, my);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(30, 35, 32, 0.75)";
+    ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillText("wrapped signal", 18, 26);
+    ctx.fillText("centre of mass", mx + 10, my - 10);
+  }
+
+  function fourierStrengthAt(freq) {
+    const n = 700;
+    let re = 0;
+    let im = 0;
+
+    for (let i = 0; i < n; i++) {
+      const t = i / n;
+      const x = signalAt(t);
+      const theta = -2 * Math.PI * freq * t;
+
+      re += x * Math.cos(theta);
+      im += x * Math.sin(theta);
+    }
+
+    re /= n;
+    im /= n;
+
+    return Math.sqrt(re * re + im * im);
+  }
+
+  function drawWindingSpectrum() {
+    if (!windingSpectrumCanvas || !windingSpectrumCtx || !windingFreqSlider) return;
+
+    const ctx = windingSpectrumCtx;
+    const { w, h } = getCanvasSize(windingSpectrumCanvas);
+
+    const selectedFreq = parseFloat(windingFreqSlider.value);
+
+    ctx.clearRect(0, 0, w, h);
+
+    const padL = 42;
+    const padR = 18;
+    const padT = 24;
+    const padB = 38;
+
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    drawAxes(ctx, w, h, padL, h - padB, w - padR, padT);
+
+    const maxF = 12;
+    const bars = [];
+
+    let maxVal = 0;
+    for (let f = 1; f <= maxF; f++) {
+      const val = fourierStrengthAt(f);
+      bars.push({ f, val });
+      maxVal = Math.max(maxVal, val);
+    }
+
+    maxVal = maxVal || 1;
+
+    const barGap = 6;
+    const barW = plotW / maxF - barGap;
+
+    for (const b of bars) {
+      const x = padL + (b.f - 1) * (plotW / maxF) + barGap / 2;
+      const barH = (b.val / maxVal) * plotH;
+      const y = h - padB - barH;
+
+      const isSelected = Math.abs(b.f - selectedFreq) < 0.5;
+
+      ctx.fillStyle = isSelected
+        ? "rgba(180, 80, 70, 0.9)"
+        : "rgba(39, 76, 94, 0.75)";
+
+      ctx.fillRect(x, y, barW, barH);
+
+      ctx.fillStyle = "rgba(30, 35, 32, 0.7)";
+      ctx.font = "12px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(String(b.f), x + barW / 2, h - 14);
+    }
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = "rgba(30, 35, 32, 0.75)";
+    ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillText("winding strength by frequency", padL, 18);
+    ctx.fillText("Hz", w - 36, h - 14);
+  }
+
+  function drawReconstruction() {
+    if (!reconstructionCanvas || !reconstructionCtx || !reconstructionSlider) return;
+
+    const ctx = reconstructionCtx;
+    const { w, h } = getCanvasSize(reconstructionCanvas);
+
+    const nComponents = parseInt(reconstructionSlider.value, 10);
+
+    if (reconstructionReadout) {
+      reconstructionReadout.textContent = String(nComponents);
+    }
+
+    ctx.clearRect(0, 0, w, h);
+
+    const padL = 42;
+    const padR = 18;
+    const padT = 24;
+    const padB = 38;
+
+    const plotW = w - padL - padR;
+    const midY = h * 0.52;
+    const ampScale = h * 0.20;
+
+    drawAxes(ctx, w, h, padL, midY, w - padR, padT);
+
+    const n = 600;
+
+    // Original signal
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const x = padL + t * plotW;
+      const y = midY - signalAt(t) * ampScale;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = "rgba(30, 35, 32, 0.30)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Reconstruction using manually known components first,
+    // then extra tiny components to illustrate gradual build-up.
+    function reconstructedSignal(t) {
+      let y = 0;
+
+      if (nComponents >= 1) {
+        y += 1.0 * Math.sin(2 * Math.PI * 3 * t);
+      }
+
+      if (nComponents >= 2) {
+        y += 0.45 * Math.sin(2 * Math.PI * 7 * t + 0.7);
+      }
+
+      // Add smaller illustrative harmonics after the true components.
+      for (let k = 3; k <= nComponents; k++) {
+        y += 0.08 * Math.sin(2 * Math.PI * k * t + k * 0.4);
+      }
+
+      return y;
+    }
+
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const x = padL + t * plotW;
+      const y = midY - reconstructedSignal(t) * ampScale;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = "rgba(39, 76, 94, 0.95)";
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(30, 35, 32, 0.75)";
+    ctx.font = "14px system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillText("grey = original signal", padL, 18);
+    ctx.fillText("blue = reconstruction", padL + 170, 18);
+    ctx.fillText("time", w - 48, h - 14);
+  }
+
+  function drawAllExtraFourierAnimations() {
+    drawWinding();
+    drawWindingSpectrum();
+    drawReconstruction();
+  }
+
+  if (windingFreqSlider) {
+    windingFreqSlider.addEventListener("input", drawAllExtraFourierAnimations);
+  }
+
+  if (reconstructionSlider) {
+    reconstructionSlider.addEventListener("input", drawAllExtraFourierAnimations);
+  }
+
+  drawAllExtraFourierAnimations();
+})();

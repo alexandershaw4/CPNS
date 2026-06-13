@@ -6,6 +6,7 @@
   <title>From the Unit Circle to the Fourier Transform</title>
   <link rel="stylesheet" href="../assets/styles.css" />
   <link rel="stylesheet" href="../assets/fourier.css" />
+
   <script>
     window.MathJax = {
       tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -14,15 +15,49 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
+
 <body>
   <main class="page">
+
     <header class="hero">
       <p class="eyebrow">Visual Concepts in Computational Psychiatry</p>
       <h1>From the Unit Circle to the Fourier Transform</h1>
       <p class="subtitle">
-        A Fourier transform is not magic. It asks: <strong>how much of each rotating wave is hidden inside this signal?</strong>
+        A Fourier transform is not magic. It asks:
+        <strong>how much of each rotating wave is hidden inside this signal?</strong>
       </p>
     </header>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>The big idea</h2>
+        <p>
+          Many signals look complicated because several rhythms are mixed together.
+          A Fourier transform separates a signal into simpler oscillatory ingredients:
+          slow waves, fast waves, and everything in between.
+        </p>
+        <p>
+          In neuroscience, this is useful because EEG and MEG recordings are not single
+          clean waves. They are mixtures of rhythms produced by interacting neural populations.
+          Fourier analysis gives us a first way to ask: <em>what rhythms are present, and how strong are they?</em>
+        </p>
+      </div>
+
+      <div class="takeaway-grid">
+        <div class="takeaway">
+          <h3>Time domain</h3>
+          <p>What the signal does over time.</p>
+        </div>
+        <div class="takeaway">
+          <h3>Frequency domain</h3>
+          <p>Which rhythms make up the signal.</p>
+        </div>
+        <div class="takeaway">
+          <h3>Fourier transform</h3>
+          <p>The bridge between the two views.</p>
+        </div>
+      </div>
+    </section>
 
     <section class="concept-card">
       <div class="text-block">
@@ -30,6 +65,10 @@
         <p>
           Move around the unit circle at a constant angular speed. The horizontal coordinate traces a cosine wave,
           while the vertical coordinate traces a sine wave. This is the bridge between circular motion and oscillations.
+        </p>
+        <p>
+          This is why Fourier analysis uses complex numbers. A complex number can be thought of as a point with two
+          coordinates: a horizontal coordinate and a vertical coordinate.
         </p>
         <p class="equation">$e^{i\theta} = \cos(\theta) + i\sin(\theta)$</p>
       </div>
@@ -51,11 +90,57 @@
         </label>
         <button id="pauseButton" type="button">Pause</button>
       </div>
+
+      <div class="teaching-note">
+        <h3>Intuition</h3>
+        <p>
+          A sine wave is not separate from circular motion. It is one coordinate of circular motion.
+          When a point rotates at a steady speed, its shadow moves back and forth smoothly.
+          That shadow is an oscillation.
+        </p>
+      </div>
     </section>
 
     <section class="concept-card">
       <div class="text-block">
-        <h2>2. Real and imaginary parts are just two coordinates</h2>
+        <h2>2. Frequency, amplitude and phase</h2>
+        <p>
+          Before we get to the Fourier transform, three ideas matter.
+          <strong>Frequency</strong> tells us how quickly something repeats.
+          <strong>Amplitude</strong> tells us how large the rhythm is.
+          <strong>Phase</strong> tells us where in the cycle the rhythm is.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Frequency</h3>
+          <p>How many cycles occur per second.</p>
+          <p class="small-equation">$f = \frac{1}{T}$</p>
+        </div>
+        <div>
+          <h3>Amplitude</h3>
+          <p>How large the oscillation is.</p>
+          <p class="small-equation">$A\cos(2\pi ft)$</p>
+        </div>
+        <div>
+          <h3>Phase</h3>
+          <p>Where the oscillation starts in its cycle.</p>
+          <p class="small-equation">$A\cos(2\pi ft + \phi)$</p>
+        </div>
+      </div>
+
+      <div class="text-block">
+        <p>
+          Two waves can have the same frequency and amplitude but different phases.
+          They are the same rhythm, just shifted in time.
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>3. Real and imaginary parts are just two coordinates</h2>
         <p>
           In Fourier analysis, the word <em>imaginary</em> can make things sound more mysterious than they are.
           The real part is the cosine-like component. The imaginary part is the sine-like component. Together they
@@ -81,11 +166,19 @@
           <p>$\phi = \tan^{-1}\left(\frac{\mathrm{Im}(z)}{\mathrm{Re}(z)}\right)$</p>
         </div>
       </div>
+
+      <div class="teaching-note">
+        <h3>Key point</h3>
+        <p>
+          The Fourier transform returns complex numbers because each frequency needs two pieces of information:
+          <strong>how much</strong> of that rhythm is present, and <strong>where in its cycle</strong> it lines up with the signal.
+        </p>
+      </div>
     </section>
 
     <section class="concept-card">
       <div class="text-block">
-        <h2>3. The Fourier transform matches the signal with rotating templates</h2>
+        <h2>4. The Fourier transform matches the signal with rotating templates</h2>
         <p>
           Imagine testing many rotating circles against a signal. When the rotation frequency matches a rhythm in the
           signal, the rotating template accumulates structure rather than cancelling itself out. The resulting strength
@@ -120,6 +213,173 @@
           <span id="noiseReadout">0.20</span>
         </label>
       </div>
+
+      <div class="teaching-note">
+        <h3>What the spectrum is showing</h3>
+        <p>
+          Peaks in the spectrum appear at frequencies that are strongly present in the signal.
+          If the signal contains a 3 Hz rhythm and a 7 Hz rhythm, the Fourier spectrum should show peaks near 3 Hz and 7 Hz.
+          Noise spreads energy more broadly, making the peaks less clean.
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>5. Another intuition: winding the signal around a circle</h2>
+        <p>
+          A helpful way to understand the Fourier transform is to imagine wrapping the signal around a circle.
+          Pick a test frequency. If the test frequency does not match the signal, positive and negative parts spread
+          around the circle and cancel out. If it does match, the wrapped signal becomes lopsided and has a clear centre of mass.
+        </p>
+        <p>
+          The Fourier transform is essentially measuring that centre of mass for each test frequency.
+        </p>
+      </div>
+
+      <div class="interactive-grid two-col">
+        <div class="panel wide-panel">
+          <canvas id="windingCanvas" width="640" height="420" aria-label="Signal wound around a circle"></canvas>
+        </div>
+        <div class="panel wide-panel">
+          <canvas id="windingSpectrumCanvas" width="640" height="420" aria-label="Winding strength across frequencies"></canvas>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label>
+          Test winding frequency
+          <input id="windingFreqSlider" type="range" min="1" max="12" step="0.1" value="3" />
+          <span id="windingFreqReadout">3.0 Hz</span>
+        </label>
+      </div>
+
+      <div class="teaching-note">
+        <h3>Newbie-friendly translation</h3>
+        <p>
+          The transform asks: “If I rotate at this frequency while watching the signal, does the signal pull me in one
+          consistent direction, or does it cancel itself out?”
+        </p>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>6. Building a signal from waves</h2>
+        <p>
+          Fourier analysis also works in reverse. Once we know the amplitude and phase of each frequency,
+          we can add those waves back together to reconstruct the original signal.
+        </p>
+        <p class="equation">$x(t) = \sum_f X(f)e^{i2\pi ft}$</p>
+      </div>
+
+      <div class="interactive-grid two-col">
+        <div class="panel wide-panel">
+          <canvas id="reconstructionCanvas" width="720" height="360" aria-label="Signal reconstructed from waves"></canvas>
+        </div>
+        <div class="panel">
+          <div class="step-list">
+            <h3>Reconstruction idea</h3>
+            <ol>
+              <li>Take one frequency.</li>
+              <li>Scale it by its amplitude.</li>
+              <li>Shift it by its phase.</li>
+              <li>Add it to the other frequencies.</li>
+              <li>The mixture recreates the signal.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label>
+          Number of components
+          <input id="reconstructionSlider" type="range" min="1" max="12" step="1" value="2" />
+          <span id="reconstructionReadout">2</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>7. Power: ignoring phase when we only care about strength</h2>
+        <p>
+          The Fourier transform gives a complex value for each frequency.
+          The magnitude tells us the strength of that frequency. Squaring the magnitude gives power.
+        </p>
+        <p class="equation">$P(f) = |X(f)|^2$</p>
+        <p>
+          In EEG and MEG, we often talk about power in frequency bands: delta, theta, alpha, beta and gamma.
+          These bands summarise how much rhythmic activity is present in broad frequency ranges.
+        </p>
+      </div>
+
+      <div class="frequency-band-table">
+        <div><strong>Delta</strong><span>~1–4 Hz</span><p>Slow rhythms, often prominent in deep sleep.</p></div>
+        <div><strong>Theta</strong><span>~4–8 Hz</span><p>Often linked to memory, navigation and drowsiness.</p></div>
+        <div><strong>Alpha</strong><span>~8–12 Hz</span><p>Prominent posterior rhythm, often stronger with eyes closed.</p></div>
+        <div><strong>Beta</strong><span>~13–30 Hz</span><p>Often linked to motor and cognitive state.</p></div>
+        <div><strong>Gamma</strong><span>~30+ Hz</span><p>Fast activity, often linked to local cortical processing.</p></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>8. Why phase still matters</h2>
+        <p>
+          Power tells us how strong a rhythm is, but phase tells us where that rhythm is in its cycle.
+          This matters when comparing signals from different brain regions.
+        </p>
+        <p>
+          Two regions may have the same frequency but differ in their phase relationship.
+          Measures such as coherence, phase-locking and imaginary coherence use this idea to study functional connectivity.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Same phase</h3>
+          <p>Signals rise and fall together.</p>
+        </div>
+        <div>
+          <h3>Phase lag</h3>
+          <p>One signal consistently follows another.</p>
+        </div>
+        <div>
+          <h3>Unstable phase</h3>
+          <p>The relationship changes over time.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>9. A few practical cautions</h2>
+        <p>
+          Fourier analysis is powerful, but it is not automatic truth. It assumes that the signal is being analysed over
+          a chosen time window. The result depends on sampling rate, window length, noise, filtering and whether the signal
+          changes over time.
+        </p>
+      </div>
+
+      <div class="mini-explainer">
+        <div>
+          <h3>Sampling rate</h3>
+          <p>You cannot measure rhythms faster than the data allow.</p>
+        </div>
+        <div>
+          <h3>Window length</h3>
+          <p>Longer windows give better frequency resolution but blur changes over time.</p>
+        </div>
+        <div>
+          <h3>Non-stationarity</h3>
+          <p>Brain signals change, so spectra may differ across moments, tasks or sleep stages.</p>
+        </div>
+        <div>
+          <h3>Filtering</h3>
+          <p>Preprocessing can shape the spectrum, so interpretation needs care.</p>
+        </div>
+      </div>
     </section>
 
     <section class="concept-card lab-link">
@@ -130,9 +390,30 @@
         mass models try to explain mechanistically: changes in synaptic gain, time constants, delays and receptor dynamics
         should leave structured fingerprints in the frequency domain.
       </p>
+      <p>
+        This is why frequency-domain analysis is so useful in computational psychiatry. A change in spectral power is not
+        just a descriptive feature; it can become a clue about the synaptic and circuit mechanisms that generated the data.
+      </p>
     </section>
 
-  
+    <section class="concept-card">
+      <div class="text-block">
+        <h2>Summary</h2>
+        <p>
+          The Fourier transform is a way of comparing a signal with many rotating waves.
+          Frequencies that match the signal leave a strong trace. Frequencies that do not match tend to cancel out.
+        </p>
+      </div>
+
+      <div class="summary-list">
+        <p><strong>Unit circle:</strong> circular motion creates sine and cosine waves.</p>
+        <p><strong>Complex numbers:</strong> a compact way to track two coordinates: cosine and sine.</p>
+        <p><strong>Fourier transform:</strong> tests how strongly each rotating wave is present.</p>
+        <p><strong>Spectrum:</strong> shows the strength of rhythms across frequency.</p>
+        <p><strong>Neuroscience:</strong> spectra help us characterise and model rhythmic brain activity.</p>
+      </div>
+    </section>
+
   </main>
 
   <script src="../assets/fourier-unit-circle.js"></script>

@@ -103,6 +103,80 @@
   aspect-ratio: 2 / 1;
 }
 
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.takeaway,
+.teaching-note,
+.step-list,
+.summary-list {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+}
+
+.takeaway h3,
+.teaching-note h3,
+.step-list h3 {
+  margin-top: 0;
+}
+
+.teaching-note {
+  margin-top: 1.25rem;
+}
+
+.small-equation {
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.frequency-band-table {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.frequency-band-table div {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.frequency-band-table strong {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.frequency-band-table span {
+  display: block;
+  font-size: 0.95rem;
+  opacity: 0.75;
+  margin-bottom: 0.5rem;
+}
+
+.frequency-band-table p,
+.summary-list p {
+  margin-bottom: 0;
+}
+
+.step-list ol {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .takeaway-grid,
+  .frequency-band-table {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Controls for this original Fourier page */
 .controls {
