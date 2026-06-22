@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Active Inference World Model Lab</title>
+  <meta name="description" content="A visual playground for belief, uncertainty and action." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero" aria-label="Project introduction">
+      <div>
+        <p class="eyebrow">CPNS Lab concept demo</p>
+        <h1>Active Inference World Model Lab</h1>
+        <p class="subtitle">A visual playground for belief, uncertainty and action.</p>
+      </div>
+      <aside class="hero-card">
+        <span class="hero-label">V1 demo</span>
+        <strong>Find the Mug</strong>
+        <p>Watch an agent use semantic priors, sensory evidence and expected free energy to decide where to search.</p>
+      </aside>
+    </section>
+
+    <section class="dashboard" aria-label="Active inference world model demo">
+      <section class="panel world-panel">
+        <div class="panel-header">
+          <div>
+            <h2>World view</h2>
+            <p>The visible environment. The true mug location is hidden unless you reveal it.</p>
+          </div>
+          <button id="revealBtn" class="ghost-button" type="button">Reveal hidden state</button>
+        </div>
+
+        <div id="worldMap" class="world-map" aria-label="Four-room house map"></div>
+
+        <div class="world-footer">
+          <div>
+            <span class="mini-label">Agent location</span>
+            <strong id="agentLocationLabel">Living room</strong>
+          </div>
+          <div>
+            <label class="mini-label" for="hiddenRoomSelect">Hidden mug location</label>
+            <select id="hiddenRoomSelect">
+              <option value="kitchen">Kitchen</option>
+              <option value="office" selected>Office</option>
+              <option value="living_room">Living room</option>
+              <option value="bedroom">Bedroom</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel mind-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Mind view</h2>
+            <p>The hidden state made visible: posterior beliefs about mug location.</p>
+          </div>
+          <div class="uncertainty-pill">
+            <span>Uncertainty</span>
+            <strong id="uncertaintyLabel">0.00</strong>
+          </div>
+        </div>
+
+        <div id="beliefBars" class="belief-bars" aria-live="polite"></div>
+
+        <div class="mini-grid">
+          <div class="metric-card">
+            <span class="mini-label">Most likely</span>
+            <strong id="mostLikelyLabel">Kitchen</strong>
+          </div>
+          <div class="metric-card">
+            <span class="mini-label">Searches made</span>
+            <strong id="searchCountLabel">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel policy-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Policy evaluation</h2>
+            <p>Lower expected free energy means the policy is currently preferred.</p>
+          </div>
+        </div>
+        <div id="policyTable" class="policy-table" aria-live="polite"></div>
+      </section>
+
+      <section class="panel controls-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Controls</h2>
+            <p>Change the agent and watch behaviour shift.</p>
+          </div>
+        </div>
+
+        <div class="controls-stack">
+          <label class="slider-row">
+            <span>Semantic prior strength</span>
+            <input id="semanticStrength" type="range" min="0" max="2.5" step="0.01" value="1.00" />
+            <output id="semanticStrengthOut">1.00</output>
+          </label>
+
+          <label class="slider-row">
+            <span>Sensory precision</span>
+            <input id="sensoryPrecision" type="range" min="0.05" max="0.99" step="0.01" value="0.86" />
+            <output id="sensoryPrecisionOut">0.86</output>
+          </label>
+
+          <label class="slider-row">
+            <span>Epistemic weight</span>
+            <input id="epistemicWeight" type="range" min="0" max="3" step="0.01" value="1.20" />
+            <output id="epistemicWeightOut">1.20</output>
+          </label>
+
+          <label class="slider-row">
+            <span>Goal preference</span>
+            <input id="goalPreference" type="range" min="0" max="4" step="0.01" value="2.20" />
+            <output id="goalPreferenceOut">2.20</output>
+          </label>
+
+          <label class="slider-row">
+            <span>Action cost</span>
+            <input id="actionCost" type="range" min="0" max="2" step="0.01" value="0.35" />
+            <output id="actionCostOut">0.35</output>
+          </label>
+
+          <label class="slider-row">
+            <span>Decision noise</span>
+            <input id="decisionNoise" type="range" min="0" max="2" step="0.01" value="0.00" />
+            <output id="decisionNoiseOut">0.00</output>
+          </label>
+        </div>
+
+        <div class="preset-row" aria-label="Preset demonstrations">
+          <button type="button" class="preset-button active" data-preset="default">Balanced agent</button>
+          <button type="button" class="preset-button" data-preset="flat">Flat priors</button>
+          <button type="button" class="preset-button" data-preset="curious">Curious explorer</button>
+          <button type="button" class="preset-button" data-preset="noisy">Noisy senses</button>
+          <button type="button" class="preset-button" data-preset="lazy">High action cost</button>
+        </div>
+
+        <div class="button-row">
+          <button id="stepBtn" class="primary-button" type="button">Step agent</button>
+          <button id="autoBtn" class="secondary-button" type="button">Auto run</button>
+          <button id="resetBtn" class="ghost-button" type="button">Reset</button>
+        </div>
+      </section>
+
+      <section class="panel trace-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Explanation trace</h2>
+            <p>An account of belief, uncertainty and action.</p>
+          </div>
+          <label class="toggle-row">
+            <input id="advancedToggle" type="checkbox" />
+            <span>Advanced mode</span>
+          </label>
+        </div>
+        <ol id="traceList" class="trace-list"></ol>
+      </section>
+
+      <section id="advancedPanel" class="panel advanced-panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Advanced mode</h2>
+            <p>Compact readouts of the prior, posterior, likelihood assumptions and policy-score decomposition.</p>
+          </div>
+        </div>
+        <div class="advanced-grid">
+          <pre id="priorReadout"></pre>
+          <pre id="likelihoodReadout"></pre>
+          <pre id="efeReadout"></pre>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
