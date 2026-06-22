@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Polyphonic Active Inference Drone | CPNS Lab</title>
-  <meta name="description" content="A hierarchical polyphonic active inference drone in PyBullet with belief-state control, discrete mode inference, temporal scene dynamics, and policy-level epistemic control." />
+  <meta name="description" content="A hierarchical polyphonic active inference drone in PyBullet with belief-state control, discrete mode inference, temporal scene dynamics and policy-level epistemic control." />
   <style>
     :root {
       --bg: #f6f8fb;
@@ -142,12 +142,12 @@
     <section class="hero" id="overview">
       <div>
         <div class="eyebrow">Hierarchical polyphonic active inference in a 3D PyBullet environment</div>
-        <h1>An embodied drone controller built around belief dynamics, scene interpretation, and future-scene reasoning</h1>
+        <h1>An embodied drone controller built around belief dynamics, scene interpretation and future-scene reasoning</h1>
         <p class="lede">
-          This project implements a drone agent that must reach a target beacon in a cluttered three-dimensional world under partial observability. The controller is not given simulator truth. Instead, hidden-state estimates are updated online from noisy self-observations, egocentric target cues, and ray-based obstacle sensing, and action is selected from those beliefs by a polyphonic control architecture whose pressures are modulated by a slower latent scene layer.
+          This project implements a drone agent that must reach a target beacon in a cluttered three-dimensional world under partial observability. The controller is not given simulator truth. Instead, hidden-state estimates are updated online from noisy self-observations, egocentric target cues and ray-based obstacle sensing and action is selected from those beliefs by a polyphonic control architecture whose pressures are modulated by a slower latent scene layer.
         </p>
         <p class="lede">
-          The system combines continuous belief updates, posterior-like behavioural mode arbitration, scene-level epistemic control, and temporal latent scene dynamics. In practice this allows the drone to remember the target under occlusion, distinguish poor vantage from genuine blockage, switch between exploration and exploitation, and choose actions partly for how they are expected to improve the future scene rather than only the immediate target distance.
+          The system combines continuous belief updates, posterior-like behavioural mode arbitration, scene-level epistemic control and temporal latent scene dynamics. In practice this allows the drone to remember the target under occlusion, distinguish poor vantage from genuine blockage, switch between exploration and exploitation and choose actions partly for how they are expected to improve the future scene rather than only the immediate target distance.
         </p>
         <div class="chips">
           <div class="chip">PyBullet</div>
@@ -170,7 +170,7 @@
           Your browser does not support embedded video.
         </video>
         <div class="video-meta">
-          Demonstration run of the current controller. The overlay shows the target belief, confidence, observation status, behavioural mode, and the slower scene/context variables that bias exploration, exploitation, and repositioning.
+          Demonstration run of the current controller. The overlay shows the target belief, confidence, observation status, behavioural mode and the slower scene/context variables that bias exploration, exploitation and repositioning.
         </div>
       </div>
     </section>
@@ -188,13 +188,13 @@
       <div class="card panel">
         <h2>Why this system is interesting</h2>
         <p>
-          Many active inference demonstrations remain either highly discrete or unrealistically privileged. This system was designed to move beyond that. The drone inhabits a continuous 3D environment, receives only local noisy cues, and must reach a target while maintaining a coherent belief state through periods of occlusion, clutter, and changing line-of-sight geometry. The policy does not reduce to direct pursuit of a known coordinate.
+          Many active inference demonstrations remain either highly discrete or unrealistically privileged. This system was designed to move beyond that. The drone inhabits a continuous 3D environment, receives only local noisy cues and must reach a target while maintaining a coherent belief state through periods of occlusion, clutter and changing line-of-sight geometry. The policy does not reduce to direct pursuit of a known coordinate.
         </p>
         <p>
-          The more distinctive feature is the organisation of uncertainty. The agent maintains a fast belief layer over self state, target state, and local obstacle structure; a discrete layer over behavioural modes; and a slower latent scene/context layer that summarises whether the world currently looks visible, soft-occluded, lost, advancing, stalled, trapped, open, or blocked. Candidate policies are then evaluated not only for target progress and safety, but also for how much they are expected to clarify and improve these higher-order latent scene variables over time.
+          The more distinctive feature is the organisation of uncertainty. The agent maintains a fast belief layer over self state, target state and local obstacle structure; a discrete layer over behavioural modes; and a slower latent scene/context layer that summarises whether the world currently looks visible, soft-occluded, lost, advancing, stalled, trapped, open, or blocked. Candidate policies are then evaluated not only for target progress and safety, but also for how much they are expected to clarify and improve these higher-order latent scene variables over time.
         </p>
         <div class="note">
-          In practical terms, the controller asks not only “where is the target?” but also “am I merely occluded, genuinely blocked, or stuck in a poor-vantage region?”, and then uses that answer to bias what it does next.
+          In practical terms, the controller asks not only “where is the target?” but also “am I merely occluded, genuinely blocked, or stuck in a poor-vantage region?” and then uses that answer to bias what it does next.
         </div>
       </div>
     </section>
@@ -203,7 +203,7 @@
       <div class="card figure-card">
         <img src="c3_architecture_figure.png" alt="C3 hierarchical polyphonic active inference drone architecture diagram" />
         <div class="figure-meta">
-          System diagram of the full architecture, showing the world and observation interface, fast belief inference, discrete mode arbitration, slow scene/context inference, and temporal scene-aware policy evaluation.
+          System diagram of the full architecture, showing the world and observation interface, fast belief inference, discrete mode arbitration, slow scene/context inference and temporal scene-aware policy evaluation.
         </div>
       </div>
       <div class="card flow-card">
@@ -227,7 +227,7 @@
           <rect x="18" y="18" width="704" height="784" rx="22" fill="url(#g1)" stroke="#d8e1ea"/>
           <g font-family="Inter, system-ui, sans-serif" fill="#182230">
             <text x="34" y="52" font-size="26" font-weight="700">Simplified causal graph</text>
-            <text x="34" y="76" font-size="14" fill="#5f6f82">Continuous beliefs, discrete modes, slow scene states, and temporal policy evaluation</text>
+            <text x="34" y="76" font-size="14" fill="#5f6f82">Continuous beliefs, discrete modes, slow scene states and temporal policy evaluation</text>
           </g>
           <g stroke="#7095bf" stroke-width="3" fill="none" marker-end="url(#arrow)">
             <path d="M370 720 L370 652"/>
@@ -345,7 +345,7 @@
       <div class="card panel">
         <h2>Behavioural arbitration</h2>
         <p>
-          Action is not issued by a single monolithic controller. The system maintains posterior-like scores over a compact family of behavioural regimes, and the current regime is selected from those beliefs under the influence of target confidence, visibility, progress, local geometry, and scene/context interpretation.
+          Action is not issued by a single monolithic controller. The system maintains posterior-like scores over a compact family of behavioural regimes and the current regime is selected from those beliefs under the influence of target confidence, visibility, progress, local geometry and scene/context interpretation.
         </p>
         <ul>
           <li><strong>search_reacquire</strong>: broad exploratory movement when target memory is weak or evidence is poor</li>
@@ -356,13 +356,13 @@
           <li><strong>success_hover</strong>: terminal behaviour after the success condition is reached</li>
         </ul>
         <p>
-          These regimes are not intended as opaque labels. They are interpretable behavioural states that can be inspected, plotted, and related directly to changing beliefs over visibility, blockage, progress and target confidence.
+          These regimes are not intended as opaque labels. They are interpretable behavioural states that can be inspected, plotted and related directly to changing beliefs over visibility, blockage, progress and target confidence.
         </p>
       </div>
       <div class="card panel">
         <h2>Polyphonic control</h2>
         <p>
-          Polyphony here means that candidate actions are evaluated under several concurrent behavioural pressures rather than one fixed objective. These pressures have their own effective precisions, and those precisions are shaped by the slower scene/context layer.
+          Polyphony here means that candidate actions are evaluated under several concurrent behavioural pressures rather than one fixed objective. These pressures have their own effective precisions and those precisions are shaped by the slower scene/context layer.
         </p>
         <ul>
           <li><strong>goal pressure</strong>: reduce target distance and alignment error</li>
@@ -383,8 +383,8 @@
       <div class="card panel">
         <h2>Step-by-step operation of the system</h2>
         <ol>
-          <li><strong>World state generates observations.</strong> The simulator computes the true drone pose, target position and obstacle geometry, but only noisy self cues, egocentric target cues, and ray-based obstacle distances are exposed to the controller.</li>
-          <li><strong>Fast belief inference updates continuous hidden states.</strong> The filter updates posterior beliefs over self state, target state, and local map structure. This yields a target estimate with uncertainty and confidence rather than a privileged coordinate.</li>
+          <li><strong>World state generates observations.</strong> The simulator computes the true drone pose, target position and obstacle geometry, but only noisy self cues, egocentric target cues and ray-based obstacle distances are exposed to the controller.</li>
+          <li><strong>Fast belief inference updates continuous hidden states.</strong> The filter updates posterior beliefs over self state, target state and local map structure. This yields a target estimate with uncertainty and confidence rather than a privileged coordinate.</li>
           <li><strong>Behavioural mode beliefs are updated.</strong> The controller computes posterior-like scores over search, rollout, repositioning, recovery, hold and hover regimes using confidence, visibility, geometry, progress and deadlock cues.</li>
           <li><strong>Slow scene/context beliefs are inferred.</strong> A slower latent layer summarises whether the target is visible, soft-occluded or lost; whether progress is advancing, stalled or trapped; and whether the local geometry looks like good vantage, poor vantage or blockage.</li>
           <li><strong>Candidate policies are rolled forward.</strong> Short-horizon control sequences are imagined from the current belief state. Each is scored under the polyphonic objective, combining pragmatic, safety, stability, epistemic and future-scene terms.</li>
@@ -527,7 +527,7 @@
           \approx \mathbb{E}\big[\text{visibility improvement} + \text{progress improvement} + \text{affordance improvement} - \text{future scene uncertainty}\big].$$
         </div>
         <p>
-          Intuitively, policies are favoured when they are expected to improve visibility, disambiguate blocked corridors from poor vantage points, preserve useful target memory, and move the agent into a better latent scene over future steps.
+          Intuitively, policies are favoured when they are expected to improve visibility, disambiguate blocked corridors from poor vantage points, preserve useful target memory and move the agent into a better latent scene over future steps.
         </p>
       </div>
 
@@ -568,7 +568,7 @@ utils/
   logging_utils.py         # structured logs and overlays
 main.py                    # truth → observations → beliefs → action</div>
         <p>
-          The key engineering decision is that the controller never consumes simulator truth directly. Truth exists only to generate observations. This separation forces the policy to operate on beliefs, and it is the reason the system behaves like an inferential controller.
+          The key engineering decision is that the controller never consumes simulator truth directly. Truth exists only to generate observations. This separation forces the policy to operate on beliefs and it is the reason the system behaves like an inferential controller.
         </p>
       </div>
       <div class="card panel">
@@ -601,7 +601,7 @@ main.py                    # truth → observations → beliefs → action</div>
       <div class="card panel">
         <h2>What this demonstrates</h2>
         <p>
-          This project shows that a relatively compact controller can integrate continuous latent-state estimation, discrete behavioural inference, slower contextual scene interpretation, and temporal scene-aware policy evaluation in a single embodied agent.
+          This project shows that a relatively compact controller can integrate continuous latent-state estimation, discrete behavioural inference, slower contextual scene interpretation and temporal scene-aware policy evaluation in a single embodied agent.
         </p>
       </div>
     </section>
@@ -611,40 +611,40 @@ main.py                    # truth → observations → beliefs → action</div>
       <div class="card panel">
         <h2>Run diagnostics and temporal traces</h2>
         <p>
-          Because the controller is belief-based and explicitly hierarchical, its internal state can be inspected over time rather than inferred only from visible behaviour. The plots below were generated from the attached successful run and show how target confidence, behavioural arbitration, scene beliefs, contextual precisions, and policy-level epistemic terms evolve across the trajectory.
+          Because the controller is belief-based and explicitly hierarchical, its internal state can be inspected over time rather than inferred only from visible behaviour. The plots below were generated from the attached successful run and show how target confidence, behavioural arbitration, scene beliefs, contextual precisions and policy-level epistemic terms evolve across the trajectory.
         </p>
         <p>
-          These traces are useful for validating that the system is doing something mechanistically meaningful: confidence rises and falls with evidence quality, mode probabilities shift between search and exploitation, scene beliefs respond to occlusion and progress, and the epistemic and future-scene terms become active at behaviourally relevant moments.
+          These traces are useful for validating that the system is doing something mechanistically meaningful: confidence rises and falls with evidence quality, mode probabilities shift between search and exploitation, scene beliefs respond to occlusion and progress and the epistemic and future-scene terms become active at behaviourally relevant moments.
         </p>
       </div>
       <div class="plot-grid" style="margin-top:18px;">
         <div class="card plot-card">
           <img src="01_target_tracking_confidence.png" alt="Target tracking and confidence over time" />
-          <div class="plot-meta"><strong>Target tracking and confidence.</strong> Distance to target, raw confidence, effective confidence, and target variance trace across the run.</div>
+          <div class="plot-meta"><strong>Target tracking and confidence.</strong> Distance to target, raw confidence, effective confidence and target variance trace across the run.</div>
         </div>
         <div class="card plot-card">
           <img src="02_mode_probabilities.png" alt="Behavioural mode probabilities over time" />
-          <div class="plot-meta"><strong>Behavioural mode arbitration.</strong> Posterior-like probabilities over search, rollout, vantage reposition, recovery, and goal-hold.</div>
+          <div class="plot-meta"><strong>Behavioural mode arbitration.</strong> Posterior-like probabilities over search, rollout, vantage reposition, recovery and goal-hold.</div>
         </div>
         <div class="card plot-card">
           <img src="03_scene_visibility_progress.png" alt="Scene visibility and progress beliefs over time" />
-          <div class="plot-meta"><strong>Slow visibility and progress beliefs.</strong> The slower scene layer tracks whether the target is softly occluded or lost, and whether the agent is advancing, stalled, or trapped.</div>
+          <div class="plot-meta"><strong>Slow visibility and progress beliefs.</strong> The slower scene layer tracks whether the target is softly occluded or lost and whether the agent is advancing, stalled, or trapped.</div>
         </div>
         <div class="card plot-card">
           <img src="04_scene_affordance.png" alt="Scene affordance beliefs over time" />
-          <div class="plot-meta"><strong>Affordance regime.</strong> Beliefs over good vantage, poor vantage, and blocked local geometry.</div>
+          <div class="plot-meta"><strong>Affordance regime.</strong> Beliefs over good vantage, poor vantage and blocked local geometry.</div>
         </div>
         <div class="card plot-card">
           <img src="05_context_precisions.png" alt="Context precisions and memory reliability over time" />
-          <div class="plot-meta"><strong>Context precisions.</strong> Exploit-explore balance, target-memory precision, safety precision, epistemic precision, goal precision, and temporal memory reliability.</div>
+          <div class="plot-meta"><strong>Context precisions.</strong> Exploit-explore balance, target-memory precision, safety precision, epistemic precision, goal precision and temporal memory reliability.</div>
         </div>
         <div class="card plot-card">
           <img src="06_efe_terms.png" alt="Expected free energy terms over time" />
-          <div class="plot-meta"><strong>Policy scoring terms.</strong> Decomposition of the expected-free-energy-style objective into pragmatic, risk, epistemic, scene-level, uncertainty, and occlusion terms.</div>
+          <div class="plot-meta"><strong>Policy scoring terms.</strong> Decomposition of the expected-free-energy-style objective into pragmatic, risk, epistemic, scene-level, uncertainty and occlusion terms.</div>
         </div>
         <div class="card plot-card">
           <img src="07_scene_information_gains.png" alt="Scene information gain terms over time" />
-          <div class="plot-meta"><strong>Scene-level information gain.</strong> Visibility gain, affordance gain, and blocked-vs-poor-vantage disambiguation gain under candidate policies.</div>
+          <div class="plot-meta"><strong>Scene-level information gain.</strong> Visibility gain, affordance gain and blocked-vs-poor-vantage disambiguation gain under candidate policies.</div>
         </div>
         <div class="card plot-card">
           <img src="09_target_visibility_softcue.png" alt="Target visibility and soft cue timing over time" />
