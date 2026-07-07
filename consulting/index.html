@@ -1,529 +1,744 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-GB">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dr Alexander D. Shaw — Neurocomputational Consulting</title>
-  <meta name="description" content="Inference, Decision Systems & Mechanistic AI for Complex Problems. Consultancy by Dr Alex Shaw: modelling & analysis, neuro-AI, strategic advisory, and training." />
+  <title>Uncertainty-aware world models for physical AI, robotics and adaptive decision-making | CPNS Lab</title>
+  <meta name="description" content="Consulting, advisory and research collaboration around uncertainty-aware world models, active inference, embodied AI, robotics and adaptive decision-making from Dr Alexander D. Shaw and CPNS Lab." />
+  <meta name="author" content="Dr Alexander D. Shaw" />
+
+  <meta property="og:title" content="Uncertainty-aware world models for physical AI" />
+  <meta property="og:description" content="Active inference, generative models and embodied AI for robotics, autonomous systems and adaptive decision-making." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cpnslab.com/consulting/" />
+  <meta property="og:image" content="https://cpnslab.com/consulting/alex_shaw.jpg" />
+
   <style>
-    /* ===== Theme (PDF-aligned, neutral grey accent) ===== */
-    :root{
-      --bg:#f7f9fc;
-      --bg-soft:#ffffff;
-      --text:#0f1220;
-      --muted:#5e667a;
-      --accent:#6a6f7a;      /* neutral grey, matches PDF */
-      --line:#e7ebf3;
-      --shadow:0 6px 18px rgba(17,23,41,.06);
-      --radius:16px;
-      --gap:clamp(16px,2vw,28px);
-      --container:min(1120px,92vw);
+    :root {
+      --bg: #f7f4ee;
+      --panel: #ffffff;
+      --ink: #172022;
+      --muted: #5e6a6d;
+      --line: rgba(23, 32, 34, 0.14);
+      --accent: #146c73;
+      --accent-2: #8f5f3f;
+      --soft: #e6f1f1;
+      --soft-2: #f1e9df;
+      --shadow: 0 22px 60px rgba(20, 38, 45, 0.12);
+      --radius: 22px;
+      --max: 1180px;
     }
 
-    /* ===== Reset & Base ===== */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);
-      font:16px/1.6 Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;}
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-    h1,h2,h3{line-height:1.2;margin:0 0 .4em}
-    h1{font-size:clamp(28px,3.8vw,42px); letter-spacing:-0.01em}
-    h2{font-size:clamp(22px,2.6vw,30px)}
-    h3{font-size:clamp(18px,2.1vw,22px)}
-    p{margin:.5em 0 1em; color:var(--muted)}
-    .container{width:var(--container); margin-inline:auto}
-    .btn{display:inline-flex; align-items:center; gap:.6em; border:1px solid var(--line); padding:.7em 1em; border-radius:12px; transition:.2s ease; font-weight:600; background:#fff}
-    .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow)}
-    .btn--accent{background:var(--accent); color:#fff; border-color:transparent}
-    .chip{display:inline-block; padding:.35em .7em; border-radius:999px; border:1px solid var(--line); font-size:.85rem; color:var(--muted); background:#fff}
-    .grid{display:grid; gap:var(--gap)}
-    .card{background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:clamp(16px,2vw,24px)}
-    hr{border:none; border-top:1px solid var(--line); margin:14px 0}
+    * { box-sizing: border-box; }
 
-    .nowrap{ white-space: nowrap; }
+    html { scroll-behavior: smooth; }
 
-    .hero .headline h1{
-    font-size: clamp(18px, 2.6vw, 34px);
-    line-height: 1.15;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: keep-all;
-  }
-
-    @media (max-width: 520px){
-      .hero .headline h1{ font-size: 22px; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(20, 108, 115, 0.13), transparent 32rem),
+        radial-gradient(circle at 88% 10%, rgba(143, 95, 63, 0.14), transparent 36rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
     }
 
-
-    /* ===== Header / Nav ===== */
-    header{position:sticky; top:0; z-index:50; background:#ffffffea; backdrop-filter:blur(6px); border-bottom:1px solid var(--line)}
-    .nav{display:flex; align-items:center; justify-content:space-between; padding:10px 0}
-    .brand{display:flex; align-items:center; gap:.7rem}
-    .brand h3{margin:0}
-    nav ul{list-style:none; display:flex; gap:12px; margin:0; padding:0}
-    nav a{padding:.45em .7em; border-radius:10px; color:var(--muted)}
-    nav a:hover{color:var(--text); background:#f1f4fb}
-    .menu-btn{display:none; background:#fff; border:1px solid var(--line); color:var(--text); padding:.55em .8em; border-radius:10px}
-    .mobile{display:none}
-    @media (max-width:840px){
-      nav ul{display:none}
-      .menu-btn{display:inline-flex}
-      .mobile{display:none; position:absolute; left:0; right:0; top:60px; background:#ffffff; border-bottom:1px solid var(--line)}
-      .mobile a{display:block; padding:14px var(--gap); border-top:1px solid var(--line)}
+    a {
+      color: var(--accent);
+      text-decoration: none;
     }
 
-    /* ===== Hero ===== */
-    .hero{padding:clamp(40px,7vw,80px) 0 clamp(20px,5vw,44px)}
-    .hero .headline{max-width:860px}
-    .subtitle{color:var(--accent); font-weight:700; font-size:clamp(16px,1.8vw,18px); margin-top:6px}
+    a:hover { text-decoration: underline; }
 
-    .kpis{display:flex; gap:var(--gap); flex-wrap:wrap; margin-top:12px}
-    .kpi{border:1px solid var(--line); border-radius:14px; padding:10px 14px; color:var(--muted); background:#fff}
+    .wrap {
+      width: min(var(--max), calc(100% - 36px));
+      margin: 0 auto;
+    }
 
-    /* ===== Sections ===== */
-    section{padding:clamp(32px,6vw,64px) 0}
-    .section-head{display:flex; align-items:end; justify-content:space-between; gap:var(--gap); margin-bottom:clamp(16px,3vw,22px)}
-    .section-head p{max-width:720px}
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(247, 244, 238, 0.84);
+      border-bottom: 1px solid var(--line);
+    }
 
-    /* ===== Services ===== */
-    .services{grid-template-columns:repeat(12,1fr)}
-    .services .card{grid-column:span 6}
-    .services .card h3{margin-bottom:.2em; color:var(--accent); letter-spacing:.3px; text-transform:uppercase}
-    .services .card ul{margin:.2em 0 0; padding-left:18px; color:var(--muted)}
-    @media (max-width:900px){.services .card{grid-column:1 / -1}}
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 72px;
+    }
 
-    /* ===== Case Studies ===== */
-    .cases{grid-template-columns:repeat(12,1fr)}
-    .case{grid-column:span 6}
-    .case .tag{font-size:.8rem}
-    .case h3{margin:.15em 0 .1em}
-    @media (max-width:900px){.case{grid-column:1 / -1}}
+    .brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.12;
+      color: var(--ink);
+      font-weight: 760;
+      letter-spacing: -0.02em;
+    }
 
-    /* ===== Pricing ===== */
-    .pricing{grid-template-columns:repeat(12,1fr)}
-    .plan{grid-column:span 4; display:flex; flex-direction:column}
-    .plan h3{margin:0}
-    .plan p.muted{margin-bottom:.4em}
-    .price{font-size:clamp(20px,2.2vw,26px); font-weight:800; color:var(--text); margin-top:.6em} /* add space like PDF */
-    .plan ul{margin:.4em 0 1em; padding-left:18px}
-    .plan .cta{margin-top:auto}
-    @media (max-width:980px){.plan{grid-column:1 / -1}}
+    .brand span {
+      font-size: 0.82rem;
+      font-weight: 560;
+      color: var(--muted);
+      letter-spacing: 0;
+      margin-top: 2px;
+    }
 
-    /* ===== Footer ===== */
-    footer{padding:28px 0; border-top:1px solid var(--line); color:var(--muted)}
-    .foot-grid{display:grid; gap:var(--gap); grid-template-columns:2fr 1fr 1fr}
-    @media (max-width:900px){.foot-grid{grid-template-columns:1fr}}
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
 
-    /* ===== Utilities ===== */
-    .muted{color:var(--muted)}
-    .accent{color:var(--accent)}
-    .pill{display:inline-flex; align-items:center; gap:.5em; border:1px solid var(--line); padding:.35em .7em; border-radius:999px; background:#fff}
-    .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
+    .navlinks a { color: var(--muted); }
+
+    .nav-cta {
+      border: 1px solid rgba(20, 108, 115, 0.28);
+      background: rgba(20, 108, 115, 0.08);
+      color: var(--accent) !important;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-weight: 680;
+    }
+
+    .hero {
+      padding: 78px 0 54px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.82fr);
+      gap: 42px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 12px;
+      border: 1px solid rgba(20, 108, 115, 0.24);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--accent);
+      font-weight: 720;
+      font-size: 0.9rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(2.55rem, 6.1vw, 5.85rem);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      max-width: 950px;
+    }
+
+    .lead {
+      font-size: clamp(1.1rem, 1.7vw, 1.34rem);
+      color: #334246;
+      max-width: 780px;
+      margin: 0 0 26px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 28px 0 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 760;
+      border: 1px solid transparent;
+      text-decoration: none !important;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 14px 30px rgba(20, 108, 115, 0.22);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.76);
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      font-size: 0.88rem;
+      color: #335052;
+      background: rgba(230, 241, 241, 0.86);
+      border: 1px solid rgba(20, 108, 115, 0.14);
+      padding: 7px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .video-card {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: calc(var(--radius) + 8px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .video-card video,
+    .video-placeholder {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: linear-gradient(135deg, #16363a, #29545a 55%, #9b7755);
+    }
+
+    .video-placeholder {
+      color: white;
+      padding: 30px;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .video-placeholder strong {
+      font-size: 1.7rem;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+    }
+
+    .video-caption {
+      padding: 18px 20px 20px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+      background: rgba(247, 244, 238, 0.62);
+    }
+
+    .stat {
+      padding: 15px 18px;
+      border-right: 1px solid var(--line);
+    }
+
+    .stat:last-child { border-right: 0; }
+
+    .stat strong {
+      display: block;
+      font-size: 1.55rem;
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    section { padding: 58px 0; }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 0.72fr 1fr;
+      gap: 38px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .kicker {
+      color: var(--accent-2);
+      font-weight: 780;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 3.3vw, 3.25rem);
+      line-height: 1.02;
+      letter-spacing: -0.058em;
+      margin: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      font-size: 1.28rem;
+    }
+
+    .section-head p,
+    .section-text {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(23, 32, 34, 0.10);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 10px 35px rgba(20, 38, 45, 0.06);
+    }
+
+    .card p { color: var(--muted); margin: 0; }
+
+    .card .tag {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: var(--soft-2);
+      color: var(--accent-2);
+      font-size: 0.78rem;
+      font-weight: 760;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .demo-card {
+      min-height: 245px;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-top {
+      padding: 20px 22px 0;
+    }
+
+    .demo-card p { margin-bottom: 18px; }
+
+    .demo-link {
+      margin-top: auto;
+      padding: 16px 22px 20px;
+      border-top: 1px solid var(--line);
+      font-weight: 760;
+      color: var(--accent);
+    }
+
+    .wide-panel {
+      border-radius: calc(var(--radius) + 8px);
+      background: linear-gradient(135deg, rgba(20, 108, 115, 0.12), rgba(143, 95, 63, 0.12)), rgba(255,255,255,0.72);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .price {
+      font-weight: 790;
+      font-size: 1.35rem;
+      letter-spacing: -0.035em;
+      margin: 12px 0 12px;
+    }
+
+    ul.clean {
+      padding-left: 18px;
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+
+    ul.clean li { margin-bottom: 7px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: 1fr 0.72fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .contact-card {
+      background: var(--ink);
+      color: white;
+      border-radius: calc(var(--radius) + 8px);
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .contact-card p { color: rgba(255,255,255,0.78); }
+
+    .contact-card a { color: white; text-decoration: underline; }
+
+    .profile-card {
+      background: rgba(255,255,255,0.76);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 8px);
+      overflow: hidden;
+    }
+
+    .profile-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      filter: grayscale(1);
+    }
+
+    .profile-card div { padding: 20px; }
+
+    .note {
+      font-size: 0.93rem;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0 36px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 940px) {
+      .hero-grid,
+      .section-head,
+      .contact,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .cards,
+      .offer-grid,
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navlinks {
+        display: none;
+      }
+
+      .hero { padding-top: 52px; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 24px, var(--max)); }
+      h1 { font-size: clamp(2.4rem, 15vw, 4rem); }
+      .stats { grid-template-columns: 1fr; }
+      .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+      .stat:last-child { border-bottom: 0; }
+      .wide-panel, .contact-card { padding: 22px; }
+    }
   </style>
 </head>
 <body>
-  <!-- ===== Header ===== -->
   <header>
-    <div class="container nav">
-      <div class="brand">
-        <h3>Dr Alexander D. Shaw</h3>
-        <span class="chip">Neurocomputational Consulting</span>
-      </div>
-      <nav>
-        <button class="menu-btn" aria-expanded="false" aria-controls="mobileMenu">Menu</button>
-        <ul aria-label="Primary">
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#cases">Case Studies</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-        <div id="mobileMenu" class="mobile" role="dialog" aria-modal="true" aria-label="Mobile Menu">
-          <a href="#about">About</a>
-          <a href="#services">Services</a>
-          <a href="#cases">Case Studies</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#contact">Contact</a>
-        </div>
+    <div class="wrap nav">
+      <a class="brand" href="/">CPNS Lab <span>Computational Psychiatry & Neuropharmacological Systems</span></a>
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="#overview">Overview</a>
+        <a href="#demos">Demos</a>
+        <a href="#offer">Offer</a>
+        <a href="#contact" class="nav-cta">Contact</a>
       </nav>
     </div>
   </header>
 
-  <!-- ===== Hero ===== -->
-  <section class="hero">
-    <div class="container">
-      <div class="headline">
-        <h1 class="nowrap">Dr&nbsp;Alexander&nbsp;Shaw&nbsp;–&nbsp;Neurocomputational&nbsp;Consulting</h1>
-        <div class="subtitle">Inference, Decision Systems & Mechanistic AI for Complex Problems</div>
-        <p class="muted">I help organisations build models that explain, predict, and act under uncertainty: from neural data to autonomous systems and strategic decision-making.</p>
-        <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap">
-          <a class="btn btn--accent" href="#services">View Services</a>
-          <a class="btn" href="#contact">Book a Consultation</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== About ===== -->
-<section id="about">
-  <div class="container grid" style="grid-template-columns:2.1fr 1fr; align-items:start">
-    <div class="card">
-      <img src="alex_shaw.jpg" alt="Dr Alexander D. Shaw"
-           style="width:130px; height:auto; border-radius:12px; float:right; margin:0 0 10px 18px; box-shadow:0 2px 6px rgba(0,0,0,0.1);" />
-      <h2>About</h2>
-
-      <p class="muted">
-        <strong>Alex</strong> is a neuroscientist and AI researcher at the University of Exeter, where he leads the
-        <em>Computational Psychiatry &amp; Neuropharmacological Systems (CPNS) Lab</em> and serves as
-        <em>Director of Business Engagement &amp; Innovation</em> for Psychology.
-      </p>
-
-      <p class="muted">
-        His work focuses on building models that explain complex data, recover hidden structure, and enable adaptive decision-making.
-        This combines dynamical systems modelling with Variational Bayes/Laplace inference, and extends across neuroscience,
-        AI systems, and real-world optimisation problems.
-      </p>
-
-      <p class="muted">
-        He develops inference methods and generative modelling frameworks used internationally, including Dynamic Causal Modelling,
-        thermodynamic variational inference, and active inference. These approaches are designed to handle nonlinear, uncertain,
-        and high-dimensional systems where standard methods often break down.
-      </p>
-
-      <p class="muted">
-        Alex works with neurotechnology companies, AI research teams, and industry partners to solve hard modelling and decision problems —
-        from extracting latent structure in complex data to designing adaptive, uncertainty-aware systems.
-      </p>
-
-      <p class="muted">
-        Much of this work is demonstrated through interactive simulations and agents, spanning control systems, planning under uncertainty,
-        and embodied AI in physical environments.
-      </p>
-
-      <div style="margin-top:10px;">
-        <a href="#demos" class="btn">Explore live demos →</a>
-      </div>
-    </div>
-
-    <aside class="card">
-      <h3>Focus Areas</h3>
-      <ul>
-        <li>Probabilistic inference &amp; Bayesian optimisation (VL, ThermoVI)</li>
-        <li>Dynamical systems modelling &amp; system identification</li>
-        <li>Decision-making under uncertainty (planning, control, EFE)</li>
-        <li>Mechanism-informed modelling &amp; interpretable AI</li>
-      </ul>
-      <hr/>
-      <h3>Selected Collaborations</h3>
-      <p class="muted">GABA Labs • Awakn Life Sciences • AstronauTx • Daiichi Sankyo • Cardiff • Bristol</p>
-    </aside>
-  </div>
-</section>
-
-<!-- ===== Case Studies ===== -->
-  
-
-      <section id="demos">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <h2>Selected Demonstrations</h2>
-              <p>Working examples of inference, decision-making, and adaptive systems applied to control, planning, and real-world environments.</p>
-              <p>These are not toy models; they illustrate how principled generative modelling and probabilistic inference can be deployed in real-world settings.</p>
-              <p class="muted" style="margin-top:10px;">
-              I’ve been applying similar approaches in industry contexts - happy to discuss if relevant.
-              </p>
-            </div>
+  <main>
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Consulting, advisory and research collaboration</div>
+          <h1>Uncertainty-aware world models for physical AI, robotics and adaptive decision-making.</h1>
+          <p class="lead">I build and advise on systems that maintain beliefs about hidden states, act under uncertainty and recover when observations do not fit predictions. The work combines active inference, generative models, dynamical systems and neurocomputational modelling.</p>
+          <div class="actions">
+            <a class="button primary" href="#drone-video">Watch the drone demo</a>
+            <a class="button secondary" href="mailto:alexandershaw4@gmail.com?subject=Consulting%20/%20world%20models%20enquiry">Discuss a project</a>
+            <a class="button secondary" href="/drone.html">Open the full drone page</a>
           </div>
-
-          <div class="grid cases">
-            
-            <article class="card case">
-              <span class="tag chip">Real-time control</span>
-              <h3>Thermodynamic Active Inference Pong Agent</h3>
-              <p>Real-time inference and action selection using variational free energy minimisation.</p>
-              <a href="/tvd_pong.html" class="cta">View demo</a>
-            </article>
-
-            <article class="card case">
-              <span class="tag chip">Decision systems</span>
-              <h3>Hierarchical Active Inference Gridworld</h3>
-              <p>Planning and navigation under uncertainty using belief-driven policies.</p>
-              <a href="/gridworld.html" class="cta">View demo</a>
-            </article>
-
-            <article class="card case">
-              <span class="tag chip">Multi-objective AI</span>
-              <h3>Polyphonic Active Inference</h3>
-              <p>Negotiation between competing objectives (safety, goals, uncertainty, energy).</p>
-              <a href="/polyphonic.html" class="cta">View demo</a>
-            </article>
-
-            <article class="card case">
-              <span class="tag chip">Embodied AI</span>
-              <h3>Active Inference Robot</h3>
-              <p>Embodied agent operating in a 3D physics environment with perception-action loops.</p>
-              <a href="/active-inference-robots.html" class="cta">View demo</a>
-            </article>
-
+          <div class="chips" aria-label="Key areas">
+            <span class="chip">Active inference</span>
+            <span class="chip">World models</span>
+            <span class="chip">Embodied AI</span>
+            <span class="chip">Robotics</span>
+            <span class="chip">Bayesian inference</span>
+            <span class="chip">Adaptive decision systems</span>
           </div>
         </div>
-      </section>
 
-      <section id="drone-demo">
-        <div class="container">
-          <div class="card">
-            <div class="section-head" style="margin-bottom:14px;">
-              <div>
-                <h2>Drone Demonstration</h2>
-                <p>Embedded footage of the polyphonic active inference drone operating in a 3D physics environment, balancing navigation, obstacle avoidance, and goal-directed behaviour under uncertainty.</p>
-              </div>
-            </div>
-            <video controls playsinline preload="metadata" style="width:100%; border-radius:12px; border:1px solid var(--line); background:#000; box-shadow:var(--shadow);">
-              <source src="run_20260415_183308.mp4" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
+        <aside class="video-card" id="drone-video" aria-label="Drone demonstration video">
+          <!--
+            Replace the source below with the exact MP4 already used on your current drone / consulting page.
+            Good GitHub Pages paths would be for example:
+            /videos/polyphonic_active_inference_drone.mp4
+            or
+            /assets/polyphonic_active_inference_drone.mp4
+          -->
+          <video controls autoplay muted loop playsinline poster="/consulting/alex_shaw.jpg">
+            <source src="/polyphonic_drone_demo_latest.mp4" type="video/mp4" />
+          </video>
+          <div class="video-caption">
+            Polyphonic active inference drone in a 3D PyBullet environment. The controller acts from noisy observations and internal beliefs rather than privileged simulator truth. <a href="/drone.html">Read the full technical page</a>.
           </div>
-        </div>
-      </section>
-
-
-  <!-- ===== Services ===== -->
-  <section id="services">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <h2>Core Services</h2>
-        <p>Four service lines focused on solving complex modelling, inference, and decision problems: from scientific data to AI systems and real-world optimisation.</p>
+          <div class="stats">
+            <div class="stat"><strong>3D</strong><span>embodied environment</span></div>
+            <div class="stat"><strong>7</strong><span>control pressures</span></div>
+            <div class="stat"><strong>belief</strong><span>not ground-truth control</span></div>
+          </div>
+        </aside>
       </div>
-      <a class="btn" href="mailto:alexandershaw4@gmail.com?subject=Consultancy%20Enquiry&amp;body=Hi%20Alex%2C%20we%27d%20like%20to%20discuss%20a%20project...">Enquire</a>
-    </div>
+    </section>
 
-    <div class="grid services">
-      <article class="card">
-        <h3>Strategic &amp; Technical Advisory</h3>
-        <p>Rigorous modelling and scientific insight applied to product, research, and investment decisions.</p>
-        <ul>
-          <li>Technical due diligence (AI, neuro, complex systems)</li>
-          <li>R&amp;D strategy &amp; model-driven product design</li>
-          <li>Mechanistic insight for high-uncertainty domains</li>
-          <li>Experimental design &amp; evaluation frameworks</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h3>Decision Systems &amp; AI</h3>
-        <p>Designing systems that act under uncertainty using principled inference and planning frameworks.</p>
-        <ul>
-          <li>Planning &amp; control beyond reinforcement learning</li>
-          <li>Generative model architectures for agents</li>
-          <li>Simulation-based optimisation &amp; policy design</li>
-          <li>Adaptive systems with uncertainty-aware behaviour</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h3>Inference &amp; Modelling Systems</h3>
-        <p>Fitting complex models to data to recover hidden structure, dynamics, and mechanisms.</p>
-        <ul>
-          <li>Nonlinear dynamical systems modelling</li>
-          <li>Variational inference (Laplace, thermodynamic VI)</li>
-          <li>Multimodal &amp; non-Gaussian posterior estimation</li>
-          <li>Model comparison, optimisation &amp; validation</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h3>Applied Analytics &amp; Measurement</h3>
-        <p>Turning complex data into actionable signals for research, products, and decision-making.</p>
-        <ul>
-          <li>Time-series modelling &amp; feature extraction</li>
-          <li>Behavioural and physiological data analysis</li>
-          <li>Biomarker discovery &amp; latent variable modelling</li>
-          <li>Real-world sensing &amp; longitudinal data pipelines</li>
-        </ul>
-      </article>
-    </div>
-  </div>
-</section>
-
-  
-
-      <section id="cases">
-    <div class="container">
-      <div class="section-head">
+    <section id="overview">
+      <div class="wrap section-head">
         <div>
-          <h2>Example Projects</h2>
-          <p>Representative projects illustrating how principled modelling and inference unlock value across AI systems, data analysis, and real-world decision-making.</p>
+          <div class="kicker">What this is</div>
+          <h2>A practical route from neuroscience-inspired theory to inspectable AI systems.</h2>
         </div>
+        <p>I am especially interested in systems where behaviour depends on incomplete evidence: robots in cluttered spaces, autonomous agents that need to search and revise beliefs, decision systems with changing context and scientific data where the hidden causes matter more than surface prediction.</p>
       </div>
-      <div class="grid cases">
-        <article class="card case">
-          <span class="tag chip">AI Systems</span>
-          <h3>Adaptive decision systems under uncertainty</h3>
-          <p>Designing agents that plan and act using probabilistic inference rather than fixed reward functions.</p>
-        </article>
 
-        <article class="card case">
-          <span class="tag chip">Inference</span>
-          <h3>Fitting nonlinear dynamical systems</h3>
-          <p>Using advanced variational inference (e.g. thermodynamic VI) to estimate parameters in complex, unstable models.</p>
+      <div class="wrap cards">
+        <article class="card">
+          <span class="tag">Physical AI</span>
+          <h3>Agents that act from beliefs</h3>
+          <p>Designing controllers that infer hidden state, evaluate possible futures and act while tracking uncertainty, rather than simply mapping observations to actions.</p>
         </article>
-
-        <article class="card case">
-          <span class="tag chip">Mechanistic Modelling</span>
-          <h3>Interpretable models vs black-box ML</h3>
-          <p>Recovering underlying mechanisms and latent structure from data, rather than relying on opaque predictive models.</p>
+        <article class="card">
+          <span class="tag">World models</span>
+          <h3>Internal models that can be inspected</h3>
+          <p>Building small but explicit generative models of objects, scenes, observations, policies and failures, so behaviour can be debugged mechanistically.</p>
         </article>
-
-        <article class="card case">
-          <span class="tag chip">Real-world Data</span>
-          <h3>Biomarkers &amp; latent structure in complex signals</h3>
-          <p>Extracting meaningful structure from noisy time-series data (e.g. EEG, behavioural, or sensor data).</p>
+        <article class="card">
+          <span class="tag">Adaptive decisions</span>
+          <h3>Planning beyond a fixed reward</h3>
+          <p>Using active inference and expected-free-energy-style objectives to balance goal pursuit, safety, information gain, stability and changing context.</p>
         </article>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== Pricing ===== -->
-  <section id="pricing">
-    <div class="container">
-      <div class="section-head">
+    <section id="demos">
+      <div class="wrap section-head">
         <div>
-          <h2>Engagement &amp; Pricing</h2>
-          <p>Clear tiers for rapid advisory, scoped projects, or ongoing partnership. </p>
+          <div class="kicker">Portfolio</div>
+          <h2>Selected demos and research prototypes.</h2>
+        </div>
+        <p>Across these demos, the theme is the same: agents acting under uncertainty, using generative models, semantic priors and belief updating to move from perception to action in games, gridworlds, drones, robots and embodied world-model simulations.</p>
+      </div>
+
+      <div class="wrap demo-grid">
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">Drone control</span>
+            <h3>Polyphonic active inference drone</h3>
+            <p>A 3D PyBullet drone controller with noisy self-observations, egocentric target cues, ray-based obstacle sensing, belief-state control and scene-aware policy evaluation.</p>
+          </div>
+          <a class="demo-link" href="/drone.html">View demo and write-up →</a>
+        </article>
+
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">World model</span>
+            <h3>House-search semantic world model</h3>
+            <p>An embodied agent searches for a cup using semantic priors, planned inspection, negative evidence, belief updating and route redirection.</p>
+          </div>
+          <a class="demo-link" href="/active_inference_world_model_lab/">Open world model lab →</a>
+        </article>
+
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">Embodied AI</span>
+            <h3>Active inference robot</h3>
+            <p>A 3D physics example where perception, action, correction and recovery are tied together through a generative model and active inference loop.</p>
+          </div>
+          <a class="demo-link" href="/active-inference-robots.html">View robot page →</a>
+        </article>
+
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">Multi-objective control</span>
+            <h3>Polyphonic gridworld</h3>
+            <p>A partially observed gridworld where safety, goal pursuit, energy maintenance, uncertainty reduction and habit are kept explicit and negotiated online.</p>
+          </div>
+          <a class="demo-link" href="/gridworld.html">View gridworld write-up →</a>
+        </article>
+
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">Real-time inference</span>
+            <h3>Thermodynamic VL Pong agent</h3>
+            <p>A compact real-time example of posterior updating and action selection through a lightweight thermodynamic variational Laplace scheme.</p>
+          </div>
+          <a class="demo-link" href="/tvd_pong.html">Open Pong demo →</a>
+        </article>
+
+        <article class="card demo-card">
+          <div class="demo-top">
+            <span class="tag">Research programme</span>
+            <h3>Coordination without command</h3>
+            <p>A broader research direction on how coherent behaviour can emerge without a single central controller, linking active inference, robotics and adaptive intelligence.</p>
+          </div>
+          <a class="demo-link" href="https://zenodo.org/records/20722897">Read the public record →</a>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap wide-panel">
+        <div class="section-head" style="margin-bottom: 0;">
+          <div>
+            <div class="kicker">Why it matters</div>
+            <h2>The point is not just another agent demo.</h2>
+          </div>
+          <p>Many AI systems behave impressively until the world changes, evidence becomes partial, or the task requires them to know when they do not know. My interest is in agents and decision systems with explicit internal state: what they believe, what they expect, what they are uncertain about and why a particular action was chosen.</p>
         </div>
       </div>
-      <div class="grid pricing">
-        <article class="card plan">
-          <h3>Advisory</h3>
-          <p class="muted">High-leverage strategy or technical consults.</p>
-          <p class="price">£500–£1200 <span class="muted" style="font-weight:400">per session</span></p>
-          <ul>
-            <li>1–2 hr video call</li>
-            <li>Written summary report</li>
-            <li>Reading list / next steps</li>
+    </section>
+
+    <section id="offer">
+      <div class="wrap section-head">
+        <div>
+          <div class="kicker">Consulting and advisory</div>
+          <h2>Clear ways to work together.</h2>
+        </div>
+        <p>Best fit: early-stage R&D, technical strategy, prototype design, feasibility assessment, academic-industry bids, or teams who need a principled modelling view before committing to a larger build.</p>
+      </div>
+
+      <div class="wrap offer-grid">
+        <article class="card">
+          <span class="tag">Fast start</span>
+          <h3>Scoping / feasibility</h3>
+          <p>A focused review of whether active inference, world models or uncertainty-aware control are relevant to your problem.</p>
+          <div class="price">£500-£1,200</div>
+          <ul class="clean">
+            <li>1-2 hour call</li>
+            <li>Technical summary note</li>
+            <li>Prototype route and risk assessment</li>
           </ul>
-          <a class="btn cta" href="mailto:alexandershaw4@gmail.com?subject=Advisory%20call&amp;body=Hi%20Alex%2C%20we%27d%20like%20to%20book%20a%20call%20about%20...">Book a call</a>
         </article>
-        <article class="card plan">
-          <h3>Project-Based</h3>
-          <p class="muted">Bespoke analysis or modelling with deliverables.</p>
-          <p class="price">£2,000–£10,000 <span class="muted" style="font-weight:400">per project</span></p>
-          <ul>
-            <li>Defined scope, milestones &amp; success criteria</li>
-            <li>Data audit &amp; preprocessing plan</li>
-            <li>Reproducible analyses, code &amp; figures (version-controlled)</li>
-            <li>VB/Laplace model fitting &amp; comparison</li>
-            <li>Mechanistic interpretation &amp; briefing</li>
-            <li>Technical report &amp; documentation</li>
+
+        <article class="card">
+          <span class="tag">Build</span>
+          <h3>Prototype sprint</h3>
+          <p>A small but concrete demo, model, simulation, dashboard or analysis pipeline that makes the idea inspectable.</p>
+          <div class="price">£2k-£10k+</div>
+          <ul class="clean">
+            <li>Defined milestone and deliverable</li>
+            <li>Simulation or modelling prototype</li>
+            <li>Code, figures and written explanation</li>
           </ul>
-          <a class="btn btn--accent cta" href="mailto:alexandershaw4@gmail.com?subject=Project%20proposal%20request&amp;body=Hi%20Alex%2C%20here%27s%20our%20brief%20...">Request a proposal</a>
         </article>
-        <article class="card plan">
-          <h3>Retainer</h3>
-          <p class="muted">Ongoing collaboration and technical advisory.</p>
-          <p class="price">£1,500–£3,000 <span class="muted" style="font-weight:400">per month</span></p>
-          <ul>
-            <li>Guaranteed availability</li>
-            <li>Pipeline design &amp; oversight</li>
-            <li>Monthly reporting</li>
+
+        <article class="card">
+          <span class="tag">Ongoing</span>
+          <h3>Advisory / retainer</h3>
+          <p>Ongoing scientific and technical input for AI, robotics, neurotechnology, modelling or decision-system projects.</p>
+          <div class="price">£1.5k-£3k / month</div>
+          <ul class="clean">
+            <li>Regular advisory calls</li>
+            <li>Technical review and architecture input</li>
+            <li>Support for papers, bids or product strategy</li>
           </ul>
-          <a class="btn cta" href="mailto:alexandershaw4@gmail.com?subject=Retainer%20inquiry&amp;body=Hi%20Alex%2C%20we%27re%20interested%20in%20a%20retainer%20for%20...">Start a partnership</a>
         </article>
       </div>
-      <p class="muted" style="margin-top:8px">Day-rate option: £800–£1,200/day depending on scope and IP terms.</p>
-    </div>
-  </section>
 
-  <!-- Contact Form-->
-  <section id="contact">
-  <div class="container" style="max-width:760px;">
-    <div class="card">
-      <h2>Contact</h2>
-      <p class="muted">
-        If you'd like to discuss collaboration, consulting, speaking, research partnerships, or applied AI / modelling work,
-        send a message below.
-      </p>
+      <div class="wrap two-col" style="margin-top: 18px;">
+        <article class="card">
+          <h3>Also open to</h3>
+          <p>Invited talks, academic collaborations, grant consortia, fractional advisory roles, industry fellowships and selective consulting around active inference, world models, embodied AI and mechanistic modelling.</p>
+        </article>
+        <article class="card">
+          <h3>Not a software house</h3>
+          <p>The strongest fit is where the problem is conceptually hard and a principled model, prototype or technical review is more valuable than just building a polished interface.</p>
+        </article>
+      </div>
+    </section>
 
-      <form action="https://formspree.io/f/mdapydre" method="POST" style="display:grid; gap:14px; margin-top:18px;">
-        <div>
-          <label for="name"><strong>Name</strong></label><br>
-          <input id="name" name="name" type="text" required
-                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
+    <section id="contact">
+      <div class="wrap contact">
+        <div class="contact-card">
+          <div class="kicker" style="color: rgba(255,255,255,0.70);">Contact</div>
+          <h2>Bring a hard problem, a possible collaboration, or a half-formed idea.</h2>
+          <p>I lead the Computational Psychiatry & Neuropharmacological Systems (CPNS) Lab. For consulting, advisory work, speaking or research partnerships, email me with a short description of the problem and what kind of help would be useful.</p>
+          <div class="actions">
+            <a class="button primary" style="background: white; color: var(--ink);" href="mailto:alexandershaw4@gmail.com?subject=Consulting%20/%20world%20models%20enquiry">alexandershaw4@gmail.com</a>
+            <a class="button secondary" style="background: transparent; color: white; border-color: rgba(255,255,255,0.35);" href="/">CPNS Lab</a>
+          </div>
+          <p class="note" style="color: rgba(255,255,255,0.64);">Suggested subject line: Consulting / world models enquiry</p>
         </div>
 
-        <div>
-          <label for="email"><strong>Email</strong></label><br>
-          <input id="email" name="email" type="email" required
-                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
-        </div>
-
-        <div>
-          <label for="subject"><strong>Subject</strong></label><br>
-          <input id="subject" name="subject" type="text"
-                 style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit;">
-        </div>
-
-        <div>
-          <label for="message"><strong>Message</strong></label><br>
-          <textarea id="message" name="message" rows="6" required
-                    style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #d7dce2; border-radius:10px; font:inherit; resize:vertical;"></textarea>
-        </div>
-
-        <input type="hidden" name="_subject" value="New message from cpns.co.uk">
-        <input type="text" name="_gotcha" style="display:none">
-
-        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-          <button type="submit" class="btn">Send message</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</section>
-
-
+        <aside class="profile-card">
+          <img src="/consulting/alex_shaw.jpg" alt="Dr Alexander D. Shaw" />
+          <div>
+            <h3>Dr Alexander D. Shaw</h3>
+            <p>Research across robotics, theoretical neuroscience, world models, computational psychiatry, active inference, dynamical systems, optimisation and applied AI.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <div class="container foot-grid">
-      <div>
-        <strong>Dr Alexander D. Shaw</strong>
-        <p class="muted">Neurocomputational Consulting • Exeter (UK)</p>
-      </div>
-      <div>
-        <p><a href="#about">About</a><br/>
-        <a href="#services">Services</a><br/>
-        <a href="#cases">Case Studies</a></p>
-      </div>
-      <div>
-        <p><a href="#pricing">Pricing</a><br/>
-        <a href="#contact">Contact</a></p>
-      </div>
+    <div class="wrap footer-row">
+      <span>© Dr Alexander D. Shaw / CPNS Lab</span>
+      <span><a href="/">CPNS Lab</a> · <a href="/drone.html">Drone demo</a> · <a href="mailto:alexandershaw4@gmail.com">Email</a></span>
     </div>
   </footer>
-
-  <script>
-    // Mobile menu toggle + smooth scroll
-    const btn = document.querySelector('.menu-btn');
-    const menu = document.getElementById('mobileMenu');
-    btn?.addEventListener('click', () => {
-      const open = menu.style.display === 'block';
-      menu.style.display = open ? 'none' : 'block';
-      btn.setAttribute('aria-expanded', String(!open));
-    });
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        const id = a.getAttribute('href');
-        if (id.length > 1){
-          e.preventDefault();
-          menu && (menu.style.display = 'none');
-          document.querySelector(id)?.scrollIntoView({behavior:'smooth', block:'start'});
-        }
-      });
-    });
-  </script>
 </body>
 </html>
