@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Active Inference World Models | CPNS Lab</title>
+  <meta name="description" content="A realistic embodied demonstration of an active inference world model using semantic priors, Bayesian belief updating, information gain and adaptive replanning.">
+  <link rel="canonical" href="https://cpnslab.com/active-inference-world-models/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Active Inference World Models | CPNS Lab">
+  <meta property="og:description" content="An embodied agent searches a realistic 3D home by maintaining beliefs, seeking information and revising its plan.">
+  <meta property="og:url" content="https://cpnslab.com/active-inference-world-models/">
+  <meta property="og:image" content="https://cpnslab.com/active-inference-world-models/assets/active-inference-world-models-og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options: {
+        enableMenu: false
+      },
+      chtml: {
+        scale: 1.02
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Active Inference World Models",
+    "url": "https://cpnslab.com/active-inference-world-models/",
+    "description": "A realistic embodied demonstration of an active inference world model.",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "CPNS Lab",
+      "url": "https://cpnslab.com/"
+    },
+    "mainEntity": {
+      "@type": "VideoObject",
+      "name": "Find the Mug: Active Inference World Model",
+      "description": "An embodied agent searches a realistic 3D home using semantic priors, belief updating and information-seeking policy selection.",
+      "thumbnailUrl": "https://cpnslab.com/active-inference-world-models/assets/active-inference-world-models-poster.jpg",
+      "contentUrl": "https://cpnslab.com/active-inference-world-models/assets/active-inference-world-models-demo.mp4",
+      "duration": "PT32.6S",
+      "uploadDate": "2026-07-13"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="../" aria-label="CPNS Lab home">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span>
+        <strong>CPNS Lab</strong>
+        <small>Computational Psychiatry &amp; Neuropharmacological Systems</small>
+      </span>
+    </a>
+
+    <nav aria-label="Page navigation">
+      <a href="#demo">Demo</a>
+      <a href="#science">Science</a>
+      <a href="#maths">Maths</a>
+      <a href="#scope">Scope</a>
+      <a class="nav-button" href="https://zenodo.org/records/21325216">Read the preprint</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero section-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">Embodied AI · Active inference · World models</p>
+        <h1>Find the mug.</h1>
+        <p class="hero-lead">
+          An embodied agent searches a realistic home by maintaining beliefs about where
+          a mug is likely to be, choosing informative places to inspect, and revising its
+          plan when the evidence contradicts its expectations.
+        </p>
+
+        <div class="button-row">
+          <a class="button primary" href="#demo">Watch the demo</a>
+          <a class="button secondary" href="https://zenodo.org/records/21325216">Open the preprint</a>
+          <a class="button ghost" href="../active_inference_world_model_lab/">Try the interactive model</a>
+        </div>
+
+        <div class="hero-metrics" aria-label="Project highlights">
+          <div>
+            <strong>4</strong>
+            <span>semantic hypotheses</span>
+          </div>
+          <div>
+            <strong>32 s</strong>
+            <span>continuous embodied search</span>
+          </div>
+          <div>
+            <strong>Explicit</strong>
+            <span>belief and policy readout</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <span class="mini-label">Research preprint</span>
+        <h2>Active Inference World Models</h2>
+        <p>From embodied control to general-purpose adaptive intelligence.</p>
+        <p class="authors">Alexander D. Shaw and Lioba C. S. Berndt</p>
+        <a class="text-link" href="https://zenodo.org/records/21325216">Zenodo record 21325216 <span aria-hidden="true">→</span></a>
+      </aside>
+    </section>
+
+    <section id="demo" class="section-shell demo-section" aria-labelledby="demo-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The demonstration</p>
+          <h2 id="demo-title">Belief-guided search in a realistic 3D home</h2>
+        </div>
+        <p>
+          The agent begins with a semantic prior, searches the most useful locations,
+          treats absence as evidence, and moves continuously through the apartment until
+          the cup is found.
+        </p>
+      </div>
+
+      <div class="video-card">
+        <video
+          id="world-model-video"
+          controls
+          playsinline
+          preload="metadata"
+          poster="assets/active-inference-world-models-poster.jpg"
+          aria-describedby="video-description">
+          <source src="assets/active-inference-world-models-demo.mp4" type="video/mp4">
+          Your browser does not support embedded video.
+          <a href="assets/active-inference-world-models-demo.mp4">Download the MP4 instead.</a>
+        </video>
+
+        <div class="video-meta">
+          <p id="video-description">
+            The video has no audio. All information is presented visually through the
+            first-person environment, posterior belief bars, candidate policy scores and
+            the final cup-detection cue.
+          </p>
+          <a href="assets/active-inference-world-models-demo.mp4" download>Download video</a>
+        </div>
+      </div>
+
+      <div class="chapter-grid" aria-label="Video chapters">
+        <button type="button" class="chapter" data-time="0">
+          <span>00:00</span>
+          <strong>Semantic prior</strong>
+          <small>Kitchen 45%, dining table 30%, console 20%, side table 5%.</small>
+        </button>
+        <button type="button" class="chapter" data-time="6.5">
+          <span>00:06</span>
+          <strong>First inspection</strong>
+          <small>The agent tests the most plausible and informative location.</small>
+        </button>
+        <button type="button" class="chapter" data-time="15">
+          <span>00:15</span>
+          <strong>Negative evidence</strong>
+          <small>Failure to find the cup redistributes belief over the remaining sites.</small>
+        </button>
+        <button type="button" class="chapter" data-time="30.5">
+          <span>00:30</span>
+          <strong>Cup found</strong>
+          <small>Visual evidence confirms the console and collapses the posterior.</small>
+        </button>
+      </div>
+    </section>
+
+    <section id="science" class="section-shell" aria-labelledby="science-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The scientific idea</p>
+          <h2 id="science-title">A world model that can expose its reasoning</h2>
+        </div>
+        <p>
+          The central object is not a fixed action policy. It is a structured belief about
+          hidden states of the world, together with a model of what each possible action
+          is expected to reveal.
+        </p>
+      </div>
+
+      <div class="three-card-grid">
+        <article class="concept-card">
+          <span class="card-number">01</span>
+          <h3>World</h3>
+          <p>
+            A realistic ReplicaCAD apartment is rendered in Habitat-Sim. The agent receives
+            egocentric observations and travels between collision-free inspection viewpoints
+            on the navigation mesh.
+          </p>
+        </article>
+
+        <article class="concept-card">
+          <span class="card-number">02</span>
+          <h3>Belief</h3>
+          <p>
+            The hidden state is the mug location. The agent maintains a categorical
+            posterior over four semantic sites and updates it whenever a location is
+            inspected.
+          </p>
+        </article>
+
+        <article class="concept-card">
+          <span class="card-number">03</span>
+          <h3>Action</h3>
+          <p>
+            Each candidate inspection is scored by travel distance, current probability
+            of success and expected information gain. The lowest-scoring policy is selected.
+          </p>
+        </article>
+      </div>
+
+      <div class="flow-card" aria-label="Inference and action loop">
+        <div>
+          <span>1</span>
+          <strong>Start with a semantic prior</strong>
+          <p>Mugs are usually more likely in kitchens and dining areas.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>2</span>
+          <strong>Evaluate search policies</strong>
+          <p>Which inspection is useful, informative and reachable?</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>3</span>
+          <strong>Act and observe</strong>
+          <p>The agent moves to a viewpoint and gathers visual evidence.</p>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div>
+          <span>4</span>
+          <strong>Revise and replan</strong>
+          <p>Negative evidence changes the posterior and the next action.</p>
+        </div>
+      </div>
+
+      <aside class="honesty-card">
+        <div>
+          <p class="mini-label">What is active inference here?</p>
+          <h3>Semantic planning under uncertainty</h3>
+        </div>
+        <p>
+          The active inference layer chooses <em>where to inspect</em>. Habitat-Sim supplies
+          the low-level navigation between viewpoints. The current visual detector is an
+          idealised semantic sensor, which lets us isolate and test belief updating and
+          policy selection before adding learned vision and lower-level active inference
+          control.
+        </p>
+      </aside>
+    </section>
+
+    <section id="maths" class="section-shell" aria-labelledby="maths-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Accessible maths</p>
+          <h2 id="maths-title">The complete demo in three ideas</h2>
+        </div>
+        <p>
+          The implementation uses deliberately transparent equations. Each term has a
+          visible role in the behaviour shown in the video.
+        </p>
+      </div>
+
+      <div class="maths-grid">
+        <article class="math-card">
+          <span class="math-index">1</span>
+          <h3>Update beliefs with evidence</h3>
+          <div class="equation" role="img" aria-label="The new probability of a location is proportional to the likelihood of the observation at that location times the previous probability.">
+            \[
+              q_{t+1}(L_j)
+              =
+              \frac{p(o_{t+1}\mid L_j)\,q_t(L_j)}
+              {\sum_k p(o_{t+1}\mid L_k)\,q_t(L_k)}
+            \]
+          </div>
+          <p>
+            \(L_j\) is a possible mug location. When an inspected site is empty, its
+            likelihood is reduced to 0.05 while the alternatives retain likelihood 1.
+            The probability mass therefore moves elsewhere rather than simply disappearing.
+          </p>
+        </article>
+
+        <article class="math-card">
+          <span class="math-index">2</span>
+          <h3>Value information</h3>
+          <div class="equation" role="img" aria-label="Information gain is current entropy minus expected entropy after an observation.">
+            \[
+              \mathrm{IG}_i
+              =
+              H[q_t(L)]
+              -
+              \mathbb{E}_{o\mid \pi_i}
+              \left[H\!\left(q_{t+1}(L\mid o,\pi_i)\right)\right]
+            \]
+          </div>
+          <p>
+            Entropy \(H[q]=-\sum_j q(L_j)\log q(L_j)\) measures uncertainty. An inspection
+            is informative when it is expected to make the posterior sharper, whether the
+            mug is found or ruled out.
+          </p>
+        </article>
+
+        <article class="math-card featured-math">
+          <span class="math-index">3</span>
+          <h3>Select the next inspection</h3>
+          <div class="equation" role="img" aria-label="Policy score equals point two times distance minus three times target probability minus one point five times information gain. Lower scores are preferred.">
+            \[
+              G_i
+              =
+              0.20\,d_i
+              -
+              3.00\,q_t(L_i)
+              -
+              1.50\,\mathrm{IG}_i
+            \]
+          </div>
+          <p>
+            \(d_i\) is the navigation distance to inspection site \(i\). The second term
+            favours locations where the mug is currently likely. The third favours actions
+            that reduce uncertainty. Lower \(G_i\) is preferred.
+          </p>
+          <div class="plain-language">
+            <strong>In plain language:</strong>
+            go somewhere plausible and informative, while accounting for the effort needed
+            to get there.
+          </div>
+        </article>
+      </div>
+
+      <details class="formal-details">
+        <summary>How this relates to expected free energy</summary>
+        <div>
+          <p>
+            In the broader active inference formulation, policies are evaluated using
+            expected free energy:
+          </p>
+          <div class="equation compact" role="img" aria-label="Expected free energy of a policy is expected cost plus ambiguity minus information gain.">
+            \[
+              G(\pi)
+              \approx
+              \underbrace{\mathbb{E}[-\log p(o\mid C)]}_{\text{goal alignment}}
+              +
+              \underbrace{\mathbb{E}[H(p(o\mid s))]}_{\text{ambiguity}}
+              -
+              \underbrace{I(s;o\mid\pi)}_{\text{information gain}}
+            \]
+          </div>
+          <p>
+            The house-search demo uses a compact, interpretable approximation at the
+            semantic planning level. This keeps every component visible in the readout
+            rather than hiding the decision inside a learned policy network.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section class="section-shell" aria-labelledby="why-title">
+      <div class="split-section">
+        <div>
+          <p class="eyebrow">Why it matters</p>
+          <h2 id="why-title">Negative evidence becomes part of intelligent behaviour</h2>
+          <p class="large-copy">
+            Many systems can act when the target is visible. A more demanding problem is
+            deciding what to look for, where to look next, and how to recover when the first
+            explanation is wrong.
+          </p>
+        </div>
+        <div class="benefit-list">
+          <article>
+            <strong>Inspectability</strong>
+            <p>Beliefs, uncertainty and candidate actions remain visible throughout.</p>
+          </article>
+          <article>
+            <strong>Adaptive replanning</strong>
+            <p>The policy changes online as evidence changes the posterior.</p>
+          </article>
+          <article>
+            <strong>Semantic structure</strong>
+            <p>Knowledge about rooms, objects and likely locations guides efficient search.</p>
+          </article>
+          <article>
+            <strong>Embodiment</strong>
+            <p>Actions take time and must respect spatial constraints in a physical scene.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="scope" class="section-shell" aria-labelledby="scope-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Current scope</p>
+          <h2 id="scope-title">A controlled proof of concept, with a clear route forward</h2>
+        </div>
+        <p>
+          This demonstration is designed to make the inference loop legible. It does not
+          claim general household autonomy.
+        </p>
+      </div>
+
+      <div class="scope-grid">
+        <article>
+          <span>Current</span>
+          <h3>Hand-specified semantic prior</h3>
+          <p>The initial probabilities encode ordinary knowledge about where mugs tend to be found.</p>
+        </article>
+        <article>
+          <span>Current</span>
+          <h3>Idealised visual detection</h3>
+          <p>A semantic simulator channel confirms whether the cup is visible from the chosen viewpoint.</p>
+        </article>
+        <article>
+          <span>Current</span>
+          <h3>Hierarchical control</h3>
+          <p>Active inference selects semantic destinations while Habitat handles local navigation.</p>
+        </article>
+        <article>
+          <span>Next</span>
+          <h3>Learned vision and uncertain detection</h3>
+          <p>Replace the idealised detector with a vision model that returns graded, fallible evidence.</p>
+        </article>
+        <article>
+          <span>Next</span>
+          <h3>Unseen homes and richer hypotheses</h3>
+          <p>Test transfer across layouts, object categories and learned semantic relationships.</p>
+        </article>
+        <article>
+          <span>Next</span>
+          <h3>Manipulation and lower-level inference</h3>
+          <p>Extend the hierarchy from search decisions to grasping, locomotion and continuous control.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell reading-section" aria-labelledby="reading-title">
+      <div class="reading-card preprint-card">
+        <p class="eyebrow">Read the paper</p>
+        <h2 id="reading-title">Active Inference World Models: From Embodied Control to General-Purpose Adaptive Intelligence</h2>
+        <p>
+          The preprint develops the wider argument for world models grounded in active
+          inference, linking embodied control, semantic priors, adaptive decision-making
+          and general-purpose intelligence.
+        </p>
+        <div class="button-row">
+          <a class="button primary" href="https://zenodo.org/records/21325216">Read on Zenodo</a>
+          <button type="button" class="button ghost" id="copy-citation">Copy citation</button>
+        </div>
+        <p class="citation" id="citation-text">
+          Shaw, A. D. &amp; Berndt, L. C. S. (2026). <em>Active Inference World Models:
+          From Embodied Control to General-Purpose Adaptive Intelligence</em>. Zenodo.
+        </p>
+      </div>
+
+      <div class="reading-card related-card">
+        <p class="eyebrow">Explore further</p>
+        <h2>Related CPNS resources</h2>
+        <ul>
+          <li><a href="../active_inference_world_model_lab/">Interactive World Model Lab</a></li>
+          <li><a href="../active-inference-robots.html">Active inference agents and robotics</a></li>
+          <li><a href="../drone.html">Polyphonic active inference drone</a></li>
+          <li><a href="../active_inference.html">Active inference explained</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <strong>CPNS Lab</strong>
+      <p>Mechanistic modelling for mind, brain and intelligent systems.</p>
+    </div>
+    <div class="footer-links">
+      <a href="../">Home</a>
+      <a href="https://zenodo.org/records/21325216">Preprint</a>
+      <a href="mailto:a.d.shaw@exeter.ac.uk">Contact</a>
+    </div>
+  </footer>
+
+  <div class="copy-toast" id="copy-toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
