@@ -117,7 +117,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.82fr);
       gap: 42px;
-      align-items: start;
+      align-items: center;
     }
 
     .eyebrow {
@@ -202,12 +202,6 @@
       padding: 7px 10px;
       border-radius: 999px;
       white-space: nowrap;
-    }
-
-    .hero-videos {
-      display: grid;
-      gap: 18px;
-      align-self: start;
     }
 
     .video-card {
@@ -528,23 +522,7 @@
           </div>
         </div>
 
-        <div class="hero-videos">
-          <aside class="video-card" id="world-model-video" aria-label="Active inference cup-search world-model demonstration video">
-            <video controls autoplay muted loop playsinline preload="metadata" poster="/active-inference-world-models/assets/active-inference-world-models-poster.jpg">
-              <source src="/active-inference-world-models/assets/active-inference-world-models-demo.mp4" type="video/mp4" />
-              Your browser does not support embedded video.
-            </video>
-            <div class="video-caption">
-              An embodied agent searches a simulated home for a cup. It begins with semantic priors, inspects likely locations, treats absence as evidence, updates its beliefs and redirects its search. <a href="/active-inference-world-models/">See the full demo and write-up</a> or <a href="/active_inference_world_model_lab/">try the interactive world-model lab</a>.
-            </div>
-            <div class="stats">
-              <div class="stat"><strong>semantic</strong><span>priors guide the search</span></div>
-              <div class="stat"><strong>negative</strong><span>evidence updates belief</span></div>
-              <div class="stat"><strong>adaptive</strong><span>routes change online</span></div>
-            </div>
-          </aside>
-
-          <aside class="video-card" id="drone-video" aria-label="Drone demonstration video">
+        <aside class="video-card" id="drone-video" aria-label="Drone demonstration video">
           <!--
             Replace the source below with the exact MP4 already used on your current drone / consulting page.
             Good GitHub Pages paths would be for example:
@@ -563,8 +541,7 @@
             <div class="stat"><strong>7</strong><span>control pressures</span></div>
             <div class="stat"><strong>belief</strong><span>not ground-truth control</span></div>
           </div>
-          </aside>
-        </div>
+        </aside>
       </div>
     </section>
 
