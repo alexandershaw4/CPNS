@@ -348,6 +348,50 @@
       gap: 16px;
     }
 
+    .tea-feature {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(290px, 0.75fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .tea-feature .video-card {
+      height: 100%;
+    }
+
+    .tea-feature video {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .tea-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logic-list {
+      display: grid;
+      gap: 13px;
+      margin-top: 20px;
+    }
+
+    .logic-item {
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .logic-item strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--ink);
+    }
+
+    .logic-item span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
     .demo-card {
       min-height: 245px;
       padding: 0;
@@ -472,7 +516,8 @@
 
       .cards,
       .offer-grid,
-      .demo-grid {
+      .demo-grid,
+      .tea-feature {
         grid-template-columns: 1fr;
       }
 
@@ -499,6 +544,7 @@
       <a class="brand" href="/">Alexander Shaw Consulting <span></span></a>
       <nav class="navlinks" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
+        <a href="#tea-demo">Tea demo</a>
         <a href="#demos">Demos</a>
         <a href="#offer">Offer</a>
         <a href="#contact" class="nav-cta">Contact</a>
@@ -592,6 +638,53 @@
           <span class="tag">Adaptive decisions</span>
           <h3>Planning beyond a fixed reward</h3>
           <p>Using active inference and expected-free-energy-style objectives to balance goal pursuit, safety, information gain, stability and changing context.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="tea-demo">
+      <div class="wrap section-head">
+        <div>
+          <div class="kicker">New embodied world-model demo</div>
+          <h2>From finding an object to completing a household task.</h2>
+        </div>
+        <p>The newer Habitat-Sim demonstration extends the cup-search world model into a full tea-making task. The agent must decide what to search for, revise its beliefs as evidence arrives and coordinate a sequence of actions whose success depends on hidden object states.</p>
+      </div>
+
+      <div class="wrap tea-feature">
+        <aside class="video-card" aria-label="Active inference tea-making world-model demonstration video">
+          <video controls muted playsinline preload="metadata" poster="/consulting/assets/habitat-make-tea-multiview-poster.png">
+            <source src="/consulting/assets/habitat-make-tea-multiview.mp4" type="video/mp4" />
+            Your browser does not support embedded video.
+          </video>
+          <div class="video-caption">
+            Multi-view task execution with the agent's first-person observation inset. The visible decision panel exposes the current task frontier, candidate searches, expected free energy and belief updates. <a href="/active-inference-world-models/">See the full technical demonstration and write-up</a>.
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>3 objects</strong><span>mug, kettle and teabag</span></div>
+            <div class="stat"><strong>beliefs</strong><span>locations and hidden states</span></div>
+            <div class="stat"><strong>task graph</strong><span>dependencies guide action</span></div>
+          </div>
+        </aside>
+
+        <article class="card tea-copy">
+          <span class="tag">Decision logic made visible</span>
+          <h3>Search, infer, act and verify.</h3>
+          <p>The task is represented as a dependency-aware sequence rather than a fixed animation. At each stage, the agent combines its current beliefs, the relevance of each object to the task, expected information gain and movement cost before selecting what to do next.</p>
+          <div class="logic-list">
+            <div class="logic-item">
+              <strong>Active search</strong>
+              <span>Candidate object-location searches are compared online, allowing useful discoveries to be made even before they become the immediate task bottleneck.</span>
+            </div>
+            <div class="logic-item">
+              <strong>Negative evidence</strong>
+              <span>Not seeing an object where it was expected redistributes probability across the remaining locations and changes the next search decision.</span>
+            </div>
+            <div class="logic-item">
+              <strong>Stateful task execution</strong>
+              <span>The agent checks whether the kettle contains water, fills and boils it when required, then inserts the teabag, pours, steeps and serves.</span>
+            </div>
+          </div>
         </article>
       </div>
     </section>
