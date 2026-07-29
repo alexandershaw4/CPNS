@@ -1,8 +1,13 @@
-const video = document.getElementById("world-model-video");
-
 document.querySelectorAll(".chapter").forEach((button) => {
   button.addEventListener("click", () => {
+    const targetId = button.dataset.video || "world-model-video";
+    const video = document.getElementById(targetId);
     if (!video) return;
+
+    document.querySelectorAll("video").forEach((otherVideo) => {
+      if (otherVideo !== video) otherVideo.pause();
+    });
+
     const time = Number(button.dataset.time || 0);
     video.currentTime = time;
     video.play().catch(() => {});
