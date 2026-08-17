@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Applied AI case studies | World models and autonomous systems under uncertainty | Alexander Shaw</title>
+  <meta name="description" content="Two applied AI case studies from Alexander Shaw: an uncertainty-aware tea-making world model and an embodied drone controller that acts from beliefs under partial observability." />
+  <meta name="author" content="Dr Alexander D. Shaw" />
+
+  <meta property="og:title" content="Applied AI case studies: autonomous systems under uncertainty" />
+  <meta property="og:description" content="Tea-making world models and embodied drone control: two compact case studies in uncertainty-aware autonomous systems." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cpnslab.com/case-studies/" />
+  <meta property="og:image" content="https://cpnslab.com/active-inference-world-models/assets/active-inference-world-models-poster.jpg" />
+
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --panel: #ffffff;
+      --ink: #172022;
+      --muted: #5e6a6d;
+      --line: rgba(23, 32, 34, 0.14);
+      --accent: #146c73;
+      --accent-2: #8f5f3f;
+      --soft: #e6f1f1;
+      --soft-2: #f1e9df;
+      --shadow: 0 22px 60px rgba(20, 38, 45, 0.12);
+      --radius: 22px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(20, 108, 115, 0.13), transparent 32rem),
+        radial-gradient(circle at 88% 10%, rgba(143, 95, 63, 0.14), transparent 36rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(247, 244, 238, 0.84);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.12;
+      color: var(--ink);
+      font-weight: 760;
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      font-size: 0.82rem;
+      font-weight: 560;
+      color: var(--muted);
+      letter-spacing: 0;
+      margin-top: 2px;
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.95rem;
+    }
+
+    .navlinks a { color: var(--muted); }
+
+    .nav-cta {
+      border: 1px solid rgba(20, 108, 115, 0.28);
+      background: rgba(20, 108, 115, 0.08);
+      color: var(--accent) !important;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-weight: 680;
+    }
+
+    .hero { padding: 84px 0 62px; }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(310px, 0.68fr);
+      gap: 44px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 12px;
+      border: 1px solid rgba(20, 108, 115, 0.24);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--accent);
+      font-weight: 720;
+      font-size: 0.9rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(2.6rem, 6.2vw, 5.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.072em;
+      max-width: 900px;
+    }
+
+    .lead {
+      font-size: clamp(1.1rem, 1.7vw, 1.34rem);
+      color: #334246;
+      max-width: 790px;
+      margin: 0 0 26px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 28px 0 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 760;
+      border: 1px solid transparent;
+      text-decoration: none !important;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 14px 30px rgba(20, 108, 115, 0.22);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.76);
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .hero-card,
+    .case-shell,
+    .card,
+    .cta-panel {
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(23, 32, 34, 0.10);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card { padding: 26px; }
+
+    .hero-card .kicker { margin-bottom: 12px; }
+    .hero-card p { margin: 0; color: var(--muted); }
+
+    .hero-points {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .hero-point {
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .hero-point strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 1.03rem;
+    }
+
+    section { padding: 64px 0; }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 0.78fr 1fr;
+      gap: 40px;
+      align-items: end;
+      margin-bottom: 30px;
+    }
+
+    .kicker {
+      color: var(--accent-2);
+      font-weight: 780;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      line-height: 1.01;
+      letter-spacing: -0.058em;
+      margin: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      font-size: 1.32rem;
+    }
+
+    .section-head p,
+    .section-copy,
+    .card p {
+      color: var(--muted);
+      font-size: 1.04rem;
+      margin: 0;
+    }
+
+    .case-shell { overflow: hidden; }
+
+    .case-media {
+      display: grid;
+      grid-template-columns: minmax(0, 1.38fr) minmax(300px, 0.62fr);
+      gap: 0;
+      align-items: stretch;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-media video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 430px;
+      object-fit: cover;
+      background: #18363a;
+    }
+
+    .case-intro {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(230,241,241,0.82), rgba(255,255,255,0.72));
+    }
+
+    .case-intro .tag,
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 14px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: var(--soft-2);
+      color: var(--accent-2);
+      font-size: 0.78rem;
+      font-weight: 760;
+    }
+
+    .case-intro p { color: var(--muted); margin: 0; }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .case-block {
+      padding: 28px 30px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-block:nth-child(2n) { border-right: 0; }
+    .case-block:nth-last-child(-n+2) { border-bottom: 0; }
+
+    .case-block p { margin: 0; color: var(--muted); }
+
+    .case-block strong.inline {
+      color: var(--ink);
+      font-weight: 760;
+    }
+
+    .impact {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: var(--soft);
+      border: 1px solid rgba(20, 108, 115, 0.12);
+      color: #29474a;
+      font-weight: 680;
+    }
+
+    .applications {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .chip {
+      font-size: 0.86rem;
+      color: #335052;
+      background: rgba(230, 241, 241, 0.86);
+      border: 1px solid rgba(20, 108, 115, 0.14);
+      padding: 7px 10px;
+      border-radius: 999px;
+    }
+
+    .case-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 30px;
+      border-top: 1px solid var(--line);
+      background: rgba(247, 244, 238, 0.60);
+    }
+
+    .case-footer p { margin: 0; color: var(--muted); }
+
+    .link-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-weight: 740;
+      white-space: nowrap;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card { padding: 24px; }
+
+    .cta-panel {
+      padding: 34px;
+      display: grid;
+      grid-template-columns: 1fr 0.72fr;
+      gap: 28px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(20, 108, 115, 0.12), rgba(143, 95, 63, 0.12)), rgba(255,255,255,0.80);
+    }
+
+    .cta-panel p { margin: 12px 0 0; color: var(--muted); font-size: 1.05rem; }
+    .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0 36px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 940px) {
+      .hero-grid,
+      .section-head,
+      .case-media,
+      .cta-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .compare-grid { grid-template-columns: 1fr; }
+      .case-media video { min-height: 0; aspect-ratio: 16 / 9; }
+      .cta-actions { justify-content: flex-start; }
+      .navlinks { display: none; }
+    }
+
+    @media (max-width: 720px) {
+      .case-grid { grid-template-columns: 1fr; }
+      .case-block { border-right: 0; border-bottom: 1px solid var(--line); }
+      .case-block:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .case-block:last-child { border-bottom: 0; }
+      .case-footer { align-items: flex-start; flex-direction: column; }
+      .link-row { white-space: normal; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 24px, var(--max)); }
+      h1 { font-size: clamp(2.45rem, 15vw, 4rem); }
+      .hero { padding-top: 54px; }
+      .case-intro, .case-block, .case-footer, .cta-panel { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="/consulting/">Alexander Shaw Consulting <span>Applied AI · world models · adaptive systems</span></a>
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="#tea">Tea case study</a>
+        <a href="#drone">Drone case study</a>
+        <a href="/consulting/">Consulting</a>
+        <a href="#contact" class="nav-cta">Discuss a project</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Applied AI case studies</div>
+          <h1>Autonomous systems that keep track of what they know... and what they do not.</h1>
+          <p class="lead">Two compact examples of uncertainty-aware AI in action: a household world model that revises its plan as evidence changes and an embodied drone controller that acts from internal beliefs rather than privileged simulator truth.</p>
+          <div class="actions">
+            <a class="button primary" href="#tea">Start with the tea-making world model</a>
+            <a class="button secondary" href="#drone">Jump to the drone</a>
+            <a class="button secondary" href="/consulting/">Consulting and advisory</a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="kicker">Commercial relevance</div>
+          <h3>These are research prototypes, but the engineering questions are industrial.</h3>
+          <p>The common problem is not simply how to produce an action. It is how to maintain useful internal state when observations are incomplete, how to choose what to inspect next and how to adapt when the world violates expectation.</p>
+          <div class="hero-points">
+            <div class="hero-point">
+              <strong>Explicit uncertainty</strong>
+              <span class="section-copy">Beliefs and confidence are represented directly rather than hidden inside an opaque policy.</span>
+            </div>
+            <div class="hero-point">
+              <strong>Adaptive planning</strong>
+              <span class="section-copy">Unexpected evidence changes what the system does next.</span>
+            </div>
+            <div class="hero-point">
+              <strong>Inspectable decisions</strong>
+              <span class="section-copy">Candidate actions, task state and belief updates can be examined rather than inferred after the fact.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tea">
+      <div class="wrap section-head">
+        <div>
+          <div class="kicker">Case study 01 · World models</div>
+          <h2>Completing a task when the world is only partly known.</h2>
+        </div>
+        <p>A rigid task script assumes that the right object is where expected and that each prerequisite is already known. The tea-making agent instead maintains explicit beliefs about objects and hidden task states, then changes its behaviour as evidence accumulates.</p>
+      </div>
+
+      <div class="wrap case-shell">
+        <div class="case-media">
+          <video controls muted playsinline preload="metadata" poster="/consulting/assets/habitat-make-tea-multiview-poster.png">
+            <source src="/consulting/assets/habitat-make-tea-multiview.mp4" type="video/mp4" />
+            Your browser does not support embedded video.
+          </video>
+          <div class="case-intro">
+            <span class="tag">Autonomous task execution under incomplete information</span>
+            <h3>Search, infer, act, verify.</h3>
+            <p>The system must find a mug, kettle and teabag, reason about hidden task state such as whether the kettle contains water and execute a dependency-aware sequence of actions. Its search decisions combine semantic priors, information gain, task relevance and travel cost.</p>
+            <div class="impact">The plan is not merely made robust to uncertainty. Uncertainty is represented explicitly and changes the plan.</div>
+          </div>
+        </div>
+
+        <div class="case-grid">
+          <article class="case-block">
+            <div class="kicker">The problem</div>
+            <h3>Long-horizon tasks become brittle when assumptions are hidden.</h3>
+            <p>An autonomous agent may know the overall task but not the location or state of the objects needed to complete it. A fixed sequence can fail as soon as one assumption is wrong.</p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">The architecture</div>
+            <h3>Separate beliefs, observations, task dependencies and actions.</h3>
+            <p>The system maintains independent location beliefs for multiple objects, probabilistic beliefs over hidden task states, a directed task graph and an expected-free-energy-style search policy. Simulator truth remains separate from the agent's internal beliefs.</p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">What uncertainty changes</div>
+            <h3>Absence becomes evidence.</h3>
+            <p>If an object is not found where expected, probability is redistributed across the remaining candidate locations. If a hidden task state is already satisfied, the corresponding action can be skipped. <span class="inline">Evidence therefore changes both search and task execution.</span></p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">Where this could apply</div>
+            <h3>Any system that must search, inspect and act in a changing environment.</h3>
+            <p>The current implementation is a research prototype, but the architectural pattern is relevant wherever a system must maintain explicit hypotheses, gather missing information and update a multi-step plan.</p>
+            <div class="applications">
+              <span class="chip">Warehouse picking</span>
+              <span class="chip">Industrial inspection</span>
+              <span class="chip">Lab automation</span>
+              <span class="chip">Service robotics</span>
+              <span class="chip">Autonomous sampling</span>
+              <span class="chip">Smart environments</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="case-footer">
+          <p><strong>Technical depth is available.</strong> The underlying implementation exposes object-location beliefs, hidden-state inference, policy scores, task transitions and synchronised logs for debugging and counterfactual testing.</p>
+          <div class="link-row">
+            <a href="/active-inference-world-models/">Technical demo →</a>
+            <a href="https://github.com/alexandershaw4/active-inference-world-models" target="_blank" rel="noopener">Repository →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="drone">
+      <div class="wrap section-head">
+        <div>
+          <div class="kicker">Case study 02 · Embodied AI</div>
+          <h2>Control when perception is uncertain and viewpoint matters.</h2>
+        </div>
+        <p>An embodied system never sees the world from nowhere. Its observations depend on position, motion, occlusion and sensing limits. The drone prototype explores a controller that maintains internal beliefs, predicts possible futures and balances multiple concurrent demands during action.</p>
+      </div>
+
+      <div class="wrap case-shell">
+        <div class="case-media">
+          <video controls muted playsinline preload="metadata" poster="/consulting/alex_shaw.jpg">
+            <source src="/polyphonic_drone_demo_latest.mp4" type="video/mp4" />
+            Your browser does not support embedded video.
+          </video>
+          <div class="case-intro">
+            <span class="tag">Embodied control under partial observability</span>
+            <h3>Belief, not ground-truth control.</h3>
+            <p>The controller operates in a 3D PyBullet environment using noisy self-observations, target cues and obstacle sensing. Candidate actions are rolled forward through an internal dynamics model and evaluated against goal, safety, information-seeking, efficiency and memory-related pressures.</p>
+            <div class="impact">The controller acts on what it currently believes to be true — not on the hidden state available to the simulator.</div>
+          </div>
+        </div>
+
+        <div class="case-grid">
+          <article class="case-block">
+            <div class="kicker">The problem</div>
+            <h3>Real autonomous systems act with incomplete state information.</h3>
+            <p>A moving platform must continue to regulate itself while observations are noisy, obstacles are only partly observed and task-relevant information may disappear through occlusion or viewpoint change.</p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">The architecture</div>
+            <h3>Internal state + prospective action evaluation.</h3>
+            <p>The prototype combines a belief state over pose, velocity, occupancy and uncertainty with a learned transition model, short-horizon policy rollouts and a multi-term objective that makes competing control pressures explicit.</p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">What uncertainty changes</div>
+            <h3>Information itself becomes part of control.</h3>
+            <p>Candidate trajectories are not evaluated only by whether they move toward a target. They are also shaped by obstacle risk, uncertain regions, novelty and the need to preserve coherent behaviour as the system's beliefs evolve.</p>
+          </article>
+
+          <article class="case-block">
+            <div class="kicker">Where this could apply</div>
+            <h3>Autonomy in environments where sensing and action are tightly coupled.</h3>
+            <p>The current work remains simulation-based, but the architecture targets the class of problems where an autonomous platform must reason about uncertainty while remaining continuously engaged with the environment.</p>
+            <div class="applications">
+              <span class="chip">Drone inspection</span>
+              <span class="chip">Mobile robotics</span>
+              <span class="chip">Remote autonomy</span>
+              <span class="chip">Agricultural robotics</span>
+              <span class="chip">Search and rescue</span>
+              <span class="chip">Physical AI R&amp;D</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="case-footer">
+          <p><strong>What makes this useful as an R&amp;D prototype:</strong> failures can be traced to belief state, prediction, policy scoring or competing control pressures rather than being treated as an unexplained action from an end-to-end network.</p>
+          <div class="link-row">
+            <a href="/drone.html">Technical drone page →</a>
+            <a href="/active-inference-robots.html">Related robot work →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap section-head">
+        <div>
+          <div class="kicker">What connects the two</div>
+          <h2>The commercial theme is not “active inference”. It is adaptive systems under uncertainty.</h2>
+        </div>
+        <p>Active inference, generative modelling and polyphonic control are technical ingredients. The practical value is in making hidden assumptions explicit, allowing uncertainty to influence behaviour and producing systems whose decisions can be interrogated when something goes wrong.</p>
+      </div>
+
+      <div class="wrap compare-grid">
+        <article class="card">
+          <span class="tag">Belief-based autonomy</span>
+          <h3>Represent hidden state explicitly</h3>
+          <p>Keep an internal model of what is likely, what is uncertain and what evidence would change the current hypothesis.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Active information gathering</span>
+          <h3>Choose actions partly for what they reveal</h3>
+          <p>In uncertain settings, the best next action may be the one that improves the system's state estimate before committing further.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Inspectable decision logic</span>
+          <h3>Expose why the system acted</h3>
+          <p>Separate beliefs, task state, candidate policies and competing pressures so debugging and counterfactual analysis remain possible.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap cta-panel">
+        <div>
+          <div class="kicker">Consulting and collaboration</div>
+          <h2>Have a system that behaves badly when the world becomes uncertain?</h2>
+          <p>I work on early-stage R&amp;D, technical architecture, modelling and prototypes for autonomous systems, world models and decision problems where hidden state, partial observability or competing objectives matter.</p>
+          <p class="note">The strongest fit is a technically difficult problem where a principled model or prototype can de-risk a larger engineering programme.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="button primary" href="mailto:alexandershaw4@gmail.com?subject=Applied%20AI%20case%20study%20enquiry">Discuss a problem</a>
+          <a class="button secondary" href="/consulting/">See consulting options</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-row">
+      <span>© Dr Alexander D. Shaw</span>
+      <span><a href="/consulting/">Consulting</a> · <a href="/">CPNS Lab</a> · <a href="/drone.html">Drone demo</a> · <a href="mailto:alexandershaw4@gmail.com">Email</a></span>
+    </div>
+  </footer>
+</body>
+</html>
