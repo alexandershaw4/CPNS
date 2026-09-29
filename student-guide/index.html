@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A visual field guide to computational psychiatry for new BSc and MSc students in the CPNS Lab: inference, EEG and MEG, generative models, DCM, and clinical examples.">
+  <title>Computational psychiatry: a student field guide | CPNS Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%8C%81%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="guide.css">
+  <script src="guide.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-head">
+    <div class="head-inner">
+      <a class="brand" href="../index.html"><strong>CPNS Lab</strong><span>University of Exeter</span></a>
+      <nav aria-label="Site">
+        <a href="../index.html">Lab home</a>
+        <a href="../lab-concepts/">Interactive concepts</a>
+        <a href="#reading">Reading route</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero-shell">
+      <div class="hero">
+        <p class="eyebrow">A field guide for new BSc and MSc students</p>
+        <h1>What is computational psychiatry?</h1>
+        <p class="hero-lead">A person reports what they feel. We can measure how they behave and how their brain responds. A computational model helps us ask what <em>hidden processes</em> might connect those observations.</p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#start">Start with the question</a>
+          <a class="text-action" href="#model-lab">Try fitting a model</a>
+        </div>
+        <p class="hero-note">Read straight through in about 20 minutes, or use the chapter list to dip in. No equations are required to begin.</p>
+      </div>
+      <div class="hero-map" aria-label="The central idea: observations, model, hidden mechanisms and a test">
+        <span class="map-kicker">THE CENTRAL QUESTION</span>
+        <div class="map-row"><span class="map-number">01</span><div><strong>Observe</strong><small>Symptoms, choices, EEG and MEG</small></div></div>
+        <div class="map-row"><span class="map-number">02</span><div><strong>Explain</strong><small>A model proposes how signals arise</small></div></div>
+        <div class="map-row"><span class="map-number">03</span><div><strong>Test</strong><small>Compare predictions with new data</small></div></div>
+        <p>Every arrow is a research question. The model gives us a way to make each one explicit.</p>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <aside class="chapter-rail" aria-label="Guide chapters">
+        <p>IN THIS GUIDE</p>
+        <a href="#start"><span>01</span> The question</a>
+        <a href="#inference"><span>02</span> Inference</a>
+        <a href="#signals"><span>03</span> Brain signals</a>
+        <a href="#model-lab"><span>04</span> Fitting a model</a>
+        <a href="#studies"><span>05</span> Lab studies</a>
+        <a href="#promise"><span>06</span> The promise</a>
+        <a href="#reading"><span>07</span> Your route in</a>
+      </aside>
+
+      <div class="chapters">
+        <section class="chapter" id="start" aria-labelledby="start-title">
+          <div class="chapter-heading"><span class="chapter-no">01 / THE QUESTION</span><h2 id="start-title">Why put a model between a symptom and a brain?</h2></div>
+          <p class="standfirst">People with the same diagnosis may have different histories, symptoms and responses to treatment. Even the same symptom can have several plausible causes.</p>
+          <p>Imagine two people who both report poor concentration. For one, disrupted sleep may be central. For the other, altered responses to reward or uncertainty may matter more. Their experiences are real in both cases. A symptom score alone cannot tell us which account is right, so we need measurements and competing explanations.</p>
+          <div class="pull-quote"><p>Our question is often: <strong>what changed in the system that could have produced this observation?</strong></p></div>
+          <p>Computational psychiatry makes explanations precise enough to simulate and test. The field includes cognitive tasks, reinforcement learning, statistics and machine learning. In CPNS, a major thread is <strong>mechanistic modelling of brain dynamics</strong>: we combine EEG or MEG with models of circuits, synapses and receptors. We also study how similar inference principles can guide intelligent agents.</p>
+          <div class="compare" aria-label="Two complementary uses of models">
+            <div><span class="small-label">DESCRIPTIVE QUESTION</span><h3>Can a pattern distinguish groups?</h3><p>Find a difference in a signal, or test whether a measured feature predicts an outcome in new people.</p><small>Example: does a spectral feature help predict treatment response?</small></div>
+            <div><span class="small-label">GENERATIVE QUESTION</span><h3>What could produce the pattern?</h3><p>Specify hidden states and processes, generate predicted data, and fit the model to actual observations.</p><small>Example: which circuit parameters could account for the spectrum?</small></div>
+          </div>
+          <p class="qualification">Both approaches are useful. A generative parameter is an inference <em>under a particular model</em>, not a direct measurement of an individual receptor or proof of causation.</p>
+        </section>
+
+        <section class="chapter" id="inference" aria-labelledby="inference-title">
+          <div class="chapter-heading"><span class="chapter-no">02 / INFERENCE</span><h2 id="inference-title">The brain has to infer what caused its sensations</h2></div>
+          <p class="standfirst">Sensory data are incomplete and noisy. We bring expectations to them, then update those expectations when evidence arrives.</p>
+          <p>Suppose you hear a faint tone in a noisy room. Whether a tone is probably present depends on how often tones occur, how often you hear a real one and how often noise sounds like one. Adjust those three ingredients below.</p>
+          <div class="experiment" id="bayes-lab">
+            <div class="experiment-top"><span class="experiment-id">EXPERIMENT 01</span><h3>Did you hear a tone?</h3><p>A small, exact Bayesian example. “Heard a tone” is the observation; “tone really present” is the hidden state.</p></div>
+            <div class="experiment-body">
+              <div class="controls">
+                <label for="prior">How often is a tone present? <output id="prior-value" for="prior">30%</output><input id="prior" type="range" min="5" max="95" step="1" value="30"></label>
+                <label for="hit">If present, how often do you hear it? <output id="hit-value" for="hit">80%</output><input id="hit" type="range" min="50" max="100" step="1" value="80"></label>
+                <label for="false-alarm">If absent, how often does noise sound like it? <output id="false-alarm-value" for="false-alarm">20%</output><input id="false-alarm" type="range" min="0" max="50" step="1" value="20"></label>
+              </div>
+              <div class="bayes-result" aria-live="polite">
+                <p class="result-kicker">AFTER YOU HEAR A TONE</p>
+                <strong id="posterior-value">63%</strong>
+                <p>Chance a tone was really there, given this simple model.</p>
+                <div class="prob-track" role="img" aria-label="Posterior probability a tone was present"><span id="posterior-bar"></span></div>
+                <p class="formula" id="bayes-arithmetic">24 genuine detections ÷ (24 genuine + 14 false alarms) ≈ 63 in 100</p>
+              </div>
+            </div>
+            <p class="experiment-foot">Try making tones rare while keeping hearing accuracy high. A convincing sound can still be a false alarm. This exercise shows how <strong>prior probability</strong> and <strong>evidence reliability</strong> interact; it is not a model of hallucinations.</p>
+          </div>
+          <div class="concept-link"><div><span class="small-label">TAKE THIS FURTHER</span><h3>Prediction error and precision</h3><p>A prediction is compared with incoming input. Precision describes how reliable an error signal is thought to be, and therefore how much it should influence an update. Predictive coding formalises that recurrent exchange across levels of a model.</p></div><a href="../lab-concepts/predictive-coding/predictive-coding.html">Explore the predictive coding animation</a></div>
+          <p class="qualification">Predictive coding is a useful theoretical framework. Specific mappings from prediction errors to cell populations, oscillations or psychiatric symptoms remain hypotheses that experiments must test.</p>
+        </section>
+
+        <section class="chapter" id="signals" aria-labelledby="signals-title">
+          <div class="chapter-heading"><span class="chapter-no">03 / OBSERVATIONS</span><h2 id="signals-title">What can we actually measure?</h2></div>
+          <p class="standfirst">EEG records electrical potential at the scalp. MEG records magnetic fields produced by neural currents. Both track changes on a millisecond scale, but neither reads out a receptor directly.</p>
+          <p>We collect brain signals during rest, tasks, sleep or controlled pharmacological studies. Before interpreting them, we check timing, noisy channels and artefacts such as blinks or muscle activity. We can then examine event-related responses, frequency spectra and relationships between regions.</p>
+          <div class="signal-strip" aria-label="The research path from experiment to inference">
+            <div><b>1</b><strong>Experiment</strong><span>Choose an observation that can distinguish hypotheses.</span></div>
+            <div><b>2</b><strong>Clean data</strong><span>Inspect artefacts, trials and recording quality.</span></div>
+            <div><b>3</b><strong>Describe</strong><span>Look at responses, rhythms and connections.</span></div>
+            <div><b>4</b><strong>Explain</strong><span>Fit candidate models and check predictions.</span></div>
+          </div>
+          <h3 class="minor-heading">Three meanings of “connection”</h3>
+          <div class="definition-rows">
+            <div><strong>Anatomical</strong><p>Physical pathways between regions, often studied with structural MRI methods.</p></div>
+            <div><strong>Functional</strong><p>A statistical relationship between measured signals. Correlation alone does not give direction or mechanism.</p></div>
+            <div><strong>Effective</strong><p>A directed influence estimated within a specified model. Its interpretation depends on the model and data.</p></div>
+          </div>
+          <p>One signal can reflect many underlying processes. That is why the link from EEG/MEG to synapses requires a <em>forward model</em> of how proposed neural activity would generate the observed data, and careful checks for alternative explanations.</p>
+          <div class="inline-read"><span>Want to understand a spectrum first?</span><a href="../lab-concepts/fourier/unit-circle-to-fourier.html">See waves become frequencies in the Fourier explainer</a></div>
+        </section>
+
+        <section class="chapter" id="model-lab" aria-labelledby="model-title">
+          <div class="chapter-heading"><span class="chapter-no">04 / MODELS</span><h2 id="model-title">Try the central move: fit a model to data</h2></div>
+          <p class="standfirst">A forward model turns chosen parameters into predicted observations. Inversion works backwards: which settings make the model's prediction resemble what we recorded?</p>
+          <p>The curves below are <strong>synthetic frequency spectra</strong>. Move the sliders until the teal model curve fits the dark observed curve. The toy model has a peak frequency, width and amplitude. These are visual properties of a curve, <em>not</em> receptor estimates or a DCM analysis.</p>
+          <div class="experiment spectrum-lab">
+            <div class="experiment-top"><span class="experiment-id">EXPERIMENT 02</span><h3>Fit the hidden spectrum</h3><p>Observed data stay fixed while you change the model. Try a narrow peak, then a broad one.</p></div>
+            <div class="spectrum-body">
+              <div class="plot-wrap">
+                <div class="plot-legend"><span><i class="observed-key"></i> Observed</span><span><i class="model-key"></i> Your model</span></div>
+                <svg id="spectrum-plot" viewBox="0 0 640 300" role="img" aria-labelledby="spectrum-title spectrum-desc" preserveAspectRatio="xMidYMid meet">
+                  <title id="spectrum-title">Observed and predicted synthetic spectra</title>
+                  <desc id="spectrum-desc">Two curves show power against frequency from 2 to 30 hertz. The model curve changes with the controls.</desc>
+                  <g class="gridlines"><path d="M52 30H616 M52 90H616 M52 150H616 M52 210H616 M52 270H616"></path></g>
+                  <path class="axis" d="M52 24V270H616"></path>
+                  <g class="plot-labels"><text x="44" y="284">2</text><text x="241" y="284">12</text><text x="445" y="284">22</text><text x="590" y="284">30 Hz</text><text x="60" y="20">relative power</text></g>
+                  <path id="observed-curve" class="observed-line" d=""></path>
+                  <path id="model-curve" class="model-line" d=""></path>
+                </svg>
+                <p class="plot-note" id="fit-feedback" aria-live="polite">Adjust the sliders to improve the fit.</p>
+              </div>
+              <div class="fit-controls">
+                <label for="frequency">Peak frequency <output id="frequency-value" for="frequency">18 Hz</output><input id="frequency" type="range" min="5" max="25" step="0.2" value="18"></label>
+                <label for="width">Peak width <output id="width-value" for="width">5.0</output><input id="width" type="range" min="1" max="8" step="0.1" value="5"></label>
+                <label for="amplitude">Peak height <output id="amplitude-value" for="amplitude">0.55</output><input id="amplitude" type="range" min="0.3" max="1.3" step="0.01" value="0.55"></label>
+                <div class="fit-readout"><span>Curve mismatch</span><strong id="fit-error">—</strong><small>Smaller is better, on this illustrative scale.</small></div>
+                <button id="reveal-fit" type="button" class="quiet-button">Reveal the generating settings</button>
+                <p id="fit-answer" class="answer" hidden>The hidden curve was generated with a 12 Hz peak, width 2.4 and height 0.9. A close fit recovers properties of this <em>chosen</em> model.</p>
+              </div>
+            </div>
+            <p class="experiment-foot">A good fit does not prove that this is the process that generated a real brain signal. We also ask whether another model fits, whether parameters are identifiable, and whether predictions hold for new data.</p>
+          </div>
+          <h3 class="minor-heading">What changes in a real CPNS model?</h3>
+          <p>Instead of directly adjusting a peak, a <strong>neural mass model</strong> represents interacting populations of cells. Synaptic coupling, receptor-related time constants and transmission delays alter the modelled activity. A measurement model then predicts what EEG or MEG would look like. <strong>Dynamic Causal Modelling (DCM)</strong> is a framework for fitting and comparing such generative models.</p>
+          <div class="model-stack">
+            <div><span>01</span><div><strong>Build the forward model</strong><p>Write down the candidate circuit, its dynamics, inputs and observation process.</p></div></div>
+            <div><span>02</span><div><strong>Invert it with Bayesian methods</strong><p>Estimate probable parameter values and uncertainty. Variational Laplace is one approximation we develop and use.</p></div></div>
+            <div><span>03</span><div><strong>Check and compare</strong><p>Inspect whether simulated data resemble held-out or observed features, and compare plausible model variants.</p></div></div>
+            <div><span>04</span><div><strong>Study the group</strong><p>Use hierarchical methods such as Parametric Empirical Bayes (PEB) to ask how parameters vary with a group, symptom or intervention.</p></div></div>
+          </div>
+          <details class="technical"><summary>Show the compact mathematical version</summary><div><p>Let <code>θ</code> denote hidden model parameters, <code>u</code> the experimental input and <code>y</code> the observation. A forward model predicts <code>y ≈ g(θ, u) + ε</code>. Bayesian inversion combines the likelihood of the observed data under those predictions with prior beliefs about plausible parameters: <code>p(θ | y) ∝ p(y | θ) p(θ)</code>. Variational methods approximate that posterior and can compare candidate models through an evidence bound.</p><p>The numerical curve exercise above is only an analogy. Its peak, width and height do not implement neural mass dynamics or variational inversion.</p></div></details>
+          <div class="inline-read"><span>Go deeper into the actual machinery</span><a href="../methods.html">CPNS modelling methods</a><a href="../lab-concepts/parametric-empirical-bayes/peb.html">Interactive PEB explainer</a></div>
+        </section>
+
+        <section class="chapter" id="studies" aria-labelledby="studies-title">
+          <div class="chapter-heading"><span class="chapter-no">05 / RESEARCH</span><h2 id="studies-title">What has this approach taught us?</h2></div>
+          <p class="standfirst">The lab's studies use the same logic on different questions: define a clinical contrast, record a signal, fit a mechanistic model, then ask what the parameter estimates can and cannot support.</p>
+          <article class="study">
+            <div class="study-meta"><span>DEPRESSION / PHARMACOLOGY</span><span>Published study · 2024</span></div>
+            <h3>What changes in the brain during ketamine treatment?</h3>
+            <p>Resting EEG was collected before and during a ketamine infusion in people with major depression. A model of frontal and parietal circuits found increased AMPA-mediated connectivity from parietal to frontal cortex and a shorter frontal GABA<sub>A</sub> time constant. Both parameter changes were associated with the degree of symptom change at 24 hours. The tested NMDA time-constant change did not survive correction for multiple comparisons.</p>
+            <p class="study-takeaway"><strong>Take away:</strong> the drug's known molecular target and the modelled brain changes associated with outcome need not be the same parameter. These associations are research findings, not an established individual treatment test.</p>
+            <a href="https://doi.org/10.1038/s41398-024-02738-w" target="_blank" rel="noopener noreferrer">Read the ketamine paper <span class="external" aria-hidden="true">↗</span></a>
+          </article>
+          <article class="study">
+            <div class="study-meta"><span>SCHIZOPHRENIA / CIRCUITS</span><span>Published study · 2025</span></div>
+            <h3>Which circuit explanations fit altered MEG rhythms?</h3>
+            <p>A thalamo-cortical model was fit to MEG data from people with schizophrenia and controls. Within the selected model, the group comparison found stronger NMDA-mediated self-excitation of superficial pyramidal cells and weaker GABA<sub>B</sub>-mediated inhibition onto those cells. The authors also explored whether simulated adjustments to connections could bring modelled spectra closer to control patterns.</p>
+            <p class="study-takeaway"><strong>Take away:</strong> modelling turns a broad “dysconnectivity” idea into specific, testable candidate mechanisms. A simulated restoration is a hypothesis for further experiments, not evidence that a treatment will work.</p>
+            <a href="https://doi.org/10.1093/schbul/sbaf149" target="_blank" rel="noopener noreferrer">Read the schizophrenia paper <span class="external" aria-hidden="true">↗</span></a>
+          </article>
+          <article class="study">
+            <div class="study-meta"><span>SLEEP / DEVELOPMENT</span><span>Published study · 2026</span></div>
+            <h3>Can sleep reveal mechanisms linked to psychiatric risk?</h3>
+            <p>Sleep and wake EEG from children with 22q11.2 deletion syndrome and their siblings were fit with a conductance-based thalamo-cortical model. Changing NMDA-related model gain improved the match between group spectra, particularly during non-REM sleep. This provides a candidate circuit account of the observed sleep differences in a group with elevated psychiatric risk.</p>
+            <p class="study-takeaway"><strong>Take away:</strong> sleep offers a repeated window onto brain dynamics. Model perturbations can prioritise mechanisms, but independent experimental validation is still needed.</p>
+            <a href="https://www.nature.com/articles/s41398-026-04368-w" target="_blank" rel="noopener noreferrer">Read the sleep paper <span class="external" aria-hidden="true">↗</span></a>
+          </article>
+          <div class="theory-note"><span class="small-label">THE THEORY BEHIND THE PROGRAMME</span><p>For a broad account of predictive coding, neural circuits and mental disorders, start with <a href="https://doi.org/10.3389/fpsyt.2025.1713833" target="_blank" rel="noopener noreferrer">Shaw, Sumner and Berndt's review in <em>Frontiers in Psychiatry</em></a>. It is a framework for asking mechanistic questions, not a claim that one theory already explains every disorder.</p></div>
+        </section>
+
+        <section class="chapter" id="promise" aria-labelledby="promise-title">
+          <div class="chapter-heading"><span class="chapter-no">06 / INTERPRETATION</span><h2 id="promise-title">What is the promise, and what would count as progress?</h2></div>
+          <p class="standfirst">The ambition is to connect a person's experience to testable biological hypotheses and, eventually, better choices about intervention. The route from a fitted model to a useful clinical tool is long.</p>
+          <div class="horizon">
+            <div><span class="small-label">NOW</span><h3>Explain a signal</h3><p>Can a model reproduce data and point to plausible circuit processes?</p></div>
+            <div><span class="small-label">NEXT</span><h3>Test a prediction</h3><p>Does a proposed mechanism survive a new task, cohort or pharmacological manipulation?</p></div>
+            <div><span class="small-label">LATER</span><h3>Help a decision</h3><p>Can a validated measure improve an individual treatment choice beyond existing care?</p></div>
+          </div>
+          <h3 class="minor-heading">Three checks we keep returning to</h3>
+          <ul class="checks">
+            <li><strong>Model dependence.</strong> Could different circuits explain the same EEG or MEG pattern? What happens when we compare alternatives?</li>
+            <li><strong>Generalisation.</strong> Does the finding hold across people, recording sessions, tasks and independent cohorts?</li>
+            <li><strong>Clinical meaning.</strong> Does it predict an outcome in a way that is reliable and useful for someone outside the original study?</li>
+          </ul>
+          <p>This is why good computational psychiatry needs careful experiments, strong data quality, uncertainty estimates and honest reporting of null or ambiguous results. Models make assumptions visible so we can improve them.</p>
+        </section>
+
+        <section class="chapter" id="reading" aria-labelledby="reading-title">
+          <div class="chapter-heading"><span class="chapter-no">07 / YOUR ROUTE IN</span><h2 id="reading-title">Where should a new lab student start?</h2></div>
+          <p class="standfirst">Pick a question you care about, then learn just enough of the toolkit to investigate it. You do not need to master the full maths before collecting or thinking clearly about data.</p>
+          <div class="pathways">
+            <div><span class="small-label">IF YOU ARE NEW TO THIS</span><h3>A BSc starting route</h3><ol><li>Try the tone experiment and explain how changing the prior alters the answer.</li><li>Open the <a href="../lab-concepts/fourier/unit-circle-to-fourier.html">Fourier</a> and <a href="../lab-concepts/bayes/bayesian-updating.html">Bayes</a> visual explainers.</li><li>Read one case above. Write down its question, observation and proposed mechanism.</li><li>Think of an alternative explanation that the same data might allow.</li></ol></div>
+            <div><span class="small-label">IF YOU ALREADY ANALYSE DATA</span><h3>An MSc starting route</h3><ol><li>Fit the toy spectrum, then ask what the curve cannot identify.</li><li>Explore <a href="../lab-concepts/predictive-coding/predictive-coding.html">predictive coding</a> and the <a href="../lab-concepts/parametric-empirical-bayes/peb.html">PEB group model</a>.</li><li>Read a methods section from one case and sketch its forward model and comparison.</li><li>Propose a posterior predictive check, a competing model or a held-out test.</li></ol></div>
+          </div>
+          <div class="resource-shelf">
+            <h3>Keep exploring</h3>
+            <a href="../lab-concepts/">All interactive concepts <span>Bayes, waves, predictive coding, free energy, active inference and PEB</span></a>
+            <a href="../methods.html">Computational neuroscience methods <span>Neural masses, transfer functions, DCM and inference</span></a>
+            <a href="../helmholtz-hodge-demo.html">Flow Lab <span>Dynamical systems, circulation and steady states</span></a>
+            <a href="../active_inference_world_model_lab/">World Model Lab <span>How inference also informs the lab's work with agents</span></a>
+          </div>
+          <div class="closing"><h3>A useful question to bring to a meeting</h3><p>“What observation would make us change our mind about this model?”</p></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><div><a href="../index.html">CPNS Lab</a><span>Computational Psychiatry &amp; Neuropharmacological Systems · University of Exeter</span></div><a href="#main">Back to top</a></footer>
+</body>
+</html>
