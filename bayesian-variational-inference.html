@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An intuitive introduction to Bayesian and variational inference | CPNS Lab</title>
+<meta name="description" content="An interactive CPNS introduction to Bayes’ rule, precision-weighted prediction errors, MAP fitting, variational inference and variational Laplace.">
+<meta name="theme-color" content="#164951">
+<style>:root{color-scheme:light;--paper:#f7f8f6;--white:#fff;--ink:#1e292d;--muted:#596a70;--faint:#e0e7e5;--teal:#246a72;--teal-dark:#164951;--teal-soft:#e5f1ef;--ochre:#a76639;--dark:#13282d}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;color:var(--ink);background:var(--paper);font:17px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--teal-dark);text-underline-offset:3px;text-decoration-thickness:1px}a:hover{color:var(--teal)}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--ochre);outline-offset:4px}.skip-link{position:absolute;top:-100px;left:12px;z-index:100;background:var(--dark);color:white;padding:10px 16px}.skip-link:focus{top:10px}.site-head{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);border-bottom:1px solid var(--faint);backdrop-filter:blur(12px)}.head-inner{max-width:1350px;padding:13px 32px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;flex-direction:column;line-height:1.2;color:var(--dark);text-decoration:none;white-space:nowrap}.brand strong{font-size:19px;letter-spacing:-.03em}.brand span{font-size:12px;color:var(--muted)}.site-head nav{display:flex;flex-wrap:wrap;gap:10px 23px}.site-head nav a{font-size:14px;font-weight:650;text-decoration:none;color:var(--muted)}.site-head nav a:hover{text-decoration:underline}
+.hero-shell{background:#e9f1ef;border-bottom:1px solid #d8e3e0;padding:clamp(42px,6vw,88px) max(24px,calc((100vw - 1280px)/2));display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.65fr);gap:clamp(32px,5vw,80px);align-items:center}.eyebrow,.small-label,.chapter-no{color:var(--teal-dark);font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:800}.eyebrow{margin:0 0 20px}h1{font-size:clamp(2.8rem,5.1vw,4.7rem);font-weight:750;letter-spacing:-.06em;line-height:1.04;margin:0 0 26px;max-width:850px}.hero-lead{font-size:clamp(1.18rem,1.8vw,1.4rem);line-height:1.5;max-width:650px;margin:0}.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px 26px;margin:30px 0 18px}.primary-action{background:var(--teal-dark);color:white;border-radius:4px;padding:12px 20px;text-decoration:none;font-weight:750;font-size:15px}.primary-action:hover{background:var(--teal);color:white}.hero-note{font-size:14px;color:var(--muted);margin:0}.hero-map{background:var(--dark);color:#f5faf9;padding:30px;border-radius:4px;box-shadow:12px 12px 0 #cbded9}.hero-map .small-label{color:#a9d6d3}.map-row{padding:18px 0;border-top:1px solid #ffffff2e;display:flex;gap:16px}.map-row:first-of-type{margin-top:20px}.map-row span{font:700 13px/1.8 ui-monospace,monospace;color:#a9d6d3}.map-row strong{font-size:21px;line-height:1.2;display:block}.map-row small{font-size:14px;color:#bfcece;display:block;margin-top:6px;line-height:1.4}
+.page-grid{max-width:1280px;padding:0 28px;margin:auto;display:grid;grid-template-columns:190px minmax(0,900px);justify-content:space-between;gap:clamp(35px,5vw,76px)}.chapter-rail{position:sticky;top:103px;align-self:start;margin-top:59px;display:grid;gap:5px}.chapter-rail p{margin:0 0 13px;color:var(--muted);font-size:12px;letter-spacing:.13em;font-weight:800}.chapter-rail a{display:flex;gap:12px;text-decoration:none;color:var(--muted);font-size:14px;padding:6px 8px;border-left:2px solid transparent}.chapter-rail a:hover,.chapter-rail a.active{color:var(--teal-dark);background:#edf3f1;border-color:var(--teal)}.chapter-rail span{font:700 12px/1.8 ui-monospace,monospace;color:var(--teal)}main{min-width:0}.chapter{padding:70px 0 74px;border-bottom:1px solid #cad5d2;scroll-margin-top:75px}.chapter:last-child{border:0}.chapter-no{display:block;margin-bottom:17px}h2{font-size:clamp(2rem,3.2vw,3.1rem);font-weight:750;line-height:1.1;letter-spacing:-.047em;margin:0 0 25px}h3{line-height:1.25;letter-spacing:-.025em;font-size:1.45rem;margin:32px 0 18px}.chapter p{max-width:74ch;margin:0 0 19px}.standfirst{font-size:1.24rem;line-height:1.5;color:#314449;font-weight:530}.three-up{display:grid;grid-template-columns:repeat(3,1fr);margin:30px 0;border-block:1px solid #bfd0cc;gap:22px;padding:25px 0}.three-up b{color:var(--teal-dark);font-size:19px}.three-up p{font-size:15px;margin:8px 0 0}.callout{background:var(--teal-soft);padding:22px 26px;margin:28px 0;border-left:4px solid var(--teal)}.callout p:last-child,.callout ul:last-child{margin-bottom:0}.qualification{font-size:14px;color:var(--muted);padding-left:16px;border-left:2px solid #b6c9c5}details{border-block:1px solid var(--faint);margin:26px 0;background:#fff}summary{padding:17px 19px;cursor:pointer;font-weight:650;font-size:16px}details>div{padding:0 19px 14px}math{font-size:1.03em}.math.display{display:block;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:18px 9px;margin:23px 0;background:#eef3f1;border:1px solid #dee8e4;text-align:center}.math.display math{margin:auto;max-width:none}.math.inline{white-space:nowrap}h2 .math.inline math{font-size:.95em}
+.experiment{margin:34px 0 30px;background:white;border:1px solid #bdd2cf;box-shadow:0 14px 32px #16393d0b}.experiment-top{padding:24px 28px 18px;border-bottom:1px solid var(--faint)}.experiment-top h3{font-size:27px;margin:8px 0}.experiment-top p{font-size:15px;color:var(--muted);margin:0}.experiment-body{display:grid;grid-template-columns:minmax(210px,.65fr) minmax(0,1fr);gap:25px;padding:25px 28px}.controls{display:grid;gap:20px;align-content:start}label{display:block;font-size:14px;font-weight:650}label output{float:right;color:var(--teal-dark);font-variant-numeric:tabular-nums}input[type=range]{display:block;cursor:pointer;accent-color:var(--teal);width:100%;margin:12px 0 0;min-height:24px}select{width:100%;font:inherit;background:#fff;border:1px solid #a8bcb7;border-radius:3px;padding:8px;margin-top:10px;color:var(--ink)}button{font:650 14px/1.4 system-ui,sans-serif;border:1px solid #aec4bf;border-radius:4px;padding:9px 12px;min-height:40px;background:#f0f5f3;color:var(--teal-dark);cursor:pointer}button:hover{background:#deebe7}button.primary{background:var(--teal-dark);color:white;border-color:var(--teal-dark)}button.primary:hover{background:var(--teal)}button:disabled{opacity:.55;cursor:default}.button-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.chart-box{min-width:0}.chart-box svg{display:block;width:100%;height:auto;background:#fbfdfc;overflow:visible}.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 17px;font-size:12px;font-weight:650;line-height:1.5;margin:10px 0}.prior{color:var(--ochre)}.posterior{color:var(--teal-dark)}.likelihood,.data{color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--faint);border-block:1px solid var(--faint)}.metrics>div{background:#f1f7f4;padding:17px 22px;font-size:12px;color:var(--muted);line-height:1.45}.metrics strong{display:block;font-size:30px;color:var(--teal-dark);font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:-.03em;margin-top:5px}.metrics small{display:block;font-size:12px;margin-top:4px}.experiment .experiment-foot{max-width:none;padding:18px 28px;margin:0;font-size:14px;line-height:1.55;color:#45595d;background:#fafcfb}.chart-note{font-size:13px!important;line-height:1.5;color:var(--muted);margin:14px 0 0!important}.fit-controls{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px;padding:25px 28px;border-bottom:1px solid var(--faint);align-items:end}.fit-charts{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;padding:25px 18px}.vi-metrics{grid-template-columns:repeat(5,minmax(0,1fr))}.vi-metrics>div{padding:15px 12px}.vi-metrics strong{font-size:23px}.table-wrap{overflow-x:auto;margin:25px 0}table{width:100%;border-collapse:collapse;text-align:left;font-size:15px;line-height:1.55}th{background:#e5eeeb;color:var(--teal-dark)}td,th{padding:13px 16px;border-bottom:1px solid #d5e0dc;vertical-align:top}td:first-child{font-weight:550;min-width:170px}tbody tr:nth-child(even){background:#f0f4f2}.reading-links{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:26px 0}.reading-links a{background:var(--teal-soft);padding:20px;text-decoration:none;border:1px solid #c6dcd4}.reading-links strong{display:block;line-height:1.3}.reading-links span{display:block;color:var(--muted);font-size:14px;line-height:1.5;margin-top:10px}.end-note{font-size:15px;color:var(--muted);border-top:1px solid #cad5d2;padding-top:24px;margin-top:35px!important}.footer{background:var(--dark);color:#bfcece;padding:24px max(24px,calc((100vw - 1224px)/2));display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;font-size:13px}.footer a{color:#c9e8e3}noscript p{padding:20px;background:#fff2dd;border:1px solid var(--ochre)}
+@media(max-width:1100px){.page-grid{grid-template-columns:165px minmax(0,1fr);gap:35px}.experiment-body{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}.controls .button-row,.controls>.chart-note{grid-column:1/-1}.vi-metrics{grid-template-columns:repeat(3,1fr)}.hero-shell{grid-template-columns:1.4fr 1fr}.hero-map{padding:23px}.fit-charts{grid-template-columns:1fr}.fit-charts .chart-box{max-width:650px;width:100%;margin:auto}}
+@media(max-width:760px){html{scroll-padding-top:110px}.head-inner{padding:12px 20px;gap:12px}.site-head nav{gap:8px 14px;justify-content:flex-end}.site-head nav a{font-size:12px}.hero-shell{display:block;padding:44px 24px}.hero-map{margin-top:34px;box-shadow:8px 8px 0 #cbded9}.page-grid{display:block;padding:0 24px}.chapter-rail{position:static;margin:30px 0 0;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--faint);padding-bottom:25px}.chapter-rail p{grid-column:1/-1}.chapter-rail a{font-size:13px}.chapter{padding:48px 0 52px;scroll-margin-top:105px}h2{font-size:2.1rem}.standfirst{font-size:1.13rem}.three-up,.reading-links{grid-template-columns:1fr;gap:17px}.three-up{padding:20px 0}.three-up p{margin-top:3px}.experiment-top{padding:20px}.experiment-top h3{font-size:24px}.experiment-body,.fit-controls{padding:20px;gap:22px}.fit-charts{padding:18px 8px}.controls,.fit-controls{grid-template-columns:1fr}.metrics>div{padding:15px 10px}.metrics strong{font-size:25px}.vi-metrics{grid-template-columns:repeat(2,1fr)}.experiment .experiment-foot{padding:18px 20px}.callout{padding:20px}.math.display{font-size:.91rem}.math.inline{white-space:normal}td,th{padding:12px}.footer{display:block}.footer a{display:inline-block;margin-top:10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.site-head,.chapter-rail,.hero-actions,.footer,.controls,.fit-controls,.button-row{display:none}.hero-shell,.page-grid{display:block;padding:20px;background:white}.hero-map{box-shadow:none;break-inside:avoid}.chapter{padding:25px 0}.experiment{box-shadow:none;break-inside:avoid}body{font-size:11pt;background:white}.experiment-body{display:block}.chart-box svg{max-height:260px}.math.display{overflow:visible}a{color:inherit}h1{font-size:32pt}h2{font-size:24pt}.reading-links{display:block}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to the introduction</a>
+<header class="site-head"><div class="head-inner"><a class="brand" href="https://cpnslab.com/"><strong>CPNS Lab</strong><span>University of Exeter</span></a><nav aria-label="CPNS navigation"><a href="https://cpnslab.com/">Home</a><a href="https://cpnslab.com/lab-concepts/">Interactive concepts</a><a href="https://cpnslab.com/student-guide/">Student guide</a></nav></div></header>
+<div class="hero-shell"><div><p class="eyebrow">CPNS / An intuitive introduction</p><h1>Bayesian and<br>variational inference</h1><p class="hero-lead">How do we learn from uncertain data? Follow a prediction error from a simple Bayesian update to fitting a function—and then fitting a distribution.</p><div class="hero-actions"><a class="primary-action" href="#bayes">Start with Bayes</a><a href="#combine">Try the first experiment ↓</a></div><p class="hero-note">Three experiments · equations explained in words · no specialist background assumed</p></div><aside class="hero-map" aria-label="The path through the introduction"><span class="small-label">One thread, four ideas</span><div class="map-row"><span>01</span><div><strong>Beliefs meet evidence</strong><small>Combine a prior with an uncertain measurement.</small></div></div><div class="map-row"><span>02</span><div><strong>Errors become updates</strong><small>Precision and derivatives tell us how to move.</small></div></div><div class="map-row"><span>03</span><div><strong>A fit gets uncertainty</strong><small>Curvature turns a point estimate into a local Gaussian.</small></div></div><div class="map-row"><span>04</span><div><strong>Distributions get fitted</strong><small>A variational bound scores the approximation itself.</small></div></div></aside></div>
+<div class="page-grid"><nav class="chapter-rail" aria-label="On this page"><p>FOLLOW THE THREAD</p><a href="#bayes"><span>01</span>Bayes’ rule</a><a href="#precision"><span>02</span>Errors & precision</a><a href="#combine"><span>03</span>An exact update</a><a href="#update"><span>04</span>Learning rules</a><a href="#fit"><span>05</span>Fitting a function</a><a href="#variational"><span>06</span>Variational inference</a><a href="#laplace"><span>07</span>Variational Laplace</a><a href="#cpns"><span>08</span>Neural models & reading</a></nav><main id="main"><noscript><p>The explanations and equations work without JavaScript. Enable JavaScript to use the three experiments.</p></noscript><section class="chapter" id="bayes">
+<p><span class="chapter-no">01 / Start with uncertainty</span></p>
+<h2 id="bayes-updates-a-distribution">Bayes updates a distribution</h2>
+<p class="standfirst">
+A measurement does not tell us exactly what is true. It tells us which possibilities have become more plausible.
+</p>
+<p>Suppose we want to infer an unknown quantity <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>. Before seeing the data, we describe what we believe with a <strong>prior</strong>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta)</annotation></semantics></math>. A model describes how different values of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math> could generate data <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>: this is the <strong>likelihood</strong>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y\mid\theta)</annotation></semantics></math>. Bayes’ rule combines them:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>∣</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">p(\theta\mid y)=\frac{p(y\mid\theta)\,p(\theta)}{p(y)}.</annotation></semantics></math></div>
+<p>The <strong>posterior</strong> is our updated distribution over <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>. The <strong>evidence</strong>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y)</annotation></semantics></math>, normalises it so that its total probability is one. Evidence also matters when comparing models: it measures how well a model predicts the data after averaging over its prior uncertainty.</p>
+<div class="three-up">
+<div>
+<b>Prior</b>
+<p>
+What was plausible before this measurement?
+</p>
+</div>
+<div>
+<b>Likelihood</b>
+<p>
+How compatible is this measurement with each possible parameter value?
+</p>
+</div>
+<div>
+<b>Posterior</b>
+<p>
+What is plausible after combining the two?
+</p>
+</div>
+</div>
+<p>A likelihood is not automatically a probability distribution over parameters. It describes the probability density of the data <em>given</em> parameters. Multiplying it by a prior, then normalising, gives the posterior.</p>
+<details>
+<summary>
+Why can the evidence be difficult to calculate?
+</summary>
+<div>
+<p>We need to average over all parameter values:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>∫</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>θ</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">p(y)=\int p(y\mid\theta)\,p(\theta)\,d\theta.</annotation></semantics></math></div>
+<p>For some simple models this integral is available analytically. For a nonlinear model with many parameters, it can be expensive or intractable. This is one reason to approximate the posterior.</p>
+</div>
+</details>
+</section>
+<section class="chapter" id="precision">
+<p><span class="chapter-no">02 / Read the expression</span></p>
+<h2 id="what-does-etoppi-e-mean">What does <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mi>⊤</mi></msup><mi>Π</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">e^\top\Pi e</annotation></semantics></math> mean?</h2>
+<p class="standfirst">
+It is a prediction-error score that takes uncertainty into account.
+</p>
+<p>Let <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">e=y-f(\theta)</annotation></semantics></math> be the difference between the observed data and the model’s prediction. Write <strong>precision</strong> as <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Π</mi><annotation encoding="application/x-tex">\Pi</annotation></semantics></math> (capital pi), rather than <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>. Precision is inverse variance for a scalar, or inverse covariance for a vector:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>=</mo><mfrac><mn>1</mn><msup><mi>σ</mi><mn>2</mn></msup></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mi>Π</mi><mo>=</mo><msup><mi>Σ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\pi=\frac{1}{\sigma^2},\qquad \Pi=\Sigma^{-1}.</annotation></semantics></math></div>
+<p>Small variance means high precision. Under the model, a precise measurement is expected to be close to its prediction, so the same error counts more strongly. Low precision makes a given mismatch less surprising.</p>
+<p>For a single error, the expression is just <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><msup><mi>e</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\pi e^2</annotation></semantics></math>. If <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">e=2</annotation></semantics></math>, a standard deviation of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math> gives a score of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>. A standard deviation of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math> gives a score of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.25</mn><annotation encoding="application/x-tex">0.25</annotation></semantics></math>. The error has not changed; its meaning has changed because the expected uncertainty is different.</p>
+<p>For a vector, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>e</mi><mi>⊤</mi></msup><annotation encoding="application/x-tex">e^\top</annotation></semantics></math> is the same vector written as a row. Multiplication produces one scalar score. For independent errors, this reduces to a weighted sum:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mi>⊤</mi></msup><mi>Π</mi><mi>e</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>π</mi><mi>i</mi></msub><msubsup><mi>e</mi><mi>i</mi><mn>2</mn></msubsup><mspace width="2.0em"></mspace><mrow><mtext mathvariant="normal">when </mtext><mspace width="0.333em"></mspace></mrow><mi>Π</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is diagonal</mtext></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">e^\top\Pi e=\sum_i\pi_i e_i^2\qquad\text{when }\Pi\text{ is diagonal}.</annotation></semantics></math></div>
+<div class="callout">
+<p><strong>Three expressions, three roles</strong></p>
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>: the prediction error.</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Π</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">\Pi e</annotation></semantics></math>: the precision-weighted error, still a vector.</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mi>⊤</mi></msup><mi>Π</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">e^\top\Pi e</annotation></semantics></math>: the total weighted squared error, a scalar.</li>
+</ul>
+</div>
+<p>If errors are correlated, off-diagonal terms matter too. The score then asks whether the <em>pattern</em> of errors is surprising under the covariance model. Precision is an assumption about reliability; assigning high precision does not make a measurement trustworthy.</p>
+<details>
+<summary>
+Where does the Gaussian distribution enter?
+</summary>
+<div>
+<p>With <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∣</mo><mi>θ</mi><mo>∼</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>Σ</mi><mi>y</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y\mid\theta\sim\mathcal N(f(\theta),\Sigma_y)</annotation></semantics></math>, the negative log likelihood is</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>e</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>Σ</mi><mi>y</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow><mo>+</mo><mfrac><mi>n</mi><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">-\log p(y\mid\theta)=\frac12e^\top\Pi_y e+\frac12\log|\Sigma_y|+\frac n2\log(2\pi).</annotation></semantics></math></div>
+<p>If the covariance is fixed, the last two terms do not affect the parameter gradient. If we estimate the noise covariance too, we must retain them: reducing precision cannot be treated as a cost-free way to make errors disappear.</p>
+</div>
+</details>
+</section>
+<section class="chapter" id="combine">
+<p><span class="chapter-no">03 / An exact Bayesian update</span></p>
+<h2 id="move-towards-evidence-by-the-right-amount">Move towards evidence, by the right amount</h2>
+<p>Suppose our prior is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>∼</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mn>0</mn></msub><mo>,</mo><msubsup><mi>σ</mi><mn>0</mn><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta\sim\mathcal N(\mu_0,\sigma_0^2)</annotation></semantics></math>, and the measurement is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mi>θ</mi><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">y=\theta+\epsilon</annotation></semantics></math>, where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϵ</mi><mo>∼</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mi>y</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\epsilon\sim\mathcal N(0,\sigma_y^2)</annotation></semantics></math>. The posterior is also Gaussian. Its precision is the sum of the two precisions, and its mean is their weighted average:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>π</mi><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><msub><mi>π</mi><mn>0</mn></msub><mo>+</mo><msub><mi>π</mi><mi>y</mi></msub><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>μ</mi><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>π</mi><mn>0</mn></msub><msub><mi>μ</mi><mn>0</mn></msub><mo>+</mo><msub><mi>π</mi><mi>y</mi></msub><mi>y</mi></mrow><mrow><msub><mi>π</mi><mn>0</mn></msub><mo>+</mo><msub><mi>π</mi><mi>y</mi></msub></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">\pi_{\mathrm{post}}=\pi_0+\pi_y,\qquad \mu_{\mathrm{post}}=\frac{\pi_0\mu_0+\pi_y y}{\pi_0+\pi_y}.</annotation></semantics></math></div>
+<p>The same result can be written as a correction to the old mean:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>=</mo><msub><mi>μ</mi><mn>0</mn></msub><mo>+</mo><munder><munder><mfrac><msub><mi>π</mi><mi>y</mi></msub><mrow><msub><mi>π</mi><mn>0</mn></msub><mo>+</mo><msub><mi>π</mi><mi>y</mi></msub></mrow></mfrac><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">gain</mtext></munder><munder><munder><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><msub><mi>μ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">prediction error</mtext></munder><mi>.</mi></mrow><annotation encoding="application/x-tex">\mu_{\mathrm{post}}=\mu_0+\underbrace{\frac{\pi_y}{\pi_0+\pi_y}}_{\text{gain}}\underbrace{(y-\mu_0)}_{\text{prediction error}}.</annotation></semantics></math></div>
+<p>This is the connection: a Bayesian update uses a prediction error, but the amount we move depends on how precise the new evidence is <em>relative to</em> our existing belief.</p>
+<div id="gaussian-lab" class="experiment">
+<div class="experiment-top">
+<span class="small-label">Experiment 1 / Exact inference</span>
+<h3>
+How much should one measurement change your mind?
+</h3>
+<p>
+Move the sliders. The posterior is calculated analytically, with no fitting algorithm.
+</p>
+</div>
+<div class="experiment-body">
+<div class="controls">
+<label for="prior-mean">Prior mean
+<output id="prior-mean-out" for="prior-mean">
+10.00
+</output>
+<input id="prior-mean" type="range" min="6" max="14" step="0.1" value="10"></label> <label for="prior-sd">Prior standard deviation
+<output id="prior-sd-out" for="prior-sd">
+2.00
+</output>
+<input id="prior-sd" type="range" min="0.5" max="4" step="0.05" value="2"></label> <label for="observation">Observed value
+<output id="observation-out" for="observation">
+14.00
+</output>
+<input id="observation" type="range" min="6" max="18" step="0.1" value="14"></label> <label for="noise-sd">Measurement standard deviation
+<output id="noise-sd-out" for="noise-sd">
+1.00
+</output>
+<input id="noise-sd" type="range" min="0.25" max="5" step="0.05" value="1"></label>
+<div class="button-row">
+<button type="button" id="reliable">
+Reliable evidence
+</button>
+<button type="button" id="noisy">
+Noisy evidence
+</button>
+<button type="button" id="bayes-reset">
+Reset
+</button>
+</div>
+</div>
+<div class="chart-box">
+<svg id="bayes-chart" viewBox="0 0 600 350" role="img" aria-labelledby="bayes-title bayes-desc">
+<title id="bayes-title">
+Prior, likelihood and posterior
+</title>
+<desc id="bayes-desc">Probability density curves update when the controls change.</desc>
+</svg>
+<div class="legend">
+<span class="prior">Prior · dashed</span><span class="likelihood">Likelihood · dotted</span><span class="posterior">Posterior · solid</span>
+</div>
+</div>
+</div>
+<div class="metrics" aria-live="polite" aria-atomic="true">
+<div>
+Posterior mean<strong id="post-mean">13.20</strong>
+</div>
+<div>
+Posterior SD<strong id="post-sd">0.89</strong>
+</div>
+<div>
+Update gain<strong id="post-gain">80%</strong>
+</div>
+</div>
+<p class="experiment-foot" id="bayes-story">
+The observation moves the mean 80% of the way from 10 to 14. Posterior uncertainty is smaller than either starting uncertainty.
+</p>
+</div>
+<p>With the default values, the prior variance is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math> and the measurement variance is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>. The gain is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.8</mn><annotation encoding="application/x-tex">0.8</annotation></semantics></math>: the mean moves from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math> to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>13.2</mn><annotation encoding="application/x-tex">13.2</annotation></semantics></math>, and posterior variance is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.8</mn><annotation encoding="application/x-tex">0.8</annotation></semantics></math>. Make the measurement noisier and the correction shrinks. This direct-observation Gaussian example is exact; more complicated models need more work.</p>
+<p class="qualification">
+The likelihood curve is shown as a density over the horizontal axis for comparison. In this particular direct-observation model it also integrates to one over θ; that does not hold for likelihoods in general.
+</p>
+</section>
+<section class="chapter" id="update">
+<p><span class="chapter-no">04 / From a score to a learning rule</span></p>
+<h2 id="differentiate-the-mismatch">Differentiate the mismatch</h2>
+<p class="standfirst">
+The quadratic error is a cost. Its derivative tells us how to change a parameter to reduce that cost.
+</p>
+<p>Start with the Gaussian data cost <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℰ</mi><mi>y</mi></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>e</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi></mrow><annotation encoding="application/x-tex">\mathcal E_y=\frac12e^\top\Pi_y e</annotation></semantics></math>. Define the Jacobian <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>J</mi><mo>=</mo><mi>∂</mi><mi>f</mi><mi>/</mi><mi>∂</mi><mi>θ</mi></mrow><annotation encoding="application/x-tex">J=\partial f/\partial\theta</annotation></semantics></math>: it tells us how each prediction changes when we change each parameter. Because <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">e=y-f(\theta)</annotation></semantics></math>, increasing a prediction decreases its error. The chain rule gives</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>∇</mi><mi>θ</mi></msub><msub><mi>ℰ</mi><mi>y</mi></msub><mo>=</mo><mo>−</mo><msup><mi>J</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">\nabla_\theta\mathcal E_y=-J^\top\Pi_y e.</annotation></semantics></math></div>
+<p>Add a Gaussian prior with mean <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\theta_0</annotation></semantics></math> and precision <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Π</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\Pi_0</annotation></semantics></math>. Ignoring constants that are fixed with respect to the parameters, the negative log posterior is</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℰ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>e</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><msub><mi>Π</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathcal E(\theta)=\frac12e^\top\Pi_y e+\frac12(\theta-\theta_0)^\top\Pi_0(\theta-\theta_0).</annotation></semantics></math></div>
+<p>A gradient-descent step is therefore</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">w</mi></mrow></msub><mo>=</mo><mi>θ</mi><mo>+</mo><mi>η</mi><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>J</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi><mo>−</mo><msub><mi>Π</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\theta_{\mathrm{new}}=\theta+\eta\left[J^\top\Pi_y e-\Pi_0(\theta-\theta_0)\right].</annotation></semantics></math></div>
+<p>The first term moves parameters to reduce the data mismatch. The second pulls them towards the prior. The step size <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math> controls the numerical optimisation: it is not, in general, the exact Bayesian gain from the previous example.</p>
+<div class="callout">
+<p><strong>Why the factor of one half?</strong> Differentiating a square gives a factor of two. The half cancels it, leaving the clean precision-weighted error. The square and the update are related, but they are not the same expression.</p>
+</div>
+Repeated updates seek the <strong>maximum a posteriori</strong> (MAP) estimate: the parameter value at the posterior’s highest point. We have used Bayesian assumptions to construct the objective, but tracking one value does not yet describe the whole posterior distribution.
+</section>
+<section class="chapter" id="fit">
+<p><span class="chapter-no">05 / Fit a function</span></p>
+<h2 id="would-this-reinvent-variational-laplace">Would this reinvent variational Laplace?</h2>
+<p class="standfirst">
+It recovers part of the machinery. To reach variational Laplace, we also need an approximation to posterior uncertainty and a variational objective.
+</p>
+<p>Imagine fitting a decaying response, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>;</mo><mi>A</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>A</mi><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>k</mi><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(t;A,k)=A\exp(-kt)</annotation></semantics></math>. The amplitude <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> and decay rate <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math> are unknown. Each observation creates an error, and the Jacobian maps those errors back to parameter changes.</p>
+<p>Curvature can make the updates more efficient. A Gauss–Newton approximation to the curvature of the negative log posterior is</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mrow><mi mathvariant="normal">G</mi><mi mathvariant="normal">N</mi></mrow></msub><mo>=</mo><msup><mi>J</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>J</mi><mo>+</mo><msub><mi>Π</mi><mn>0</mn></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">H_{\mathrm{GN}}=J^\top\Pi_yJ+\Pi_0.</annotation></semantics></math></div>
+<p>Instead of choosing one scalar step size, it rescales and couples the parameter corrections:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>θ</mi><mo>=</mo><msubsup><mi>H</mi><mrow><mi mathvariant="normal">G</mi><mi mathvariant="normal">N</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>J</mi><mi>⊤</mi></msup><msub><mi>Π</mi><mi>y</mi></msub><mi>e</mi><mo>−</mo><msub><mi>Π</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><msub><mi>θ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\Delta\theta=H_{\mathrm{GN}}^{-1}\left[J^\top\Pi_y e-\Pi_0(\theta-\theta_0)\right].</annotation></semantics></math></div>
+<p>This uses the same information that helps describe local uncertainty: steep curvature implies a narrow range of plausible parameters; shallow curvature implies a wider range.</p>
+<div id="fit-lab" class="experiment">
+<div class="experiment-top">
+<span class="small-label">Experiment 2 / MAP + local curvature</span>
+<h3>
+Fit an exponential response
+</h3>
+<p>
+Ten fixed synthetic observations. Take a step, or run the fit. Compare the prediction with the local uncertainty ellipse.
+</p>
+</div>
+<div class="fit-controls">
+<label for="fit-noise">Assumed noise SD
+<output id="fit-noise-out" for="fit-noise">
+0.12
+</output>
+<input id="fit-noise" type="range" min="0.08" max="0.6" step="0.01" value="0.12"></label> <label for="prior-strength">Prior precision multiplier
+<output id="prior-strength-out" for="prior-strength">
+1.00
+</output>
+<input id="prior-strength" type="range" min="0.1" max="20" step="0.1" value="1"></label> <label for="fit-method">Update method<select id="fit-method"><option value="gn">Gauss–Newton</option><option value="gradient">Gradient descent</option></select></label>
+<div class="button-row">
+<button type="button" id="fit-step">
+One step
+</button>
+<button type="button" id="fit-run" class="primary">
+Run fit
+</button>
+<button type="button" id="fit-reset">
+Reset fit
+</button>
+</div>
+</div>
+<div class="fit-charts">
+<div class="chart-box">
+<svg id="fit-chart" viewBox="0 0 600 350" role="img" aria-labelledby="fit-title fit-desc">
+<title id="fit-title">
+Observed response and fitted prediction
+</title>
+<desc id="fit-desc">Dots show synthetic observations; the solid curve is the current model prediction.</desc>
+</svg>
+<div class="legend">
+<span class="data">● Observations</span><span class="posterior">Prediction · solid</span><span class="prior">Generating curve · dashed</span>
+</div>
+</div>
+<div class="chart-box">
+<svg id="ellipse-chart" viewBox="0 0 500 350" role="img" aria-labelledby="ellipse-title ellipse-desc">
+<title id="ellipse-title">
+Local uncertainty in amplitude and decay rate
+</title>
+<desc id="ellipse-desc">A local Gaussian 95 percent contour around the current parameter estimate.</desc>
+</svg>
+<p class="chart-note">
+95% contour of the local Gaussian. A tilted ellipse means the parameter uncertainties are coupled.
+</p>
+</div>
+</div>
+<div class="metrics" aria-live="polite" aria-atomic="true">
+<div>
+Amplitude A<strong id="fit-a">1.000</strong><small id="fit-a-sd"></small>
+</div>
+<div>
+Decay rate k<strong id="fit-k">0.200</strong><small id="fit-k-sd"></small>
+</div>
+<div>
+Objective 𝓔<strong id="fit-cost"></strong><small id="fit-status">Initial parameters</small>
+</div>
+</div>
+<p class="experiment-foot">
+Changing noise or prior precision restarts the fit. Priors: A = 1.2 ± 0.8, k = 0.25 ± 0.35 (mean ± SD, before the multiplier). The generating parameters are A = 2.5 and k = 0.65 s⁻¹. Steps use backtracking to reduce the objective.
+</p>
+</div>
+<p><strong>Try this:</strong> run the fit, then increase the assumed noise and run it again. The observations have not changed, but they now exert less influence. Increase prior precision and the solution is pulled more strongly towards the prior. Switch to gradient descent to see how curvature affects the route to the solution.</p>
+<p class="qualification">
+This demonstration performs MAP optimisation and displays the inverse Gauss–Newton curvature. Before convergence, the ellipse is only a local curvature summary; near a valid optimum it approximates posterior uncertainty. It is not a full variational Laplace implementation.
+</p>
+</section>
+<section class="chapter" id="variational">
+<p><span class="chapter-no">06 / Fit a distribution</span></p>
+<h2 id="variational-inference-asks-a-bigger-question">Variational inference asks a bigger question</h2>
+<p class="standfirst">
+Instead of asking only “which parameter value fits?”, ask “which tractable distribution best approximates the posterior?”
+</p>
+<p>Choose a family of distributions <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">q(\theta)</annotation></semantics></math>, perhaps Gaussians described by a mean <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math> and covariance <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>. We then optimise those distribution parameters. One common objective is the <strong>evidence lower bound</strong> (ELBO), also called variational free energy under the convention used here:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>𝔼</mi><mi>q</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mo stretchy="false" form="postfix">∥</mo><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">F(q)=\mathbb E_q[\log p(y\mid\theta)]-D_{\mathrm{KL}}\!\left(q(\theta)\,\|\,p(\theta)\right).</annotation></semantics></math></div>
+<p>The first term is expected log likelihood: how well the data are explained <em>across the uncertainty in</em> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>. The second is the divergence from the prior: how much the distribution changes its beliefs to achieve that fit. It is often called complexity, but it is not simply the number of parameters.</p>
+<p>For a nonlinear model, optimising the mean of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math> need not give exactly the MAP estimate. The objective considers a spread of parameter values, rather than evaluating the fit at just one point.</p>
+<p>The key identity is</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mo stretchy="false" form="postfix">∥</mo><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>∣</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\log p(y)=F(q)+D_{\mathrm{KL}}\!\left(q(\theta)\,\|\,p(\theta\mid y)\right).</annotation></semantics></math></div>
+<p>KL divergence is non-negative. So <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math> is a lower bound on log evidence, and maximising <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math> brings <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math> closer to the posterior in this particular direction of KL divergence. Some texts define free energy with the opposite sign and <em>minimise</em> it; always check the convention.</p>
+<div id="vi-lab" class="experiment">
+<div class="experiment-top">
+<span class="small-label">Experiment 3 / A variational family</span>
+<h3>
+Make a Gaussian approximate the posterior
+</h3>
+<p>
+This uses the prior and observation from Experiment 1. Adjust the mean and width of q. Its score rewards both the fit and the right uncertainty.
+</p>
+</div>
+<div class="experiment-body">
+<div class="controls">
+<label for="q-mean">Approximation mean m
+<output id="q-mean-out" for="q-mean">
+10.00
+</output>
+<input id="q-mean" type="range" min="0" max="24" step="any" value="10"></label> <label for="q-sd">Approximation standard deviation s
+<output id="q-sd-out" for="q-sd">
+2.00
+</output>
+<input id="q-sd" type="range" min="0.15" max="6" step="any" value="2"></label>
+<div class="button-row">
+<button type="button" id="q-match" class="primary">
+Match exact posterior
+</button>
+<button type="button" id="q-prior">
+Start from prior
+</button>
+</div>
+<p class="chart-note">
+Here the exact posterior is known, so we can show the gap. For difficult models, that exact comparison is usually unavailable.
+</p>
+</div>
+<div class="chart-box">
+<svg id="vi-chart" viewBox="0 0 600 350" role="img" aria-labelledby="vi-title vi-desc">
+<title id="vi-title">
+Gaussian approximation and exact posterior
+</title>
+<desc id="vi-desc">The dashed curve is the adjustable approximation; the solid curve is the exact posterior.</desc>
+</svg>
+<div class="legend">
+<span class="posterior">Exact posterior · solid</span><span class="prior">Approximation q · dashed</span>
+</div>
+</div>
+</div>
+<div class="metrics vi-metrics" aria-live="polite" aria-atomic="true">
+<div>
+Expected log likelihood<strong id="vi-accuracy"></strong>
+</div>
+<div>
+KL from prior<strong id="vi-complexity"></strong>
+</div>
+<div>
+ELBO F<strong id="vi-elbo"></strong>
+</div>
+<div>
+Log evidence<strong id="vi-evidence"></strong>
+</div>
+<div>
+Gap to posterior<strong id="vi-gap"></strong>
+</div>
+</div>
+<p class="experiment-foot" id="vi-story">
+</p>
+</div>
+<p><strong>Try this:</strong> match the exact posterior, then make <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math> very narrow. Concentrating on the best-looking parameter value does not keep improving the bound. We lose the posterior’s uncertainty, and the divergence grows. A distribution’s spread is part of what inference must get right.</p>
+<details>
+<summary>
+What is being calculated in this experiment?
+</summary>
+<div>
+<p>For <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>=</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mo>,</mo><msup><mi>s</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">q=\mathcal N(m,s^2)</annotation></semantics></math>, the expected log likelihood includes both the squared error of its mean and its variance:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝔼</mi><mi>q</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><msubsup><mi>σ</mi><mi>y</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mfrac><mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mi>s</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><msubsup><mi>σ</mi><mi>y</mi><mn>2</mn></msubsup></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathbb E_q[\log p(y\mid\theta)]=-\frac12\log(2\pi\sigma_y^2)-\frac{(y-m)^2+s^2}{2\sigma_y^2}.</annotation></semantics></math></div>
+<p>The prior divergence is</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="false" form="postfix">∥</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mo>−</mo><msub><mi>μ</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><msubsup><mi>σ</mi><mn>0</mn><mn>2</mn></msubsup></mfrac><mo>−</mo><mn>1</mn><mo>+</mo><mo>log</mo><mfrac><msubsup><mi>σ</mi><mn>0</mn><mn>2</mn></msubsup><msup><mi>s</mi><mn>2</mn></msup></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">D_{\mathrm{KL}}(q\|p)=\frac12\left[\frac{s^2+(m-\mu_0)^2}{\sigma_0^2}-1+\log\frac{\sigma_0^2}{s^2}\right].</annotation></semantics></math></div>
+<p>The exact evidence is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>;</mo><msub><mi>μ</mi><mn>0</mn></msub><mo>,</mo><msubsup><mi>σ</mi><mn>0</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>σ</mi><mi>y</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y)=\mathcal N(y;\mu_0,\sigma_0^2+\sigma_y^2)</annotation></semantics></math>. All scores use natural logarithms (nats). “Match exact posterior” sets the known analytical solution; it does not simulate an optimisation algorithm.</p>
+</div>
+</details>
+</section>
+<section class="chapter" id="laplace">
+<p><span class="chapter-no">07 / Put the pieces together</span></p>
+<h2 id="from-laplace-approximation-to-variational-laplace">From Laplace approximation to variational Laplace</h2>
+<p>Near a well-behaved posterior mode, approximate the negative log posterior by a quadratic:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℰ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>ℰ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>−</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathcal E(\theta)\approx\mathcal E(\hat\theta)+\frac12(\theta-\hat\theta)^\top H(\theta-\hat\theta).</annotation></semantics></math></div>
+<p>Exponentiating a negative quadratic gives a Gaussian. This is the <strong>Laplace approximation</strong>:</p>
+<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>𝒩</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo>,</mo><msup><mi>H</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">q(\theta)\approx\mathcal N(\hat\theta,H^{-1}).</annotation></semantics></math></div>
+<p>Here <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>H</mi><annotation encoding="application/x-tex">H</annotation></semantics></math> is the positive-definite Hessian at the mode. In nonlinear least squares, the Gauss–Newton matrix is a useful approximation to that Hessian; it omits terms involving residuals and second derivatives of the predictions.</p>
+<p><strong>Variational Laplace</strong> uses Gaussian approximations and local curvature within a variational free-energy scheme. In implementations such as SPM’s model inversion, mean updates, posterior covariance, and noise-precision estimates work together. The details go beyond taking a MAP step and appending an error bar.</p>
+<div class="table-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Routine</th>
+<th style="text-align: left;">What it gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Minimise squared prediction errors</td>
+<td style="text-align: left;">A least-squares parameter estimate; with fixed Gaussian noise, a maximum-likelihood estimate.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Add a prior and optimise</td>
+<td style="text-align: left;">A MAP estimate: one best parameter vector under the posterior density.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Approximate curvature at a valid mode</td>
+<td style="text-align: left;">A local Gaussian posterior approximation: MAP plus approximate covariance.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Optimise a distribution using a variational bound</td>
+<td style="text-align: left;">Variational inference; the approximation can use many different families.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Use a Gaussian/local-curvature scheme for variational inversion</td>
+<td style="text-align: left;">Variational Laplace; typically with coordinated mean, covariance and precision updates.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>So, would a function-fitting routine be reinventing variational Laplace? <strong>It could be heading there.</strong> Precision-weighted errors, derivatives and curvature are shared ingredients. The defining extra step is treating inference as an approximation to a <em>distribution</em>, with uncertainty included in the variational objective.</p>
+<div class="callout">
+<p><strong>Where the approximation can fail</strong></p>
+<p>A single Gaussian can miss multiple posterior modes, asymmetry or curved dependencies. A local optimum may not be the global one. The covariance is conditional on the model and noise assumptions, and an approximate evidence is not exact evidence. Check whether the approximation is adequate for the scientific question.</p>
+</div>
+</section>
+<section class="chapter" id="cpns">
+<p><span class="chapter-no">08 / Bring it back to a generative model</span></p>
+<h2 id="the-same-logic-scales-to-neural-models">The same logic scales to neural models</h2>
+<p>In a neural generative model, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math> might contain coupling strengths, time constants or other physiological parameters. A forward model predicts a signal from those parameters. Comparing the predicted and observed signals creates a vector of errors. The Jacobian connects changes in the signal to changes in the underlying parameters.</p>
+<p>The logic remains: specify plausible parameters and a noise model; predict the observations; use precision to interpret the errors; update the parameter beliefs; and describe how much uncertainty remains. A good fit alone does not establish that a parameter is well identified or that the model is the right explanation.</p>
+<div class="three-up">
+<div>
+<b>Prediction</b>
+<p>
+What signal should these parameters generate?
+</p>
+</div>
+<div>
+<b>Update</b>
+<p>
+Which parameter changes explain the mismatch?
+</p>
+</div>
+<div>
+<b>Uncertainty</b>
+<p>
+Which combinations remain plausible after seeing the data?
+</p>
+</div>
+</div>
+<h3 id="a-small-notation-guide">A small notation guide</h3>
+<div class="table-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(\theta)</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math></td>
+<td style="text-align: left;">Observed data, model prediction, and their difference.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Σ</mi><annotation encoding="application/x-tex">\Sigma</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Π</mi><annotation encoding="application/x-tex">\Pi</annotation></semantics></math></td>
+<td style="text-align: left;">Covariance and its inverse, precision. Lowercase <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math> is scalar precision.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>J</mi><annotation encoding="application/x-tex">J</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>H</mi><annotation encoding="application/x-tex">H</annotation></semantics></math></td>
+<td style="text-align: left;">Prediction Jacobian and local curvature of the negative log posterior.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\theta_0</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Π</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\Pi_0</annotation></semantics></math></td>
+<td style="text-align: left;">Prior mean and prior precision.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math></td>
+<td style="text-align: left;">Approximate posterior, its mean and its covariance.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>D</mi><mrow><mi mathvariant="normal">K</mi><mi mathvariant="normal">L</mi></mrow></msub><annotation encoding="application/x-tex">D_{\mathrm{KL}}</annotation></semantics></math></td>
+<td style="text-align: left;">Variational lower bound and Kullback–Leibler divergence.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="follow-the-ideas-further">Follow the ideas further</h3>
+<div class="reading-links">
+<p><a href="https://cpnslab.com/student-guide/"><strong>CPNS student guide</strong><span>Place inference within the wider modelling workflow.</span></a> <a href="https://cpnslab.com/lab-concepts/"><strong>Interactive concepts</strong><span>Explore related ideas in the CPNS teaching collection.</span></a> <a href="https://cpnslab.com/methods.html"><strong>CPNS methods</strong><span>Connect the introduction to the lab’s methodological work.</span></a></p>
+</div>
+<h3 id="primary-references">Primary references</h3>
+<ul>
+<li>Friston, K. J., Mattout, J., Trujillo-Barreto, N., Ashburner, J. &amp; Penny, W. D. (2007). <a href="https://doi.org/10.1016/j.neuroimage.2006.08.035">Variational free energy and the Laplace approximation</a>. <em>NeuroImage</em>, 34, 220–234. <a href="https://www.fil.ion.ucl.ac.uk/~wpenny/publications/var_laplace.pdf">Author-hosted PDF</a>.</li>
+<li>Blei, D. M., Kucukelbir, A. &amp; McAuliffe, J. D. (2017). <a href="https://arxiv.org/abs/1601.00670">Variational Inference: A Review for Statisticians</a>. <em>Journal of the American Statistical Association</em>, 112, 859–877.</li>
+<li>SPM: <a href="https://github.com/spm/spm/blob/main/spm_nlsi_GN.m">spm_nlsi_GN.m</a>. A concrete implementation to read after understanding the distinction between MAP fitting and variational inversion.</li>
+</ul>
+<p class="end-note">
+The examples are deliberately small. The first and third have exact Gaussian answers; the nonlinear fit uses an approximation. Keeping those cases separate makes the connection between Bayes, optimisation and variational inference easier to see.
+</p>
+</section>
+</main></div>
+<footer class="footer"><span>CPNS Lab · Bayesian &amp; variational inference</span><a href="#main">Back to the introduction ↑</a></footer>
+<script>'use strict';
+const InferenceMath = (() => {
+  const times = [0,.35,.7,1,1.5,2,2.5,3,4,5];
+  const offsets = [.06,-.09,.11,-.13,.04,.08,-.07,.02,-.03,.05];
+  const observations = times.map((t,i) => 2.5*Math.exp(-.65*t)+offsets[i]);
+  function posterior(mu,priorSD,y,noiseSD) {
+    const v0=priorSD*priorSD, vy=noiseSD*noiseSD, v=v0*vy/(v0+vy), gain=v0/(v0+vy);
+    return {mean:mu+gain*(y-mu), variance:v, sd:Math.sqrt(v), gain};
+  }
+  function gaussian(x,m,s){return Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));}
+  function divergence(m,s,mu,sd){return .5*((s*s+(m-mu)**2)/(sd*sd)-1+Math.log(sd*sd/(s*s)));}
+  function variational(mu,priorSD,y,noiseSD,m,s){
+    const p=posterior(mu,priorSD,y,noiseSD);
+    const accuracy=-.5*Math.log(2*Math.PI*noiseSD*noiseSD)-((y-m)**2+s*s)/(2*noiseSD*noiseSD);
+    const complexity=divergence(m,s,mu,priorSD),elbo=accuracy-complexity;
+    const sum=priorSD*priorSD+noiseSD*noiseSD;
+    const evidence=-.5*(Math.log(2*Math.PI*sum)+(y-mu)**2/sum);
+    return {accuracy,complexity,elbo,evidence,gap:Math.max(0,divergence(m,s,p.mean,p.sd))};
+  }
+  function fitStats(theta,noise,precision){
+    const [a,k]=theta,w=1/(noise*noise),pa=precision/(.8*.8),pk=precision/(.35*.35);
+    let cost=.5*(pa*(a-1.2)**2+pk*(k-.25)**2),g0=-pa*(a-1.2),g1=-pk*(k-.25);
+    let h00=pa,h01=0,h11=pk;
+    times.forEach((t,i)=>{
+      const ja=Math.exp(-k*t),prediction=a*ja,e=observations[i]-prediction,jk=-a*t*ja;
+      cost+=.5*w*e*e;g0+=w*ja*e;g1+=w*jk*e;h00+=w*ja*ja;h01+=w*ja*jk;h11+=w*jk*jk;
+    });
+    const det=h00*h11-h01*h01;
+    return {cost,g:[g0,g1],h:[h00,h01,h11],cov:[h11/det,-h01/det,h00/det]};
+  }
+  function fitStep(theta,noise,precision,method){
+    const before=fitStats(theta,noise,precision),[u,v]=before.g,[h00,h01,h11]=before.h;
+    let direction;
+    if(method==='gradient'){
+      const eig=.5*(h00+h11+Math.sqrt((h00-h11)**2+4*h01*h01));
+      direction=[u/eig,v/eig];
+    }else{
+      const [c00,c01,c11]=before.cov;direction=[c00*u+c01*v,c01*u+c11*v];
+    }
+    if(Math.hypot(...direction)<1e-8)return {theta:[...theta],stats:before,done:true};
+    let alpha=1;
+    for(let i=0;i<30;i++){
+      const trial=theta.map((x,j)=>x+alpha*direction[j]);
+      const after=fitStats(trial,noise,precision);
+      if(Number.isFinite(after.cost)&&after.cost<before.cost){
+        return {theta:trial,stats:after,done:before.cost-after.cost<1e-11};
+      }
+      alpha*=.5;
+    }
+    return {theta:[...theta],stats:before,done:true};
+  }
+  return {times,observations,posterior,gaussian,divergence,variational,fitStats,fitStep};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=InferenceMath;
+
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id),M=InferenceMath;
+  const colors={teal:'#246a72',ochre:'#a76639',muted:'#596a70',grid:'#e0e7e5',ink:'#1e292d'};
+  const fixed=(n,d=2)=>Number(n).toFixed(d);
+  const tick=n=>Math.abs(n)<1e-10?'0':Number(n.toPrecision(3)).toString();
+  function canvas(svg,xlim,ylim,xlabel,ylabel){
+    // Keep chart lettering readable as the experiment stacks on small screens.
+    const available=svg.getBoundingClientRect().width||600;
+    svg.setAttribute('viewBox',`0 0 ${Math.max(360,Math.min(600,available))} 350`);
+    const width=svg.viewBox.baseVal.width,height=svg.viewBox.baseVal.height;
+    const L=68,R=22,T=30,B=57,W=width-L-R,H=height-T-B;
+    const x=v=>L+(v-xlim[0])/(xlim[1]-xlim[0])*W,y=v=>T+H-(v-ylim[0])/(ylim[1]-ylim[0])*H;
+    let markup='';
+    for(let i=0;i<=4;i++){
+      const xv=xlim[0]+i*(xlim[1]-xlim[0])/4,yv=ylim[0]+i*(ylim[1]-ylim[0])/4;
+      markup+=`<path d="M ${L} ${y(yv)} H ${L+W}" stroke="${colors.grid}"/><text x="${L-10}" y="${y(yv)+6}" text-anchor="end">${tick(yv)}</text><text x="${x(xv)}" y="${T+H+25}" text-anchor="middle">${tick(xv)}</text>`;
+    }
+    markup+=`<path d="M ${L} ${T} V ${T+H} H ${L+W}" fill="none" stroke="#a6b8b2"/><text x="${L+W/2}" y="${height-8}" text-anchor="middle">${xlabel}</text><text x="${L}" y="18">${ylabel}</text>`;
+    const group=document.createElementNS('http://www.w3.org/2000/svg','g');
+    group.setAttribute('fill',colors.muted);group.setAttribute('font-family','system-ui, sans-serif');group.setAttribute('font-size','16');group.innerHTML=markup;
+    svg.querySelectorAll('g').forEach(n=>n.remove());svg.append(group);
+    return {x,y,group,L,W,T,H};
+  }
+  function path(plot,points,color,dash='',fill='none'){
+    const d=points.map((p,i)=>`${i?'L':'M'}${plot.x(p[0]).toFixed(2)},${plot.y(p[1]).toFixed(2)}`).join(' ');
+    const el=document.createElementNS('http://www.w3.org/2000/svg','path');
+    el.setAttribute('d',d);el.setAttribute('stroke',color);el.setAttribute('stroke-width','3');el.setAttribute('fill',fill);el.setAttribute('stroke-linejoin','round');if(dash)el.setAttribute('stroke-dasharray',dash);plot.group.append(el);
+  }
+  function densityChart(id,curves){
+    const lo=Math.min(...curves.map(c=>c.mean-4*c.sd)),hi=Math.max(...curves.map(c=>c.mean+4*c.sd));
+    const ymax=Math.max(...curves.map(c=>M.gaussian(c.mean,c.mean,c.sd)))*1.15;
+    const plot=canvas($(id),[lo,hi],[0,ymax],'Hidden quantity θ','Probability density');
+    curves.forEach(c=>{
+      const points=Array.from({length:801},(_,i)=>{const x=lo+(hi-lo)*i/800;return [x,M.gaussian(x,c.mean,c.sd)];});
+      path(plot,points,c.color,c.dash);
+    });
+  }
+  const bayesIDs=['prior-mean','prior-sd','observation','noise-sd'];
+  function parameters(){return bayesIDs.map(id=>Number($(id).value));}
+  function renderBayes(){
+    const [mu,s0,y,sy]=parameters(),p=M.posterior(mu,s0,y,sy);
+    bayesIDs.forEach(id=>$(id+'-out').textContent=fixed($(id).value));
+    $('post-mean').textContent=fixed(p.mean);$('post-sd').textContent=fixed(p.sd);$('post-gain').textContent=Math.round(p.gain*100)+'%';
+    $('bayes-story').textContent=`The observation moves the mean ${fixed(p.gain*100,1)}% of the way from ${tick(mu)} to ${tick(y)}. Posterior SD is ${fixed(p.sd)}, compared with prior SD ${fixed(s0)} and measurement SD ${fixed(sy)}.`;
+    $('bayes-desc').textContent=`Prior mean ${fixed(mu)}, SD ${fixed(s0)}; observation ${fixed(y)}, noise SD ${fixed(sy)}; posterior mean ${fixed(p.mean)}, SD ${fixed(p.sd)}.`;
+    densityChart('bayes-chart',[{mean:mu,sd:s0,color:colors.ochre,dash:'10 6'},{mean:y,sd:sy,color:colors.muted,dash:'2 7'},{mean:p.mean,sd:p.sd,color:colors.teal}]);
+    renderVI();
+  }
+  bayesIDs.forEach(id=>$(id).addEventListener('input',renderBayes));
+  function preset(noise){[10,2,14,noise].forEach((v,i)=>$(bayesIDs[i]).value=v);renderBayes();}
+  $('reliable').addEventListener('click',()=>preset(1));$('noisy').addEventListener('click',()=>preset(4));$('bayes-reset').addEventListener('click',()=>preset(1));
+  function renderVI(){
+    const [mu,s0,y,sy]=parameters(),m=Number($('q-mean').value),s=Number($('q-sd').value),p=M.posterior(mu,s0,y,sy),r=M.variational(mu,s0,y,sy,m,s);
+    $('q-mean-out').textContent=fixed(m);$('q-sd-out').textContent=fixed(s);
+    ['accuracy','complexity','elbo','evidence','gap'].forEach(k=>$('vi-'+k).textContent=fixed(r[k],3));
+    $('vi-story').textContent=`F = ${fixed(r.accuracy,3)} − ${fixed(r.complexity,3)} = ${fixed(r.elbo,3)} nats. Log evidence − F = ${fixed(r.gap,3)} nats, the KL divergence from q to the posterior.${r.gap<1e-9?' The two distributions match: the bound is tight.':''}`;
+    $('vi-desc').textContent=`Approximation mean ${fixed(m)}, SD ${fixed(s)}; exact posterior mean ${fixed(p.mean)}, SD ${fixed(p.sd)}; KL gap ${fixed(r.gap,3)} nats.`;
+    densityChart('vi-chart',[{mean:m,sd:s,color:colors.ochre,dash:'10 6'},{mean:p.mean,sd:p.sd,color:colors.teal}]);
+  }
+  ['q-mean','q-sd'].forEach(id=>$(id).addEventListener('input',renderVI));
+  $('q-match').addEventListener('click',()=>{const p=M.posterior(...parameters());$('q-mean').value=p.mean;$('q-sd').value=p.sd;renderVI();});
+  $('q-prior').addEventListener('click',()=>{const [mu,s]=parameters();$('q-mean').value=mu;$('q-sd').value=s;renderVI();});
+  let theta=[1,.2],iterations=0,timer=null,finished=false;
+  function fitParams(){return [Number($('fit-noise').value),Number($('prior-strength').value)];}
+  function stop(){if(timer!==null)clearInterval(timer);timer=null;$('fit-run').textContent='Run fit';}
+  function renderFit(){
+    const [noise,precision]=fitParams(),stats=M.fitStats(theta,noise,precision),[a,k]=theta,[c00,c01,c11]=stats.cov;
+    $('fit-noise-out').textContent=fixed(noise);$('prior-strength-out').textContent=fixed(precision);
+    $('fit-a').textContent=fixed(a,3);$('fit-k').textContent=fixed(k,3);$('fit-cost').textContent=fixed(stats.cost,3);
+    $('fit-a-sd').textContent=`Local SD ${fixed(Math.sqrt(c00),3)}`;$('fit-k-sd').textContent=`Local SD ${fixed(Math.sqrt(c11),3)} s⁻¹`;
+    $('fit-status').textContent=`${iterations} step${iterations===1?'':'s'} · ${finished?'converged':timer!==null?'running':iterations?'paused':'initial parameters'}`;
+    $('fit-step').disabled=finished;$('fit-run').disabled=finished;
+    const predictions=Array.from({length:201},(_,i)=>{let t=i*5/200;return [t,a*Math.exp(-k*t)];});
+    const allY=[...M.observations,...predictions.map(p=>p[1]),2.5],ylo=Math.min(0,...allY)-.08,yhi=Math.max(...allY)*1.12;
+    const plot=canvas($('fit-chart'),[0,5],[ylo,yhi],'Time t (s)','Response (arbitrary units)');
+    path(plot,Array.from({length:201},(_,i)=>{let t=i*5/200;return[t,2.5*Math.exp(-.65*t)];}),colors.ochre,'9 6');path(plot,predictions,colors.teal);
+    M.times.forEach((t,i)=>{const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',plot.x(t));dot.setAttribute('cy',plot.y(M.observations[i]));dot.setAttribute('r','4.5');dot.setAttribute('fill',colors.ink);plot.group.append(dot);});
+    const radius=Math.sqrt(5.991464547),l00=Math.sqrt(c00),l10=c01/l00,l11=Math.sqrt(Math.max(0,c11-l10*l10));
+    const da=radius*Math.sqrt(c00),dk=radius*Math.sqrt(c11);
+    const ellipse=canvas($('ellipse-chart'),[a-da*1.25,a+da*1.25],[k-dk*1.25,k+dk*1.25],'Amplitude A','Decay rate k (s⁻¹)');
+    const points=Array.from({length:181},(_,i)=>{const phi=2*Math.PI*i/180;return[a+radius*l00*Math.cos(phi),k+radius*(l10*Math.cos(phi)+l11*Math.sin(phi))];});
+    path(ellipse,points,colors.teal,'','#e5f1ef');
+    const center=document.createElementNS('http://www.w3.org/2000/svg','circle');center.setAttribute('cx',ellipse.x(a));center.setAttribute('cy',ellipse.y(k));center.setAttribute('r','4');center.setAttribute('fill',colors.teal);ellipse.group.append(center);
+    $('ellipse-desc').textContent=`Local Gaussian contour centred at amplitude ${fixed(a,3)}, decay rate ${fixed(k,3)}. Marginal SDs ${fixed(Math.sqrt(c00),3)} and ${fixed(Math.sqrt(c11),3)}. ${finished?'Fit converged.':'Fit has not yet converged.'}`;
+    $('fit-desc').textContent=`Ten synthetic observations and current prediction A=${fixed(a,3)}, k=${fixed(k,3)}. Objective ${fixed(stats.cost,3)} after ${iterations} steps.`;
+  }
+  function step(){
+    if(finished)return;
+    const [noise,precision]=fitParams(),result=M.fitStep(theta,noise,precision,$('fit-method').value);
+    theta=result.theta;iterations++;finished=result.done||iterations>=3000;
+    if(finished)stop();renderFit();
+    if(iterations>=3000)$('fit-status').textContent=`${iterations} steps · iteration limit`;
+  }
+  function resetFit(){stop();theta=[1,.2];iterations=0;finished=false;renderFit();}
+  $('fit-step').addEventListener('click',step);$('fit-reset').addEventListener('click',resetFit);
+  $('fit-run').addEventListener('click',()=>{if(timer!==null){stop();renderFit();return;}timer=setInterval(()=>{const steps=$('fit-method').value==='gradient'?5:1;for(let i=0;i<steps&&!finished;i++)step();},120);renderFit();});
+  ['fit-noise','prior-strength'].forEach(id=>$(id).addEventListener('input',resetFit));$('fit-method').addEventListener('change',resetFit);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&timer!==null){stop();renderFit();}});
+  let resizeTimer;
+  window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{renderBayes();renderFit();},100);});
+  const links=[...document.querySelectorAll('.chapter-rail a')];
+  if('IntersectionObserver' in window){
+    const observer=new IntersectionObserver(entries=>{entries.filter(e=>e.isIntersecting).forEach(e=>links.forEach(a=>{const active=a.hash==='#'+e.target.id;a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');}));},{rootMargin:'-10% 0px -70% 0px'});document.querySelectorAll('.chapter').forEach(s=>observer.observe(s));}
+  renderBayes();renderFit();
+})();
+</script>
+</body></html>
