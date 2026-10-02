@@ -65,14 +65,178 @@ Why can the evidence be difficult to calculate?
 <p><span class="chapter-no">02 / Read the expression</span></p>
 <h2 id="what-does-etoppi-e-mean">What does <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mi>⊤</mi></msup><mi>Π</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">e^\top\Pi e</annotation></semantics></math> mean?</h2>
 <p class="standfirst">
-It is a prediction-error score that takes uncertainty into account.
+<p>
+  It is a prediction-error score that takes uncertainty into account.
 </p>
-<p>Let <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>y</mi><mo>−</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">e=y-f(\theta)</annotation></semantics></math> be the difference between the observed data and the model’s prediction. Write <strong>precision</strong> as <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Π</mi><annotation encoding="application/x-tex">\Pi</annotation></semantics></math> (capital pi), rather than <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>. Precision is inverse variance for a scalar, or inverse covariance for a vector:</p>
-<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>=</mo><mfrac><mn>1</mn><msup><mi>σ</mi><mn>2</mn></msup></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mi>Π</mi><mo>=</mo><msup><mi>Σ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\pi=\frac{1}{\sigma^2},\qquad \Pi=\Sigma^{-1}.</annotation></semantics></math></div>
-<p>Small variance means high precision. Under the model, a precise measurement is expected to be close to its prediction, so the same error counts more strongly. Low precision makes a given mismatch less surprising.</p>
-<p>For a single error, the expression is just <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><msup><mi>e</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\pi e^2</annotation></semantics></math>. If <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">e=2</annotation></semantics></math>, a standard deviation of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math> gives a score of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>. A standard deviation of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math> gives a score of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.25</mn><annotation encoding="application/x-tex">0.25</annotation></semantics></math>. The error has not changed; its meaning has changed because the expected uncertainty is different.</p>
-<p>For a vector, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>e</mi><mi>⊤</mi></msup><annotation encoding="application/x-tex">e^\top</annotation></semantics></math> is the same vector written as a row. Multiplication produces one scalar score. For independent errors, this reduces to a weighted sum:</p>
-<div class="math display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mi>⊤</mi></msup><mi>Π</mi><mi>e</mi><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>π</mi><mi>i</mi></msub><msubsup><mi>e</mi><mi>i</mi><mn>2</mn></msubsup><mspace width="2.0em"></mspace><mrow><mtext mathvariant="normal">when </mtext><mspace width="0.333em"></mspace></mrow><mi>Π</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> is diagonal</mtext></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">e^\top\Pi e=\sum_i\pi_i e_i^2\qquad\text{when }\Pi\text{ is diagonal}.</annotation></semantics></math></div>
+
+<p>
+  Let
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <mi>e</mi><mo>=</mo><mi>y</mi><mo>−</mo>
+        <mi>f</mi><mrow><mo>(</mo><mi>θ</mi><mo>)</mo></mrow>
+      </mrow>
+      <annotation encoding="application/x-tex">e = y - f(\theta)</annotation>
+    </semantics>
+  </math>
+  be the prediction error: the difference between the observed data
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mi>y</mi>
+  </math>
+  and the model's prediction
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>f</mi><mo>(</mo><mi>θ</mi><mo>)</mo></mrow>
+  </math>.
+</p>
+
+<p>
+  The <strong>precision</strong> describes how certain we are about that observation.
+  For a scalar variable, precision is the inverse of the variance:
+</p>
+
+<div class="math display">
+  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <mi>π</mi><mo>=</mo>
+        <mfrac>
+          <mn>1</mn>
+          <msup><mi>σ</mi><mn>2</mn></msup>
+        </mfrac>
+        <mi>.</mi>
+      </mrow>
+      <annotation encoding="application/x-tex">\pi = \frac{1}{\sigma^2}.</annotation>
+    </semantics>
+  </math>
+</div>
+
+<p>
+  For a vector of observations, uncertainty is described by a covariance matrix
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mi>Σ</mi>
+  </math>,
+  and the corresponding precision matrix is its inverse:
+</p>
+
+<div class="math display">
+  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <mi>Π</mi><mo>=</mo>
+        <msup>
+          <mi>Σ</mi>
+          <mrow><mo>−</mo><mn>1</mn></mrow>
+        </msup>
+        <mi>.</mi>
+      </mrow>
+      <annotation encoding="application/x-tex">\Pi = \Sigma^{-1}.</annotation>
+    </semantics>
+  </math>
+</div>
+
+<p>
+  Small variance therefore means high precision. If an observation is expected
+  to be very reliable, even a modest prediction error is informative. If the
+  observation is noisy or uncertain, the same prediction error carries less weight.
+</p>
+
+<p>
+  For a single observation, the precision-weighted squared prediction error is
+</p>
+
+<div class="math display">
+  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <mi>π</mi><msup><mi>e</mi><mn>2</mn></msup><mi>.</mi>
+      </mrow>
+      <annotation encoding="application/x-tex">\pi e^2.</annotation>
+    </semantics>
+  </math>
+</div>
+
+<p>
+  For example, suppose the prediction error is
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>e</mi><mo>=</mo><mn>2</mn></mrow>
+  </math>.
+  If the standard deviation is
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>σ</mi><mo>=</mo><mn>1</mn></mrow>
+  </math>,
+  then
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>π</mi><mo>=</mo><mn>1</mn></mrow>
+  </math>
+  and the precision-weighted error is
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mn>4</mn>
+  </math>.
+  If instead
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>σ</mi><mo>=</mo><mn>4</mn></mrow>
+  </math>,
+  then
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow><mi>π</mi><mo>=</mo><mfrac><mn>1</mn><mn>16</mn></mfrac></mrow>
+  </math>
+  and the score becomes
+  <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+    <mn>0.25</mn>
+  </math>.
+  The prediction error itself has not changed; what has changed is how strongly
+  that error should influence our inference.
+</p>
+
+<p>
+  For a vector of prediction errors, the same idea becomes
+</p>
+
+<div class="math display">
+  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <msup><mi>e</mi><mi>⊤</mi></msup>
+        <mi>Π</mi>
+        <mi>e</mi><mi>.</mi>
+      </mrow>
+      <annotation encoding="application/x-tex">e^\top \Pi e.</annotation>
+    </semantics>
+  </math>
+</div>
+
+<p>
+  This produces a single scalar measuring the overall mismatch between the data
+  and the model, while accounting for the uncertainty and covariance of the observations.
+  If the errors are independent, the precision matrix is diagonal and the expression
+  reduces to a weighted sum of squared errors:
+</p>
+
+<div class="math display">
+  <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <msup><mi>e</mi><mi>⊤</mi></msup>
+        <mi>Π</mi>
+        <mi>e</mi>
+        <mo>=</mo>
+        <munderover>
+          <mo>∑</mo>
+          <mi>i</mi>
+          <mrow></mrow>
+        </munderover>
+        <msub><mi>π</mi><mi>i</mi></msub>
+        <msubsup><mi>e</mi><mi>i</mi><mn>2</mn></msubsup>
+        <mi>.</mi>
+      </mrow>
+      <annotation encoding="application/x-tex">
+        e^\top \Pi e = \sum_i \pi_i e_i^2.
+      </annotation>
+    </semantics>
+  </math>
+</div>
+
 <div class="callout">
 <p><strong>Three expressions, three roles</strong></p>
 <ul>
