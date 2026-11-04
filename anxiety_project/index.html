@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Predictive coding, prediction errors, and an MSc computational psychiatry study of anxiety symptoms and learning from uncertain reward feedback.">
+  <meta name="theme-color" content="#f5f3ed">
+  <title>Prediction, Learning and Anxiety · MSc Project Guide</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap');
+:root{--paper:#f5f3ed;--white:#fffef9;--ink:#183937;--muted:#657472;--line:#d9dfd7;--teal:#1f7167;--pale:#e5eee6;--coral:#bc624c;--warm:#efdfcb;--lime:#dbe7b1;--serif:'Libre Caslon Display',Georgia,serif;--sans:'DM Sans',Arial,sans-serif;scroll-behavior:smooth}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-underline-offset:4px}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:default}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--coral);outline-offset:5px}::selection{background:var(--lime)}.skip{position:absolute;top:-80px;left:20px;z-index:30;background:var(--ink);color:var(--white);padding:12px}.skip:focus{top:10px}.topbar{height:92px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 5vw;background:var(--paper);gap:24px}.brand{display:flex;align-items:center;gap:13px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.11em;line-height:1.5}.brand-mark{display:grid;place-items:center;width:38px;height:38px;background:var(--ink);color:var(--lime);border-radius:50%;font-size:25px;font-weight:400}.brand-sub{display:block;font-size:10px;color:var(--muted);letter-spacing:.08em;font-weight:400;margin-top:2px}.top-links{display:flex;align-items:center;gap:28px;font-size:12px}.top-links>a{text-decoration:none}.status{font-size:10px;letter-spacing:.06em;border:1px solid #b6c9b9;padding:6px 11px;border-radius:20px;background:#edf1e6;white-space:nowrap}.page-layout{display:grid;grid-template-columns:190px minmax(0,1fr);max-width:1450px;margin:auto;padding:0 5vw;gap:4vw}.sidebar{position:sticky;top:35px;align-self:start;padding-top:54px;font-size:12px}.side-label{font-size:9px;letter-spacing:.14em;color:var(--muted);margin-bottom:20px}.sidebar nav{display:flex;flex-direction:column;gap:13px}.sidebar a{text-decoration:none;display:flex;gap:12px;align-items:center;color:var(--muted);line-height:1.5;padding:3px 0}.sidebar a span{font-size:10px;letter-spacing:.05em;color:#80918b}.sidebar a:hover{color:var(--ink)}.side-note{font-size:11px;line-height:1.9;color:var(--muted);border-top:1px solid var(--line);margin-top:32px;padding-top:20px}.side-note strong{color:var(--ink);font-weight:500}main{min-width:0}.hero{position:relative;padding:58px 0 48px;min-height:695px;border-bottom:1px solid var(--line)}.eyebrow{font-size:9px;font-weight:600;letter-spacing:.12em;display:flex;align-items:center;gap:9px;max-width:100%;line-height:1.7}.tiny-dot{height:6px;width:6px;border-radius:50%;background:var(--coral);flex-shrink:0}h1{font:400 clamp(58px,6vw,83px)/.99 var(--serif);letter-spacing:-.028em;margin:32px 0 22px;position:relative;z-index:1;width:67%}h1 em,h2 em{color:var(--teal);font-weight:400}h1 em{display:inline-block;padding-bottom:7px}.hero-intro{font-size:14px;line-height:1.85;max-width:350px;margin:0 0 24px;position:relative;z-index:1}.button{display:inline-flex;align-items:center;justify-content:space-between;gap:23px;text-decoration:none;font-size:12px;padding:13px 19px;border-radius:3px;font-weight:500;position:relative;z-index:1}.button.primary{background:var(--ink);color:var(--white)}.button.primary:hover{background:var(--teal)}.hero-meta{display:flex;flex-wrap:wrap;gap:7px 20px;font-size:10px;color:var(--muted);margin-top:36px;padding-top:20px;border-top:1px solid var(--line);position:relative;z-index:1}.hero-meta span+span:before{content:'·';margin-right:17px}.hero-art{position:absolute;right:-1%;top:148px;width:46%;height:365px;background:radial-gradient(ellipse at center,#e4ebdb 0%,#e9edde 45%,transparent 72%)}.art-caption{font-size:7px;letter-spacing:.12em;color:var(--muted);text-align:center;position:absolute;top:0;width:100%}.art-choice{position:absolute;background:var(--white);width:130px;height:205px;top:43px;left:3%;border:1px solid #e2e5d8;border-radius:10px;padding:16px;box-shadow:0 12px 28px #1839370a;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-9deg)}.art-b{left:auto;right:1%;top:72px;transform:rotate(10deg);background:#e8eddf}.art-choice>span:not(.art-symbol){font-size:9px;font-weight:500;margin:5px 0}.art-symbol{font-size:27px;color:var(--teal);line-height:1}.art-b .art-symbol{color:var(--coral)}.art-choice strong{font-size:42px;font-weight:500;line-height:1.2;letter-spacing:-.06em}.art-choice strong span{font-size:17px;margin-left:2px}.art-choice small{font-size:7px;color:var(--muted);margin-top:8px}.art-switch{position:absolute;bottom:42px;text-align:center;width:100%;font-size:9px;color:var(--ink)}.art-switch>span{display:block;font-size:30px;line-height:1.3;color:var(--teal)}.art-note{position:absolute;bottom:0;left:0;width:100%;text-align:center;font-size:9px;color:var(--muted)}.chapter{padding:64px 0;border-bottom:1px solid var(--line);scroll-margin-top:20px}.section-kicker{font-size:9px;font-weight:600;color:var(--teal);letter-spacing:.13em;line-height:1.6;margin-bottom:17px}h2{font:400 clamp(34px,3.4vw,48px)/1.13 var(--serif);letter-spacing:-.02em;margin:0 0 25px}h3{font-size:16px;line-height:1.5;letter-spacing:-.015em;font-weight:500;margin:0 0 8px}p{margin:0 0 19px;font-size:14px;line-height:1.9;max-width:710px}strong{font-weight:600}.three-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:27px;margin:33px 0 25px}.three-steps>div{border-top:1px solid #9fae9f;padding-top:14px}.step-index{display:block;font:400 29px/1.4 var(--serif);color:var(--teal);margin-bottom:14px}.three-steps h3{font-size:14px}.three-steps p{font-size:12px;line-height:1.8;margin:0}.margin-note{font-size:12px;line-height:1.8;color:var(--muted);border-left:2px solid #afc6b5;padding-left:15px;margin-top:23px}.cite{font-size:10px;color:var(--teal);text-decoration:none;vertical-align:super;margin-left:3px;white-space:nowrap}.definition{background:var(--pale);padding:26px 30px;margin:27px 0;border-radius:4px}.definition-label{font-size:8px;letter-spacing:.13em;color:var(--teal);display:block;margin-bottom:10px}.definition h3{font:400 27px/1.3 var(--serif)}.definition p{margin:0;font-size:13px}blockquote{margin:31px 0;padding:2px 0 2px 24px;border-left:3px solid var(--coral);font:400 29px/1.4 var(--serif);max-width:690px}blockquote span{display:block;font:500 8px/1.6 var(--sans);letter-spacing:.13em;color:var(--muted);margin-bottom:12px}details{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:24px 0 0}details+details{border-top:0;margin-top:0}summary{padding:16px 25px 16px 0;font-size:12px;font-weight:500;cursor:pointer;line-height:1.7}details p{font-size:12px;line-height:1.85;margin:0 0 18px}details[open] summary{margin-bottom:1px}details .formula{font-size:13px;line-height:1.8;overflow-wrap:anywhere;margin-bottom:15px}.task-demo{background:var(--ink);color:var(--white);border-radius:8px;padding:25px 28px;margin:29px 0 20px}.demo-top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.demo-badge{font-size:8px;font-weight:500;letter-spacing:.1em;color:var(--teal)}.task-demo .demo-badge{color:var(--lime)}.demo-stats{display:flex;gap:23px;font-size:10px;color:#bfd1c6}.demo-stats strong{color:var(--white);margin-left:5px;font-size:12px}.choice-buttons{display:flex;justify-content:center;gap:30px;padding:34px 0 22px}.symbol-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;border:1px solid #88a599;background:#f5f3ed;color:var(--ink);border-radius:8px;width:142px;height:150px;font-size:12px;transition:transform .15s,background .15s}.symbol-button:hover{transform:translateY(-3px);background:var(--lime)}.symbol-button:disabled{opacity:.55;transform:none}.choice-symbol{font-size:45px;line-height:1.2;color:var(--teal)}#try-b .choice-symbol{color:var(--coral)}.demo-feedback{text-align:center;min-height:46px;font-size:13px;color:var(--white);padding:8px 0 12px}.history-label{font-size:9px;color:#bfd1c6;margin-bottom:8px}.demo-history{display:flex;gap:5px;flex-wrap:wrap;min-height:30px}.demo-history>span{display:inline-flex;align-items:center;justify-content:center;padding:3px 6px;border-radius:3px;background:#294b46;font-size:10px;color:var(--white);min-width:29px}.demo-history .rewarded{background:#dbe7b1;color:var(--ink)}.demo-bottom{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-top:18px}.text-button{border:0;border-bottom:1px solid currentColor;background:none;color:var(--white);font-size:10px;padding:4px 0;white-space:nowrap}.demo-bottom details{margin:0;border:0;max-width:65%;color:var(--white)}.demo-bottom summary{font-size:10px;padding:3px 0}.demo-bottom details p{color:#d2e0d7;font-size:11px;margin-top:12px}.two-thoughts{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin:31px 0 14px}.two-thoughts>div{border-top:1px solid var(--line);padding-top:15px}.two-thoughts span{font-size:8px;color:var(--muted);letter-spacing:.08em}.two-thoughts h3{font-family:var(--serif);font-weight:400;font-size:24px;margin:12px 0}.two-thoughts p{font-size:12px}.word-equation{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:12px;margin:26px 0}.word-equation span{padding:10px 12px;border-radius:3px;background:#e8ebe2}.word-equation .equation-result{background:var(--ink);color:var(--white)}.word-equation b{font-weight:400;font-size:22px}.plain-list{padding-left:19px;font-size:13px;line-height:1.9;margin-bottom:22px}.plain-list li+li{margin-top:8px}.calculator{margin:27px 0;padding:24px 27px;background:var(--white);border:1px solid var(--line);border-radius:6px}.interactive-heading h3{font-size:14px;margin:5px 0 22px}.calculator-controls{display:grid;grid-template-columns:1fr 1fr;gap:20px 30px}.calculator-controls label{font-size:11px;display:block}.calculator-controls label strong{float:right;font-size:12px}.calculator-controls label:last-child{grid-column:1/-1;max-width:49%}input[type=range]{display:block;width:100%;accent-color:var(--teal);height:25px;min-width:0;margin:8px 0;cursor:pointer}select{display:block;width:100%;padding:7px 8px;margin-top:9px;border:1px solid var(--line);border-radius:3px;color:var(--ink);background:var(--paper);font-size:11px}.calculation-results{display:flex;align-items:center;gap:30px;border-top:1px solid var(--line);padding-top:20px;margin-top:18px}.calculation-results>div{display:flex;flex-direction:column}.calculation-results span{font-size:10px;color:var(--muted)}.calculation-results strong{font-size:35px;font-weight:500;color:var(--teal);line-height:1.6}.calculation-results .result-arrow{font-size:27px}.calculation-equation{font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.model-rule{background:var(--pale);padding:22px 26px;border-radius:4px;margin:28px 0}.model-rule>span{font-size:8px;letter-spacing:.12em;color:var(--teal)}.model-rule p{font-size:14px;line-height:1.8;margin:8px 0 12px}.model-rule code{font-size:13px;color:var(--teal);white-space:normal;overflow-wrap:anywhere}.parameter-heading{display:flex;gap:17px;align-items:center;margin:39px 0 18px}.parameter-letter{font:400 42px/1 var(--serif);color:var(--teal);width:50px;flex-shrink:0}.parameter-letter.beta{color:var(--coral)}.parameter-heading .section-kicker{margin-bottom:5px;font-size:8px}.parameter-heading h3{font-size:17px;margin:0}.curve-demo{margin:25px 0}.range-heading{display:flex;justify-content:space-between;font-size:11px;max-width:330px}.range-heading strong{font-variant-numeric:tabular-nums}.curve-demo>input{max-width:330px}.chart-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:9px;color:var(--muted);margin:19px 0 0}.chart-legend>span{display:flex;align-items:center;gap:5px}.legend-line{display:inline-block;width:18px;border-top:2px solid var(--teal)}.legend-line.dashed{border-top:1px dashed var(--muted)}.legend-dot{display:inline-block;width:4px;height:4px;background:var(--muted);border-radius:50%}#learning-chart{width:100%;display:block;min-height:220px;overflow:visible}.microcopy{font-size:10px;line-height:1.8;color:var(--muted);margin:10px 0 0}.beta-demo{padding:22px 25px;border:1px solid var(--line);background:var(--white);border-radius:5px;margin:23px 0}.beta-demo>input{max-width:330px}.beta-demo .microcopy{margin-bottom:18px}.probability-row{display:flex;justify-content:space-between;align-items:center;margin:15px 0 7px;gap:15px;font-size:12px}.probability-row>div{display:flex;align-items:center;gap:10px}.probability-row span{font-size:10px;color:var(--muted)}.probability-track{height:7px;border-radius:5px;background:#e3e9e0;overflow:hidden}.probability-track>div{height:100%;background:var(--teal);transition:width .18s}.probability-track.secondary>div{background:var(--coral)}.study-table-wrap{margin:30px 0;overflow:auto}.study-table{width:100%;border-collapse:collapse;text-align:left;font-size:12px;line-height:1.7;min-width:540px}.study-table caption{text-align:left;font-size:10px;color:var(--muted);margin-bottom:12px}.study-table th{font-size:9px;letter-spacing:.04em;font-weight:500;padding:12px 13px;border-bottom:1px solid #acbcae;color:var(--muted)}.study-table td{padding:19px 13px;vertical-align:top;border-bottom:1px solid var(--line)}.study-table td:first-child{width:20%;padding-left:0}.study-table td:nth-child(2){width:47%}.study-table td span:not(.table-label){display:block;font-size:11px;color:var(--muted);margin-top:6px}.table-label{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);font-weight:500}.protocol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:32px 0}.protocol>div{display:flex;flex-direction:column;border-top:1px solid #acbcae;padding-top:12px}.protocol span{font-size:9px;color:var(--teal);margin-bottom:9px}.protocol strong{font-size:11px;line-height:1.6;font-weight:500}.protocol small{font-size:9px;color:var(--muted);margin-top:5px;line-height:1.7}.analysis-steps{padding:0;list-style:none;counter-reset:analysis;margin:28px 0 30px}.analysis-steps li{counter-increment:analysis;padding:19px 0 19px 46px;position:relative;border-top:1px solid var(--line);font-size:12px;line-height:1.9}.analysis-steps li:before{content:counter(analysis,decimal-leading-zero);position:absolute;left:0;top:17px;font:400 24px/1.5 var(--serif);color:var(--teal)}.analysis-steps li span{font-weight:600;display:block;font-size:13px;margin-bottom:3px}.distinction{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:35px 0}.distinction>div{border-top:2px solid var(--teal);padding-top:18px}.distinction>div+div{border-color:var(--coral)}.distinction h3{font-size:15px}.distinction .section-kicker{font-size:8px;margin-bottom:9px}.distinction p{font-size:12px;margin:0}.takeaway{display:flex;gap:22px;background:var(--pale);padding:26px;border-radius:5px;margin:30px 0}.takeaway-mark{font-size:31px;line-height:1.4;color:var(--teal)}.takeaway p{font-size:14px;line-height:1.8;margin:0}.takeaway p>span{font-size:11px;color:var(--muted);display:block;line-height:1.9;margin-top:10px}.next-steps{margin:33px 0}.next-item{display:flex;gap:24px;padding:22px 0;border-top:1px solid var(--line)}.next-number{font:400 30px/1.2 var(--serif);color:var(--teal);min-width:25px}.next-item h3{font-size:15px}.next-item p{font-size:12px;margin:0 0 12px}.state{font-size:8px;letter-spacing:.04em;border:1px solid var(--line);padding:4px 9px;border-radius:14px}.state.current{background:var(--lime);border-color:var(--lime)}.project-note{border-left:2px solid #afc6b5;padding:0 0 0 18px;margin-top:30px}.project-note>strong{font-size:11px}.project-note p{font-size:11px;color:var(--muted);margin:6px 0 0}.references{list-style:none;padding:0;margin:30px 0 0;counter-reset:reference}.references li{border-top:1px solid var(--line);padding:20px 0}.reference-tag{display:block;font-size:8px;letter-spacing:.09em;color:var(--teal);margin-bottom:8px}.references a{font-size:13px;text-decoration:none;font-weight:500;line-height:1.75;display:block}.references a:hover{text-decoration:underline}.references p{font-size:11px;color:var(--muted);margin:7px 0 0;line-height:1.8}.footer{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:35px 0 45px}.footer-brand{text-decoration:none;font-size:9px;letter-spacing:.09em;font-weight:600}.footer-brand span{margin-left:10px}.footer>span{font-size:9px;color:var(--muted);text-align:right;line-height:1.7}
+@media(min-width:1450px){.page-layout{gap:65px;padding:0 70px}.hero{min-height:730px}.hero-art{right:1%;width:43%;top:165px}.art-choice{width:150px;height:225px}.art-b{right:0;top:80px}.hero-intro{max-width:400px}}
+@media(max-width:1100px){.page-layout{grid-template-columns:145px minmax(0,1fr);gap:30px;padding:0 4vw}.topbar{padding:0 4vw}.sidebar{font-size:10px}.sidebar a{gap:9px}.sidebar nav{gap:14px}.hero-art{width:42%;right:-2%;top:180px}.art-choice{width:115px;height:180px;padding:10px}.art-b{right:-1%}.art-caption{font-size:6px}.hero-intro{max-width:310px}h1{font-size:65px}.hero{min-height:680px}.hero-meta{font-size:9px;gap:7px 12px}.hero-meta span+span:before{margin-right:10px}.protocol{grid-template-columns:repeat(3,1fr);row-gap:18px}}
+@media(max-width:850px){.page-layout{display:block;max-width:760px;padding:0 7vw}.sidebar{display:none}.topbar{padding:0 7vw;height:80px}.top-links{gap:20px}.top-links>a:first-child{display:none}.hero{min-height:660px}.hero-art{top:170px;width:44%;right:0}.art-choice{width:125px;height:190px}.art-b{right:0}.hero-intro{max-width:330px}h1{font-size:70px}.hero-meta{font-size:9px}.chapter{padding:55px 0}.eyebrow{font-size:8px}.section-kicker{font-size:8px}}
+@media(max-width:600px){body{font-size:15px}.topbar{padding:0 6vw;height:74px;gap:10px}.brand{font-size:10px;letter-spacing:.08em;gap:9px}.brand-mark{width:31px;height:31px;font-size:21px}.brand-sub{font-size:8px}.top-links{gap:0}.top-links>a{display:none}.status{font-size:8px;padding:4px 8px}.page-layout{padding:0 6vw}.hero{padding-top:36px;min-height:0;padding-bottom:28px}.eyebrow{font-size:7px;letter-spacing:.08em;max-width:95%}h1{width:100%;font-size:clamp(51px,12vw,66px);margin:23px 0 19px;line-height:1.03}.hero-intro{max-width:95%;font-size:13px}.hero-art{position:relative;top:auto;right:auto;width:100%;max-width:330px;height:315px;margin:25px auto 0}.art-choice{width:127px;height:180px;top:35px;left:15%}.art-b{top:65px;left:auto;right:10%}.art-caption{font-size:7px}.art-switch{bottom:25px;font-size:9px}.art-note{font-size:8px}.hero-meta{margin-top:20px;padding-top:17px;gap:8px 16px}.hero-meta span+span:before{display:none}.button{font-size:11px;padding:12px 16px}.chapter{padding:42px 0;scroll-margin-top:10px}h2{font-size:36px;margin-bottom:22px}p{font-size:13px;line-height:1.9}.three-steps{grid-template-columns:1fr;gap:16px;margin:25px 0}.three-steps>div{display:grid;grid-template-columns:35px 1fr;gap:0 12px;padding-top:13px}.step-index{grid-row:1/3;margin:0;font-size:24px}.three-steps h3{margin:0 0 5px}.three-steps p{font-size:12px}.definition{padding:23px 20px}.definition p{font-size:12px}.definition h3{font-size:25px}blockquote{font-size:26px;padding-left:18px}.margin-note{font-size:11px}.task-demo{padding:20px 17px}.demo-top{gap:12px}.demo-badge{font-size:7px}.demo-stats{gap:18px;font-size:9px}.demo-stats strong{font-size:11px}.choice-buttons{gap:18px;padding:26px 0 15px}.symbol-button{width:118px;height:133px;gap:10px;font-size:11px}.choice-symbol{font-size:38px}.demo-feedback{font-size:12px;min-height:50px}.demo-bottom{gap:14px}.demo-bottom details{max-width:62%}.demo-bottom summary{font-size:9px}.demo-bottom details p{font-size:10px}.two-thoughts{grid-template-columns:1fr;gap:4px;margin-top:25px}.two-thoughts h3{font-size:24px;margin:8px 0}.two-thoughts span{font-size:7px}.word-equation{gap:7px;font-size:10px}.word-equation span{padding:8px 9px}.word-equation b{font-size:17px}.plain-list{font-size:12px}.calculator{padding:21px 18px}.calculator-controls{grid-template-columns:1fr;gap:13px}.calculator-controls label:last-child{grid-column:auto;max-width:none}.calculator-controls label{font-size:11px}input[type=range]{height:32px}select{font-size:14px;padding:8px;min-height:40px}.calculation-results{gap:22px}.calculation-results strong{font-size:32px}.calculation-results span{font-size:9px}.calculation-equation{font-size:11px}.model-rule{padding:20px}.model-rule p{font-size:12px}.model-rule code{font-size:12px}.parameter-heading{gap:13px}.parameter-heading h3{font-size:15px}.parameter-letter{font-size:37px;width:33px}.parameter-heading .section-kicker{font-size:7px}.range-heading{max-width:none}.curve-demo>input,.beta-demo>input{max-width:none}.chart-legend{font-size:8px;gap:6px 12px}.microcopy{font-size:9px}#learning-chart{min-height:220px}.beta-demo{padding:20px}.probability-row span{font-size:9px}.protocol{grid-template-columns:repeat(2,1fr);gap:18px}.protocol strong{font-size:11px}.protocol small{font-size:10px}.distinction{grid-template-columns:1fr;gap:22px}.takeaway{padding:21px 18px;gap:14px}.takeaway p{font-size:12px}.takeaway p>span{font-size:10px}.takeaway-mark{font-size:26px}.next-item{gap:17px}.next-item h3{font-size:14px}.next-item p{font-size:12px}.footer{display:block;padding-top:27px}.footer>span{display:block;text-align:left;margin-top:14px}.references a{font-size:12px}.reference-tag{font-size:7px}.study-table{font-size:11px;min-width:520px}}
+@media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+.perception-example{background:var(--warm);border-radius:4px;padding:25px 28px;margin:28px 0}.perception-example .section-kicker{margin-bottom:10px;color:var(--ink)}.perception-example h3{font-size:16px}.perception-example p{font-size:13px;margin-bottom:0}.concept-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;margin:28px 0 33px}.concept-grid>div{padding-top:14px;border-top:1px solid #acbcae}.concept-grid h3{font-size:13px}.concept-grid p{font-size:12px;line-height:1.8;margin-bottom:0}.background-subheading{margin:29px 0 13px}.background-bridge{border-left:2px solid var(--teal);padding-left:20px;margin:28px 0 0}.background-bridge h3{font-size:14px}.background-bridge p{font-size:13px;margin:0}
+@media(max-width:600px){.perception-example{padding:22px 20px}.perception-example h3{font-size:15px}.perception-example p{font-size:12px}.concept-grid{grid-template-columns:1fr;gap:17px;margin:23px 0 27px}.concept-grid h3{font-size:13px;margin-bottom:5px}.concept-grid p{font-size:12px}.background-bridge{padding-left:16px}.background-bridge p{font-size:12px}}
+@media print{body{background:white;color:#111}.topbar,.sidebar,.hero-art,.button,.footer,.skip{display:none}.page-layout{display:block;padding:0}.hero{min-height:0}h1{width:100%;font-size:48px}.chapter{padding:25px 0;break-inside:avoid}.task-demo{background:#eee;color:#111}.task-demo *{color:#111}.study-table-wrap{overflow:visible}.study-table{min-width:0}.references a{color:#111}}
+
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the guide</a>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Learning under uncertainty, beginning of guide"><span class="brand-mark" aria-hidden="true">↗</span><span>CPNS LAB<span class="brand-sub">MSc project field guide</span></span></a>
+    <div class="top-links"><a href="#study">The study</a><a href="#reading">Reading list <span aria-hidden="true">↗</span></a><span class="status">Proposed project</span></div>
+  </header>
+  <div class="page-layout" id="top">
+    <aside class="sidebar" aria-label="On this page">
+      <div class="side-label">CONTENTS</div>
+      <nav>
+        <a href="#predictive-coding"><span>01</span>Predictive coding</a>
+        <a href="#computational-psychiatry"><span>02</span>Computational psychiatry</a>
+        <a href="#anxiety"><span>03</span>Anxiety and uncertainty</a>
+        <a href="#try"><span>04</span>The task</a>
+        <a href="#prediction"><span>05</span>Reward prediction errors</a>
+        <a href="#model"><span>06</span>The learning model</a>
+        <a href="#study"><span>07</span>Study design</a>
+        <a href="#analysis"><span>08</span>Analysis</a>
+        <a href="#next"><span>09</span>Next steps</a>
+      </nav>
+    </aside>
+    <main id="main">
+      <section class="hero" id="welcome">
+        <div class="eyebrow"><span class="tiny-dot"></span>COMPUTATIONAL PSYCHIATRY · MSc PROJECT GUIDE</div>
+        <h1>Prediction,<br>learning<br><em>and anxiety.</em></h1>
+        <p class="hero-intro">An introduction to predictive coding and prediction error, followed by a study of anxiety symptoms and learning from uncertain feedback.</p>
+        <a class="button primary" href="#predictive-coding">Read the background <span aria-hidden="true">↓</span></a>
+        <div class="hero-meta"><span>Shared MSc project</span><span>Reward-learning task + GAD-7</span><span>Background and demonstrations</span></div>
+        <div class="hero-art" aria-label="Illustration: option A pays more often at first, then option B becomes better">
+          <div class="art-caption">ILLUSTRATIVE REWARD PROBABILITIES</div>
+          <div class="art-choice art-a"><span class="art-symbol" aria-hidden="true">✦</span><span>Option A</span><strong>80<span>%</span></strong><small>chance of a reward</small></div>
+          <div class="art-choice art-b"><span class="art-symbol" aria-hidden="true">◈</span><span>Option B</span><strong>20<span>%</span></strong><small>chance of a reward</small></div>
+          <div class="art-switch"><span aria-hidden="true">⇄</span>Then the probabilities swap.</div>
+          <div class="art-note">The task measures learning from this feedback.</div>
+        </div>
+      </section>
+
+      <section class="chapter" id="predictive-coding">
+        <div class="section-kicker">01 / BACKGROUND</div>
+        <h2>Predictive coding<br>and prediction error</h2>
+        <p>Much of what reaches our senses is incomplete or ambiguous. A sound in a busy room, for example, could have several possible sources. To interpret it, we can draw on both the incoming information and what we already know about the situation.</p>
+        <p><strong>Predictive coding</strong> is a proposed account of how the brain could perform this kind of inference. A model of the causes of sensory input generates predictions; differences between predicted and incoming signals help revise the interpretation. In hierarchical accounts, predictions pass from higher to lower levels, while mismatches help update higher-level representations.<a class="cite" href="#ref-1" aria-label="Reference 1">[1]</a><a class="cite" href="#ref-2" aria-label="Reference 2">[2]</a></p>
+        <div class="perception-example"><div class="section-kicker">AN EVERYDAY EXAMPLE</div><h3>Hearing a word in a noisy room</h3><p>You are discussing a hot drink and expect to hear “tea”. That context helps interpret a muffled word. If the speaker repeats the word clearly and it is “key”, the new evidence challenges the original interpretation. An expectation can help make sense of uncertain input, while sufficiently reliable contradictory evidence can change it.</p></div>
+        <p>A <strong>prediction error</strong> is the mismatch between the expected signal and the signal received. It does not necessarily mean a conscious surprise or a mistake in reasoning. In a sensory model, the mismatch could concern a feature such as a sound's pitch or an edge's position.</p>
+        <div class="concept-grid"><div><h3>Prediction</h3><p>What the model expects to observe, given its current interpretation.</p></div><div><h3>Incoming information</h3><p>The signal that can support or challenge that expectation.</p></div><div><h3>Prediction error</h3><p>The difference used to revise the model's interpretation or expectations.</p></div></div>
+        <h3 class="background-subheading">Why the reliability of evidence matters</h3>
+        <p>A mismatch from a very noisy signal should not necessarily have the same influence as a mismatch from clear evidence. Predictive-coding accounts often describe this in terms of <strong>precision</strong>: the estimated reliability, or inverse uncertainty, of a signal. How much an expectation changes depends on the relative reliability assigned to the evidence and the prior expectation.<a class="cite" href="#ref-2">[2]</a></p>
+        <p>A <strong>prior expectation</strong> is an expectation available before the current observation. <strong>Inference</strong> concerns the interpretation of what is happening now; <strong>learning</strong> changes expectations or model parameters through experience. These processes can operate at different timescales.</p>
+        <div class="background-bridge"><h3>How this connects to our study</h3><p>Our task concerns expected rewards rather than the interpretation of sensory input. We will use a reinforcement-learning model in which reward prediction errors change expected values. It shares the idea of updating from a mismatch, but it is a different, narrower model. Fitting it to choices does not directly test a cortical predictive-coding mechanism.</p></div>
+      </section>
+
+      <section class="chapter intro-chapter" id="computational-psychiatry">
+        <div class="section-kicker">02 / COMPUTATIONAL PSYCHIATRY</div>
+        <h2>Explaining behaviour<br>with a model</h2>
+        <p>Imagine two people who earn the same number of points in a game. One changes their mind after almost every disappointing outcome. The other builds a sensible expectation, but does not always choose the option they think is best. Their final scores look similar. The processes behind those scores may be different.</p>
+        <p><strong>Computational psychiatry</strong> uses explicit models of thinking and behaviour to investigate questions about mental health. A model is a small set of rules that generates predictions we can compare with actual behaviour.</p>
+        <div class="three-steps">
+          <div><span class="step-index">01</span><h3>Observe choices</h3><p>Record what a person chooses and what happens next.</p></div>
+          <div><span class="step-index">02</span><h3>Model a process</h3><p>Describe a possible learning mechanism with a few adjustable settings.</p></div>
+          <div><span class="step-index">03</span><h3>Test a relationship</h3><p>Ask whether those settings relate to questionnaire scores.</p></div>
+        </div>
+        <p>“Computational” means that the explanation is precise enough to calculate and test. In this project, a simple learning rule lets us generate predictions for each decision and compare them with participants' choices.</p>
+      </section>
+
+      <section class="chapter" id="anxiety">
+        <div class="section-kicker">03 / OUR RESEARCH QUESTION</div>
+        <h2>Anxiety and learning<br>under uncertainty</h2>
+        <p>Anxiety can involve worry about uncertain future events. One question for computational psychiatry is whether differences in anxiety symptoms are associated with differences in how people learn from uncertain outcomes.</p>
+        <p>There are at least two reasons for an unexpected outcome. It may be ordinary variability in an otherwise stable situation, or it may reflect a genuine change. In the task below, a good option sometimes produces no reward, and the option that pays more can also change.</p>
+        <div class="two-thoughts"><div><span>NOISE</span><h3>Outcomes vary.</h3><p>A generally rewarding option can occasionally fail. One failure need not indicate a change in its underlying reward probability.</p></div><div><span>CHANGE</span><h3>Probabilities change.</h3><p>An option that used to pay more may become less rewarding. Older experience can then become less useful.</p></div></div>
+        <p>We will examine how strongly feedback changes a person's estimated reward values, and how consistently those values guide their next choice. The proposed symptom measure is the <strong>GAD-7</strong>, which asks about anxiety symptoms over the previous two weeks.<a class="cite" href="#ref-4">[4]</a></p>
+        <blockquote><span>RESEARCH QUESTION</span>Are anxiety symptoms associated with how people update reward expectations and use those expectations to choose?</blockquote>
+        <p>We will analyse anxiety scores continuously across an adult sample. The focus is recent self-reported symptoms, rather than a diagnosis or a direct measure of stable trait anxiety.</p>
+        <details class="evidence"><summary>What does previous research show?</summary><p>Studies have linked anxiety to differences in learning under uncertainty. McCoy and Lawson (2025), for example, manipulated outcome noise and the frequency of reversals in a reward-learning task. Anxiety-related patterns differed across conditions and experiments.<a class="cite" href="#ref-5">[5]</a> Our simpler study will test an association without assuming that higher anxiety always means a higher or lower learning rate. Their study measured anxious traits; our proposed GAD-7 outcome measures recent symptoms.</p></details>
+      </section>
+
+      <section class="chapter" id="try">
+        <div class="section-kicker">04 / THE TASK</div>
+        <h2>Probabilistic<br>reversal learning</h2>
+        <p>Choose a symbol to try to earn a point. One option pays more often than the other, but neither is guaranteed. The better option can change. Use the feedback to decide what to do next.</p>
+        <div class="task-demo">
+          <div class="demo-top"><span class="demo-badge">20-TRIAL TEACHING DEMO</span><div class="demo-stats"><span>Trial <strong id="demo-trial">1 / 20</strong></span><span>Points <strong id="demo-points">0</strong></span></div></div>
+          <div class="choice-buttons"><button class="symbol-button" id="try-a" type="button"><span class="choice-symbol" aria-hidden="true">✦</span><span>Choose A</span></button><button class="symbol-button" id="try-b" type="button"><span class="choice-symbol" aria-hidden="true">◈</span><span>Choose B</span></button></div>
+          <div class="demo-feedback" id="demo-feedback" role="status" aria-live="polite">Choose a symbol to begin.</div>
+          <div class="history-label">Your choices &amp; outcomes</div><div class="demo-history" id="demo-history" aria-label="Completed choices and rewards"></div>
+          <div class="demo-bottom"><button class="text-button" id="demo-restart" type="button">Start again <span aria-hidden="true">↻</span></button><details id="demo-reveal"><summary>Reveal the rules</summary><p id="demo-explanation">For the first 10 trials, A has an 80% reward probability and B has 20%. From trial 11, they reverse. The teaching demo uses a fixed simulated outcome schedule, so any individual result can be misleading.</p></details></div>
+        </div>
+        <p class="margin-note">This is an illustration, not the research task or a test of your ability. Nothing you do here is submitted or stored. The research version will have more trials and several reversals.</p>
+        <div class="two-thoughts"><div><span>AFTER ONE MISSED REWARD</span><h3>“Perhaps that was bad luck.”</h3><p>A generally good option will sometimes fail to pay.</p></div><div><span>AFTER A PATTERN OF MISSED REWARDS</span><h3>“Perhaps something changed.”</h3><p>The option that used to be best may no longer be best.</p></div></div>
+        <p>The task is called <strong>probabilistic reversal learning</strong>: outcomes are uncertain, and the reward probabilities reverse. We observe choices consistent with learning and adapting expectations; the expectations themselves are inferred through the model.</p>
+      </section>
+
+      <section class="chapter" id="prediction">
+        <div class="section-kicker">05 / REWARD PREDICTION ERRORS</div>
+        <h2>Calculating the difference<br>between expectation and outcome</h2>
+        <p>An expectation is a guess about what will happen. In this task, it can be represented as a number between 0 and 1: an expected reward of 0.6 means expecting a one-point reward about 60% of the time.</p>
+        <p>A <strong>prediction error</strong> is the difference between what happened and what was expected. It is the information the model uses to update.</p>
+        <div class="word-equation"><span>What happened</span><b aria-label="minus">−</b><span>What I expected</span><b aria-label="equals">=</b><span class="equation-result">Prediction error</span></div>
+        <ul class="plain-list"><li>A reward that was not strongly expected produces a <strong>positive</strong> prediction error.</li><li>A missing reward that was expected produces a <strong>negative</strong> prediction error.</li><li>An exactly expected outcome produces a prediction error of <strong>zero</strong>.</li></ul>
+        <p>“Error” is a mismatch, not a mistake made by the participant. And a negative prediction error can mean <em>no reward</em>; the task does not need to deliver a punishment.</p>
+        <div class="calculator">
+          <div class="interactive-heading"><span class="demo-badge">WORK THROUGH ONE UPDATE</span><h3>Change the expectation or outcome.</h3></div>
+          <div class="calculator-controls"><label for="expectation">Expected reward <strong id="expectation-value">0.60</strong><input id="expectation" type="range" min="0" max="1" step="0.05" value="0.6"></label><label for="outcome">Actual outcome<select id="outcome"><option value="1">Reward: 1 point</option><option value="0">No reward: 0 points</option></select></label><label for="alpha">Learning rate α <strong id="alpha-value">0.20</strong><input id="alpha" type="range" min="0.05" max="0.95" step="0.05" value="0.2"></label></div>
+          <div class="calculation-results" aria-live="polite"><div><span>Prediction error</span><strong id="pe-value">+0.40</strong></div><span class="result-arrow" aria-hidden="true">→</span><div><span>Updated expectation</span><strong id="new-value">0.68</strong></div></div>
+          <div class="calculation-equation" id="update-equation">0.60 + 0.20 × (1 − 0.60) = 0.68</div>
+        </div>
+        <p>The learning rate determines how much of the prediction error is used. A rate of 0.2 means moving 20% of the distance from the old expectation towards the latest outcome.</p>
+      </section>
+
+      <section class="chapter" id="model">
+        <div class="section-kicker">06 / THE LEARNING MODEL</div>
+        <h2>Learning rate<br>and choice consistency</h2>
+        <p>Our starting model is <strong>Rescorla–Wagner learning with a softmax choice rule</strong>. It keeps an expected reward value for each option, updates the chosen option after feedback, and uses the two values to generate a probability for the next choice.<a class="cite" href="#ref-3">[3]</a></p>
+        <div class="model-rule"><span>THE LEARNING RULE</span><p>New expectation = old expectation + α × prediction error</p><code>Q<sub>new</sub> = Q<sub>old</sub> + α × (reward − Q<sub>old</sub>)</code></div>
+        <p><strong>Q</strong> is simply the model's expected reward value. Because only the selected option's outcome is shown, the basic model leaves the unchosen option's value unchanged. We can start both values at 0.5: an equal initial expectation.</p>
+        <div class="parameter-heading"><span class="parameter-letter">α</span><div><div class="section-kicker">ALPHA / LEARNING RATE</div><h3>How much should this outcome change my mind?</h3></div></div>
+        <p>A lower α averages experience over a longer history. A higher α gives more influence to the latest outcome. Strong updating can be helpful when the world changes, but can also make the learner react to random disappointments while the world is stable.</p>
+        <div class="curve-demo"><div class="range-heading"><label for="chart-alpha">Learning rate α</label><strong id="chart-alpha-value">0.20</strong></div><input id="chart-alpha" type="range" min="0.05" max="0.95" step="0.05" value="0.2"><div class="chart-legend"><span><i class="legend-line"></i>Learned expectation</span><span><i class="legend-line dashed"></i>True reward probability</span><span><i class="legend-dot"></i>Individual outcomes</span></div><svg id="learning-chart" role="img" aria-label="Simulated expected reward for option A across 80 trials; its true probability changes from 0.8 to 0.2 halfway through. Adjusting alpha changes how quickly and noisily the model updates."></svg><p class="microcopy">Simulated illustration: A is sampled on every trial; its true reward probability changes halfway through. Every slider setting uses the same outcomes.</p></div>
+        <p class="margin-note">There is no universally “good” learning rate. The useful balance depends on how noisy and changeable the environment is.</p>
+        <div class="parameter-heading"><span class="parameter-letter beta">β</span><div><div class="section-kicker">BETA / CHOICE CONSISTENCY</div><h3>How strongly should my expectations guide my choice?</h3></div></div>
+        <p>The model may value A more highly than B without choosing A every time. The <strong>softmax rule</strong> converts the value difference into choice probabilities. Its inverse-temperature parameter, β, controls how consistently the higher-valued option is selected.</p>
+        <div class="beta-demo"><div class="range-heading"><label for="beta">Choice consistency β</label><strong id="beta-value">4.0</strong></div><input id="beta" type="range" min="0" max="10" step="0.5" value="4"><p class="microcopy">Keep expected values fixed: A = 0.70, B = 0.30.</p><div class="probability-row"><div><strong>A</strong><span>Probability of choosing A</span></div><strong id="choose-a-prob">83%</strong></div><div class="probability-track"><div id="choice-a-bar" style="width:83%"></div></div><div class="probability-row"><div><strong>B</strong><span>Probability of choosing B</span></div><strong id="choose-b-prob">17%</strong></div><div class="probability-track secondary"><div id="choice-b-bar" style="width:17%"></div></div></div>
+        <p>Low β describes less consistent value-guided choices. It can have several explanations, including exploration or lapses of attention; the parameter alone cannot tell us which explanation is correct.</p>
+        <details><summary>What does the softmax equation look like?</summary><div class="formula">P(A) = 1 / [1 + exp(−β × (Q<sub>A</sub> − Q<sub>B</sub>))]</div><p>If the values are equal, the model assigns a 50% chance to each choice. When β is zero, choices are equally likely even if the values differ. With a larger positive β, a value difference produces a stronger preference.</p></details>
+        <details><summary>Why start with this particular model?</summary><p>It fits the task's immediate choice-and-feedback structure, has few parameters, and makes trial-by-trial predictions. We will treat it as a candidate explanation and check whether it captures the behaviour. A comparison model could add a tendency to repeat choices independently of reward. A fixed learning rate does not directly measure a belief about environmental volatility.<a class="cite" href="#ref-3">[3]</a></p></details>
+      </section>
+
+      <section class="chapter" id="study">
+        <div class="section-kicker">07 / STUDY DESIGN</div>
+        <h2>Task, symptom measure,<br>and procedure</h2>
+        <p>All four MSc students can work together on the same project and pooled dataset. We plan to recruit adults from student and community populations and measure anxiety symptoms across a continuous range. The proposed battery contains <strong>one task and one seven-item questionnaire</strong>.</p>
+        <div class="study-table-wrap"><table class="study-table"><caption>The proposed study components</caption><thead><tr><th>Component</th><th>Exact choice</th><th>Role in the study</th></tr></thead><tbody><tr><td><span class="table-label">Cognitive task</span></td><td><strong>Two-option probabilistic reversal-learning task</strong><span>Reward-only feedback; 80% / 20% reward probabilities that swap.</span></td><td>Estimate learning rate α and choice consistency β; examine choices around reversals.</td></tr><tr><td><span class="table-label">Primary questionnaire</span></td><td><strong>Generalized Anxiety Disorder–7: GAD-7</strong><span>Standard seven scored items referring to the past two weeks; Spitzer et al. (2006). Each item is scored 0–3; the total ranges from 0–21.<a class="cite" href="#ref-4">[4]</a></span></td><td>Measure recent self-reported anxiety symptoms as the primary questionnaire outcome. Analyse the total continuously.</td></tr><tr><td><span class="table-label">Study administration</span></td><td><strong>Information, consent, eligibility, and brief demographics</strong><span>Age / adult eligibility, English comprehension, device suitability, and a study ID.</span></td><td>Establish consent and describe the sample. Any additional demographic fields should have a clear purpose.</td></tr></tbody></table></div>
+        <div class="protocol"><div><span>01</span><strong>Read &amp; consent</strong><small>Information and eligibility</small></div><div><span>02</span><strong>Practise</strong><small>Instructions and comprehension</small></div><div><span>03</span><strong>Make choices</strong><small>Reward-learning task</small></div><div><span>04</span><strong>Questionnaire</strong><small>GAD-7</small></div><div><span>05</span><strong>Debrief</strong><small>Explanation and support information</small></div></div>
+        <details><summary>Which task details still need to be finalised?</summary><p>A working starting point is around 200–240 experimental trials, several unsignalled reversals, a short practice phase, and desktop/laptop participation. Trial count, reversal spacing, timings, task order, and total duration will be finalised after simulation and piloting. These are proposed design choices, not a validated off-the-shelf protocol.</p><p>We need outcomes that depend on the selected symbol, occasional unrewarded choices even for the better option, and a full trial-by-trial record. We will decide any compensation or performance bonus explicitly before the ethics submission.</p></details>
+        <details><summary>What does the GAD-7 score represent?</summary><p>The GAD-7 asks about the frequency of anxiety symptoms over the past two weeks. Higher summed scores indicate more frequent symptoms. We will retain the standard wording, response options, timeframe, and scoring.<a class="cite" href="#ref-4">[4]</a></p><p>It is suitable for our question about recent symptoms, but it should not be described as a pure measure of stable trait anxiety. Some versions of the form include an additional question about functional difficulty; that question is not part of the seven-item total. We will obtain the standard form and scoring information when preparing the study materials.</p></details>
+      </section>
+
+      <section class="chapter" id="analysis">
+        <div class="section-kicker">08 / ANALYSIS</div>
+        <h2>Relating learning parameters<br>to anxiety symptoms</h2>
+        <p>Each participant provides two kinds of information: a sequence of task choices and outcomes, and questionnaire responses. The model connects the sequence of decisions to a small number of interpretable parameters.</p>
+        <ol class="analysis-steps"><li><span>Describe behaviour.</span>Check whether people learn which option is better, how often they switch after feedback, and how choices change around reversals.</li><li><span>Fit candidate models.</span>Replay each participant's actual history and find parameter values that make their choices more likely.</li><li><span>Check the model.</span>Simulate data with known parameters and check whether we can recover them. Also check whether the fitted model reproduces important patterns in actual behaviour.</li><li><span>Test the symptom relationship.</span>Use a pre-specified analysis to examine associations between learning parameters and GAD-7 total scores. Specify the primary test before examining these associations.</li></ol>
+        <div class="distinction"><div><span class="section-kicker">ASSOCIATION</span><h3>Do the measures vary together?</h3><p>Across our sample, do differences in learning parameters relate to differences in questionnaire scores? This is the primary ambition.</p></div><div><span class="section-kicker">PREDICTION</span><h3>Does the relationship generalise?</h3><p>Can a model estimate scores for participants held out while it was developed? This requires separate validation; a significant association alone does not establish it.</p></div></div>
+        <div class="model-rule"><span>AN ILLUSTRATIVE ASSOCIATION MODEL</span><p>Anxiety score = intercept + b<sub>1</sub> × learning rate + b<sub>2</sub> × choice consistency + residual</p><p>The coefficients b<sub>1</sub> and b<sub>2</sub> describe how GAD-7 scores vary with each parameter while accounting for the other. The residual is variation the model does not explain. This is a proposed analysis structure; the final model and sample-size justification will be agreed before recruitment.</p></div>
+        <div class="takeaway"><span class="takeaway-mark" aria-hidden="true">↗</span><p><strong>More trials improve estimates within a person.<br>More participants help us test differences between people.</strong><span>Trial count and sample size solve different problems. The recruitment target needs a power or simulation-based justification.</span></p></div>
+        <p>An association would indicate that a measured feature of reward learning varies with recent anxiety symptoms. It would not by itself establish the direction of causation. The task also does not directly measure threat expectations, sensory precision, brain activity, or beliefs about environmental volatility.</p>
+      </section>
+
+      <section class="chapter" id="next">
+        <div class="section-kicker">09 / NEXT STEPS</div>
+        <h2>Building the study</h2>
+        <div class="next-steps"><div class="next-item"><span class="next-number">1</span><div><h3>Agree the research question and analysis</h3><p>Specify the primary association with GAD-7 scores, the model comparisons, and the sample-size justification before collecting data.</p><span class="state current">Current stage</span></div></div><div class="next-item"><span class="next-number">2</span><div><h3>Build and check the materials</h3><p>Implement the research task in Gorilla, obtain the standard GAD-7 form and scoring information, simulate model recovery, and pilot the instructions and timing.</p><span class="state">Next</span></div></div><div class="next-item"><span class="next-number">3</span><div><h3>Prepare Worktribe ethics</h3><p>Assemble the final protocol, participant information, consent, recruitment wording, questionnaire, data-management plan, and debrief. Specify withdrawal arrangements, participant support, and compensation.</p></div></div><div class="next-item"><span class="next-number">4</span><div><h3>Recruit, analyse, and write together</h3><p>Begin recruitment once the study has the required approval. Pool recruitment, document analysis decisions, and share responsibility for the project.</p></div></div></div>
+        <div class="project-note"><strong>About this page</strong><p>This is an educational guide to a proposed MSc study. Its short task and model explorers are teaching examples. They do not collect research data, administer questionnaires, or provide personal scores. The Gorilla implementation and ethics materials are the next stage.</p></div>
+      </section>
+
+      <section class="chapter reading" id="reading">
+        <div class="section-kicker">REFERENCES</div>
+        <h2>Background and further reading</h2>
+        <p>The first two papers introduce predictive coding. The model tutorial explains behavioural modelling, and the final two papers cover the anxiety measure and a relevant reward-learning study.</p>
+        <ol class="references"><li id="ref-1"><span class="reference-tag">[1] PREDICTIVE CODING</span><a href="https://doi.org/10.1038/4580" target="_blank" rel="noopener">Rao &amp; Ballard (1999). Predictive coding in the visual cortex: a functional interpretation of some extra-classical receptive-field effects. <span aria-hidden="true">↗</span></a><p>A foundational hierarchical model of visual processing using predictions and residual errors.</p></li><li id="ref-2"><span class="reference-tag">[2] PERCEPTUAL INFERENCE</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1569488/" target="_blank" rel="noopener">Friston (2005). A theory of cortical responses. <span aria-hidden="true">↗</span></a><p>A theoretical account of perceptual inference and learning in hierarchical generative models.</p></li><li id="ref-3"><span class="reference-tag">[3] BEHAVIOURAL MODELLING</span><a href="https://elifesciences.org/articles/49547" target="_blank" rel="noopener">Wilson &amp; Collins (2019). Ten simple rules for the computational modeling of behavioral data. <span aria-hidden="true">↗</span></a><p>Choosing models, fitting them, parameter recovery, and checking what they explain.</p></li><li id="ref-4"><span class="reference-tag">[4] ANXIETY QUESTIONNAIRE</span><a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/410326" target="_blank" rel="noopener">Spitzer et al. (2006). A brief measure for assessing generalized anxiety disorder: the GAD-7. <span aria-hidden="true">↗</span></a><p>The original development and validation of the seven-item measure.</p></li><li id="ref-5"><span class="reference-tag">[5] ANXIETY AND REWARD LEARNING</span><a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1013646" target="_blank" rel="noopener">McCoy &amp; Lawson (2025). The relationship between anxious traits and learning about changes in stochasticity and volatility. <span aria-hidden="true">↗</span></a><p>An online reward-learning study that manipulated noise and reversals. It measured anxious traits rather than GAD-7 recent symptoms.</p></li></ol>
+      </section>
+      <footer class="footer"><a class="footer-brand" href="#top">CPNS LAB <span aria-hidden="true">↑</span></a><span>MSc computational psychiatry · Proposed study guide · November 2026</span></footer>
+    </main>
+  </div>
+<script>
+/* Educational demonstrations only. No responses are transmitted or stored. */
+(() => {
+  'use strict';
+
+  const byId = id => document.getElementById(id);
+  const put = (id, value) => {
+    const element = byId(id);
+    if (element) element.textContent = value;
+  };
+  const fixed = value => Number(value).toFixed(2);
+  const signed = value => `${value > 0 ? '+' : ''}${fixed(value)}`;
+  const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+
+  // Potential outcomes are fixed separately for both symbols on every trial.
+  // Only the chosen symbol's outcome is shown, just as in the proposed task.
+  const demoOutcomes = {
+    A: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    B: [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1]
+  };
+  const demo = {trial: 0, points: 0, choices: []};
+
+  function revealDemo() {
+    const disclosure = byId('demo-reveal');
+    if (disclosure && disclosure.tagName === 'DETAILS') disclosure.open = true;
+    put('demo-explanation', 'For trials 1–10, A had an 80% reward chance and B had a 20% chance. From trial 11 those chances reversed. A disappointing outcome could therefore be ordinary noise, or part of a genuine change. This short, fixed example illustrates the task; the research task will contain many more trials.');
+  }
+
+  function renderDemo() {
+    put('demo-trial', demo.trial < 20 ? `${demo.trial + 1} / 20` : '20 / 20 · complete');
+    put('demo-points', String(demo.points));
+    ['try-a', 'try-b'].forEach(id => {
+      const button = byId(id);
+      if (button) button.disabled = demo.trial >= 20;
+    });
+    const history = byId('demo-history');
+    if (history) {
+      history.replaceChildren();
+      demo.choices.forEach((choice, index) => {
+        const token = document.createElement('span');
+        token.className = `history-token ${choice.reward ? 'rewarded' : 'unrewarded'}`;
+        token.textContent = `${choice.symbol}${choice.reward ? '+' : '−'}`;
+        token.setAttribute('aria-label', `Trial ${index + 1}: chose ${choice.symbol}, ${choice.reward ? 'one point' : 'no point'}`);
+        history.appendChild(token);
+      });
+    }
+  }
+
+  function choose(symbol) {
+    if (demo.trial >= 20 || !Object.prototype.hasOwnProperty.call(demoOutcomes, symbol)) return;
+    const reward = demoOutcomes[symbol][demo.trial];
+    demo.choices.push({symbol, reward});
+    demo.points += reward;
+    demo.trial += 1;
+    put('demo-feedback', `You chose ${symbol}: ${reward ? '+1 point.' : 'no point this time.'}${demo.trial === 20 ? ' Demonstration complete. Explore what changed below.' : ''}`);
+    renderDemo();
+    if (demo.trial === 20) revealDemo();
+  }
+
+  function restartDemo() {
+    demo.trial = 0;
+    demo.points = 0;
+    demo.choices = [];
+    const disclosure = byId('demo-reveal');
+    if (disclosure && disclosure.tagName === 'DETAILS') disclosure.open = false;
+    put('demo-feedback', 'Choose either symbol to begin. Try to earn points.');
+    renderDemo();
+  }
+
+  byId('try-a')?.addEventListener('click', () => choose('A'));
+  byId('try-b')?.addEventListener('click', () => choose('B'));
+  byId('demo-restart')?.addEventListener('click', restartDemo);
+  if (byId('try-a') || byId('try-b')) restartDemo();
+
+  function updatePredictionError() {
+    const expectation = byId('expectation');
+    const outcome = byId('outcome');
+    const alpha = byId('alpha');
+    if (!expectation || !outcome || !alpha) return;
+    const oldValue = clamp(Number(expectation.value), 0, 1);
+    const reward = Number(outcome.value) === 1 ? 1 : 0;
+    const learningRate = clamp(Number(alpha.value), 0, 1);
+    const predictionError = reward - oldValue;
+    const newValue = oldValue + learningRate * predictionError;
+    put('expectation-value', fixed(oldValue));
+    put('alpha-value', fixed(learningRate));
+    put('pe-value', signed(predictionError));
+    put('new-value', fixed(newValue));
+    const description = predictionError > 0 ? 'Better than expected: the value increases.' : predictionError < 0 ? 'Worse than expected: the value decreases.' : 'Exactly as expected: the value stays the same.';
+    put('update-equation', `${fixed(oldValue)} + ${fixed(learningRate)} × (${reward} − ${fixed(oldValue)}) = ${fixed(newValue)}. ${description}`);
+  }
+  ['expectation', 'outcome', 'alpha'].forEach(id => {
+    byId(id)?.addEventListener('input', updatePredictionError);
+    byId(id)?.addEventListener('change', updatePredictionError);
+  });
+  updatePredictionError();
+
+  function updateChoiceConsistency() {
+    const beta = byId('beta');
+    if (!beta) return;
+    const inverseTemperature = clamp(Number(beta.value), 0, 10);
+    const probabilityA = 1 / (1 + Math.exp(-inverseTemperature * (0.7 - 0.3)));
+    const percentA = Math.round(probabilityA * 100);
+    put('beta-value', inverseTemperature.toFixed(1));
+    put('choose-a-prob', `${percentA}%`);
+    put('choose-b-prob', `${100 - percentA}%`);
+    [['choice-a-bar', probabilityA], ['choice-b-bar', 1 - probabilityA]].forEach(([id, probability]) => {
+      const bar = byId(id);
+      if (!bar) return;
+      bar.style.width = `${probability * 100}%`;
+      if (bar.getAttribute('role') === 'progressbar') bar.setAttribute('aria-valuenow', String(Math.round(probability * 100)));
+    });
+  }
+  byId('beta')?.addEventListener('input', updateChoiceConsistency);
+  updateChoiceConsistency();
+
+  // A seeded shuffle keeps the illustrative outcome sequence unchanged as α moves.
+  function shuffledOutcomes(rewardCount, seed) {
+    const values = Array.from({length: 40}, (_, index) => index < rewardCount ? 1 : 0);
+    for (let index = values.length - 1; index > 0; index -= 1) {
+      seed = (1664525 * seed + 1013904223) >>> 0;
+      const selected = Math.floor((seed / 4294967296) * (index + 1));
+      [values[index], values[selected]] = [values[selected], values[index]];
+    }
+    return values;
+  }
+  const curveOutcomes = [...shuffledOutcomes(32, 1907), ...shuffledOutcomes(8, 6073)];
+  const namespace = 'http://www.w3.org/2000/svg';
+  function svgElement(tag, attributes = {}, textContent) {
+    const element = document.createElementNS(namespace, tag);
+    Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+    if (textContent !== undefined) element.textContent = textContent;
+    return element;
+  }
+
+  function drawLearningCurve() {
+    const chart = byId('learning-chart');
+    const slider = byId('chart-alpha');
+    if (!chart || !slider) return;
+    const alpha = clamp(Number(slider.value), 0, 1);
+    put('chart-alpha-value', fixed(alpha));
+    const measuredWidth = chart.parentElement?.getBoundingClientRect().width || chart.getBoundingClientRect().width || 600;
+    const width = Math.max(280, Math.floor(measuredWidth));
+    const height = width < 420 ? 280 : 300;
+    const frame = {left: 53, right: width - 17, top: 25, bottom: height - 47};
+    const x = trial => frame.left + 4 + trial / 80 * (frame.right - frame.left - 8);
+    const y = value => frame.bottom - 4 - value * (frame.bottom - frame.top - 8);
+    chart.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    chart.setAttribute('width', '100%');
+    chart.setAttribute('height', String(height));
+    chart.setAttribute('role', 'img');
+    chart.setAttribute('aria-label', `Simulated reward learning with learning rate ${fixed(alpha)}. Option A is sampled every trial. Its reward chance changes from 80% to 20% after trial 40. The learned estimate starts at 0.5.`);
+    chart.replaceChildren();
+    const content = svgElement('g', {'font-family': 'inherit', 'font-size': 12, fill: 'var(--ink)'});
+    chart.appendChild(content);
+    content.appendChild(svgElement('rect', {x: frame.left, y: frame.top, width: frame.right - frame.left, height: frame.bottom - frame.top, fill: 'none', stroke: 'var(--line)', 'stroke-width': 1}));
+    [0, 0.5, 1].forEach(value => {
+      content.appendChild(svgElement('line', {x1: frame.left, x2: frame.right, y1: y(value), y2: y(value), stroke: 'var(--line)', 'stroke-width': 1}));
+      content.appendChild(svgElement('text', {x: frame.left - 8, y: y(value) + 4, 'text-anchor': 'end'}, value.toFixed(1)));
+    });
+    const ticks = width < 420 ? [0, 20, 40, 60, 80] : [0, 10, 20, 30, 40, 50, 60, 70, 80];
+    ticks.forEach(trial => {
+      content.appendChild(svgElement('text', {x: x(trial), y: frame.bottom + 20, 'text-anchor': 'middle'}, String(trial)));
+    });
+    content.appendChild(svgElement('text', {x: (frame.left + frame.right) / 2, y: height - 4, 'text-anchor': 'middle'}, 'Trial'));
+    content.appendChild(svgElement('text', {transform: `translate(14 ${(frame.top + frame.bottom) / 2}) rotate(-90)`, 'text-anchor': 'middle'}, 'Expected reward'));
+    const changeX = x(40.5);
+    content.appendChild(svgElement('line', {x1: changeX, x2: changeX, y1: frame.top, y2: frame.bottom, stroke: 'var(--muted)', 'stroke-width': 1, 'stroke-dasharray': '2 4', opacity: 0.65}));
+    content.appendChild(svgElement('text', {x: changeX, y: 15, 'text-anchor': 'middle'}, 'Reward chance changes'));
+    content.appendChild(svgElement('path', {d: `M ${x(0)} ${y(0.8)} H ${changeX} V ${y(0.2)} H ${x(80)}`, fill: 'none', stroke: 'var(--muted)', 'stroke-width': 1.6, 'stroke-dasharray': '6 4'}));
+    let q = 0.5;
+    let path = `M ${x(0)} ${y(q)}`;
+    curveOutcomes.forEach((reward, index) => {
+      q += alpha * (reward - q);
+      path += ` L ${x(index + 1)} ${y(q)}`;
+      content.appendChild(svgElement('circle', {cx: x(index + 1), cy: y(reward), r: 2, fill: 'var(--muted)', opacity: 0.35}));
+    });
+    content.appendChild(svgElement('path', {d: path, fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2.6, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}));
+    chart.dataset.alpha = fixed(alpha);
+    chart.dataset.lastEstimate = q.toFixed(6);
+  }
+  byId('chart-alpha')?.addEventListener('input', drawLearningCurve);
+  const learningChart = byId('learning-chart');
+  if (learningChart) {
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(drawLearningCurve).observe(learningChart.parentElement || learningChart);
+    } else {
+      window.addEventListener('resize', drawLearningCurve);
+    }
+    drawLearningCurve();
+  }
+})();
+
+</script>
+</body>
+</html>
